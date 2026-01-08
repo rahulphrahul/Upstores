@@ -1,0 +1,11 @@
+.petty-cash-page {
+  margin: auto;
+}
+
+.card {
+  border-radius: 10px;
+}
+
+.table th, .table td {
+  vertical-align: middle;
+}

@@ -1,0 +1,25 @@
+.manage-students-page {
+  padding: 1rem;
+}
+
+.student-table tr.table-row-clickable {
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.student-table tr.table-row-clickable:hover {
+  background-color: #f1f3f5;
+}
+
+.student-profile {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.student-profile strong {
+  color: #333;
+}
+
+.profile-header h5 {
+  font-weight: 600;
+}

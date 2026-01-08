@@ -1,0 +1,133 @@
+.master-dashboard {
+  width: 100%;
+}
+
+/* PAGE TITLE */
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #001ae3;
+}
+
+/* STATS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0, 26, 227, 0.12);
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #001ae3;
+  margin-top: 0.5rem;
+}
+
+/* SECTIONS */
+.section {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 14px;
+  margin-bottom: 2rem;
+  box-shadow: 0 6px 16px rgba(0, 26, 227, 0.1);
+}
+
+.section h4 {
+  margin-bottom: 1rem;
+  color: #1c1c1c;
+}
+
+/* CHART PLACEHOLDER */
+.chart-placeholder {
+  height: 220px;
+  background: #f4f6ff;
+  border: 1px dashed #001ae3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #001ae3;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+/* TABLE */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  font-size: 14px;
+}
+
+.data-table th {
+  background: #f4f6ff;
+  color: #001ae3;
+}
+
+/* BUTTONS */
+.btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  margin-right: 6px;
+}
+
+.btn.approve {
+  background: #001ae3;
+  color: #ffffff;
+}
+
+.btn.reject {
+  background: #e74c3c;
+  color: #ffffff;
+}
+
+.empty-text {
+  text-align: center;
+  color: #777;
+  padding: 1rem 0;
+}
+.chart-box {
+  width: 100%;
+  height: 260px;
+}
+
+.approve-btn {
+  background: #001ae3;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+.reject-btn {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}

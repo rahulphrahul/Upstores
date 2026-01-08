@@ -1,0 +1,87 @@
+.customer-page {
+  width: 100%;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #001ae3;
+  margin-bottom: 16px;
+}
+
+/* TOGGLE */
+.view-toggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.view-toggle button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #001ae3;
+  background: transparent;
+  color: #001ae3;
+  cursor: pointer;
+}
+
+.view-toggle .active {
+  background: #001ae3;
+  color: #fff;
+}
+
+/* LIST */
+.shop-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.shop-card {
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 26, 227, 0.12);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.shop-card h4 {
+  margin-bottom: 4px;
+  color: #001ae3;
+}
+
+.shop-card span {
+  font-size: 13px;
+  color: #777;
+}
+
+/* MAP */
+.map-box {
+  height: 420px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* BUTTON */
+.btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #001ae3;
+  color: #fff;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .shop-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}

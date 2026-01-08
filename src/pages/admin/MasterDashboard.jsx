@@ -1,0 +1,314 @@
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useLayoutEffect,
+} from "react";
+
+import * as am5 from "@amcharts/amcharts5";
+import * as am5xy from "@amcharts/amcharts5/xy";
+import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+
+import {
+  getDashboardStats,
+  getDailyTransactions,
+  getMonthlyTransactions,
+  getPendingFunds,
+  fundAction,
+} from "../../service/apiService";
+
+import MasterDashboardSkeleton from "./skeletons/MasterDashboardSkeleton";
+import "./MasterDashboard.css";
+
+function MasterDashboard() {
+  /* =========================
+     STATE
+  ========================= */
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({});
+  const [dailyData, setDailyData] = useState([]);
+  const [monthlyData, setMonthlyData] = useState([]);
+  const [pending, setPending] = useState([]);
+
+  /* =========================
+     CHART DOM REFS
+  ========================= */
+  const dailyChartDiv = useRef(null);
+  const monthlyChartDiv = useRef(null);
+
+  const dailyRootRef = useRef(null);
+  const monthlyRootRef = useRef(null);
+
+  /* =========================
+     LOAD DATA
+  ========================= */
+  const loadAll = async () => {
+    try {
+      setLoading(true);
+
+      const [
+        statsRes,
+        dailyRes,
+        monthlyRes,
+        pendingRes,
+      ] = await Promise.all([
+        getDashboardStats(),
+        getDailyTransactions(),
+        getMonthlyTransactions(),
+        getPendingFunds(),
+      ]);
+
+      setStats(statsRes);
+      setDailyData(dailyRes);
+      setMonthlyData(monthlyRes);
+      setPending(pendingRes);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadAll();
+  }, []);
+
+  /* =========================
+     CREATE CHARTS (amCharts 5 SAFE)
+  ========================= */
+  useLayoutEffect(() => {
+    if (
+      loading ||
+      dailyData.length === 0 ||
+      monthlyData.length === 0 ||
+      !dailyChartDiv.current ||
+      !monthlyChartDiv.current
+    ) {
+      return;
+    }
+
+    /* ---------- CLEANUP OLD ROOTS ---------- */
+    if (dailyRootRef.current) {
+      dailyRootRef.current.dispose();
+      dailyRootRef.current = null;
+    }
+    if (monthlyRootRef.current) {
+      monthlyRootRef.current.dispose();
+      monthlyRootRef.current = null;
+    }
+
+    /* =========================
+       PARSE DATA (CRITICAL FIX)
+    ========================= */
+    const parsedDailyData = dailyData.map(d => ({
+      day: d.day,
+      total: Number(d.total),
+    }));
+
+    const parsedMonthlyData = monthlyData.map(m => ({
+      month: m.month,
+      total: Number(m.total),
+    }));
+
+    /* =========================
+       DAILY LINE CHART
+    ========================= */
+    const dailyRoot = am5.Root.new(dailyChartDiv.current);
+    dailyRootRef.current = dailyRoot;
+    dailyRoot.setThemes([am5themes_Animated.new(dailyRoot)]);
+
+    const dailyChart = dailyRoot.container.children.push(
+      am5xy.XYChart.new(dailyRoot, {
+        panX: false,
+        panY: false,
+      })
+    );
+
+    const dailyXAxis = dailyChart.xAxes.push(
+      am5xy.CategoryAxis.new(dailyRoot, {
+        categoryField: "day",
+        renderer: am5xy.AxisRendererX.new(dailyRoot, {}),
+      })
+    );
+
+    const dailyYAxis = dailyChart.yAxes.push(
+      am5xy.ValueAxis.new(dailyRoot, {
+        min: 0,
+        extraMax: 0.1,
+        renderer: am5xy.AxisRendererY.new(dailyRoot, {}),
+      })
+    );
+
+    const dailySeries = dailyChart.series.push(
+      am5xy.LineSeries.new(dailyRoot, {
+        xAxis: dailyXAxis,
+        yAxis: dailyYAxis,
+        valueYField: "total",
+        categoryXField: "day",
+      })
+    );
+
+    dailySeries.strokes.template.setAll({
+      strokeWidth: 3,
+      stroke: am5.color(0x001ae3),
+    });
+
+    dailyXAxis.data.setAll(parsedDailyData);
+    dailySeries.data.setAll(parsedDailyData);
+
+    dailySeries.appear(1000);
+    dailyChart.appear(1000, 100);
+
+    /* =========================
+       MONTHLY BAR CHART
+    ========================= */
+    const monthlyRoot = am5.Root.new(monthlyChartDiv.current);
+    monthlyRootRef.current = monthlyRoot;
+    monthlyRoot.setThemes([am5themes_Animated.new(monthlyRoot)]);
+
+    const monthlyChart = monthlyRoot.container.children.push(
+      am5xy.XYChart.new(monthlyRoot, {
+        panX: false,
+        panY: false,
+      })
+    );
+
+    const monthlyXAxis = monthlyChart.xAxes.push(
+      am5xy.CategoryAxis.new(monthlyRoot, {
+        categoryField: "month",
+        renderer: am5xy.AxisRendererX.new(monthlyRoot, {}),
+      })
+    );
+
+    const monthlyYAxis = monthlyChart.yAxes.push(
+      am5xy.ValueAxis.new(monthlyRoot, {
+        min: 0,
+        extraMax: 0.1,
+        renderer: am5xy.AxisRendererY.new(monthlyRoot, {}),
+      })
+    );
+
+    const monthlySeries = monthlyChart.series.push(
+      am5xy.ColumnSeries.new(monthlyRoot, {
+        xAxis: monthlyXAxis,
+        yAxis: monthlyYAxis,
+        valueYField: "total",
+        categoryXField: "month",
+      })
+    );
+
+    monthlySeries.columns.template.setAll({
+      width: am5.percent(60),
+      fill: am5.color(0x001ae3),
+      strokeOpacity: 0,
+    });
+
+    monthlyXAxis.data.setAll(parsedMonthlyData);
+    monthlySeries.data.setAll(parsedMonthlyData);
+
+    monthlySeries.appear(1000);
+    monthlyChart.appear(1000, 100);
+
+    /* ---------- CLEANUP ---------- */
+    return () => {
+      dailyRoot.dispose();
+      monthlyRoot.dispose();
+    };
+  }, [loading, dailyData, monthlyData]);
+
+  /* =========================
+     FUND ACTION
+  ========================= */
+  const handleAction = async (id, action) => {
+    await fundAction(id, action);
+    loadAll();
+  };
+
+  /* =========================
+     SKELETON
+  ========================= */
+  if (loading) {
+    return <MasterDashboardSkeleton />;
+  }
+
+  /* =========================
+     MAIN UI
+  ========================= */
+  return (
+    <div className="master-dashboard">
+      <h2 className="page-title">Master Dashboard</h2>
+
+      {/* COUNTS */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <p>Total Customers</p>
+          <h3>{stats.customers}</h3>
+        </div>
+        <div className="stat-card">
+          <p>Total Shops</p>
+          <h3>{stats.shops}</h3>
+        </div>
+        <div className="stat-card">
+          <p>Total Points</p>
+          <h3>{stats.points}</h3>
+        </div>
+      </div>
+
+      {/* CHARTS */}
+      <div className="grid-2">
+        <div className="card">
+          <h4>Daily Transactions</h4>
+          <div ref={dailyChartDiv} className="chart-box" />
+        </div>
+
+        <div className="card">
+          <h4>Monthly Transactions</h4>
+          <div ref={monthlyChartDiv} className="chart-box" />
+        </div>
+      </div>
+
+      {/* PENDING APPROVALS */}
+      <div className="card">
+        <h4>Pending Fund Approvals</h4>
+
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Shop</th>
+              <th>Amount</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pending.map((p) => (
+              <tr key={p.id}>
+                <td>{p.shop}</td>
+                <td>₹ {p.amount}</td>
+                <td>
+                  <button
+                    className="approve-btn"
+                    onClick={() => handleAction(p.id, "approve")}
+                  >
+                    Approve
+                  </button>
+                  <button
+                    className="reject-btn"
+                    onClick={() => handleAction(p.id, "reject")}
+                  >
+                    Reject
+                  </button>
+                </td>
+              </tr>
+            ))}
+
+            {pending.length === 0 && (
+              <tr>
+                <td colSpan="3">No pending approvals</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+export default MasterDashboard;

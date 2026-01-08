@@ -1,0 +1,59 @@
+.billing-page {
+  margin: auto;
+}
+
+.bill-container {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.bill-container table {
+  font-size: 15px;
+}
+
+.bill-container th {
+  background-color: #f8f9fa;
+  width: 220px;
+}
+
+@media print {
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  body * {
+    visibility: hidden;
+  }
+  #bill, #bill * {
+    visibility: visible;
+  }
+  #bill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+/* Hide anything with class no-print during printing */
+@media print {
+  .no-print {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Optional: remove shadows and padding from print area for clean PDF */
+  body * {
+    box-shadow: none !important;
+  }
+
+  .bill-container {
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    width: 100% !important;
+  }
+}
