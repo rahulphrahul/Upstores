@@ -76,6 +76,23 @@
   background: #001ae3;
   color: #fff;
 }
+/* extra css */
+.customer-page { padding: 20px; }
+.page-title { font-size: 24px; margin-bottom: 20px; }
+.view-toggle { margin-bottom: 20px; }
+.view-toggle button { margin-right: 8px; padding: 8px 12px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; }
+.view-toggle button.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+
+.shop-list { display: grid; gap: 16px; }
+.shop-card { background: #fff; border-radius: 10px; padding: 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+.shop-card h4 { margin: 0 0 4px 0; }
+.shop-card p { margin: 0; color: #6b7280; }
+.shop-card span { color: #374151; font-size: 14px; }
+.shop-card .btn { padding: 6px 12px; }
+
+.map-box { height: 500px; width: 100%; border-radius: 10px; margin-top: 16px; }
+.loading { font-size: 16px; color: #6b7280; margin-top: 20px; }
+.empty { text-align: center; color: #9ca3af; margin-top: 20px; }
 
 /* RESPONSIVE */
 @media (max-width: 768px) {

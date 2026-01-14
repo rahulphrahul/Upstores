@@ -131,6 +131,147 @@ export const toggleExecutiveShopStatus = async (data) =>
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   }).then(res => res.json());
+
+  /* ================= Executive SELLERS ================= */
+
+/* ============================
+   GET EXECUTIVE SELLERS
+============================ */
+export const getExecutiveSellers = async (executive_id) => {
+  return fetch(
+    `${BASE_URL}/sellers/get_executive_seller.php?executive_id=${executive_id}`
+  ).then((res) => res.json());
+};
+/* ============================
+   GET Categories
+============================ */
+export const getCategories = async () =>
+  fetch(`${BASE_URL}/categories/getCategories.php`).then(res => res.json());
+
+/* ============================
+   ADD EXECUTIVE SELLER
+============================ */
+export const addExecutiveSeller = async (data) => {
+  return fetch(`${BASE_URL}/sellers/add_executive_seller.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  }).then((res) => res.json());
+};
+
+
+/* ============================
+   UPDATE EXECUTIVE SELLER
+============================ */
+export const updateExecutiveSeller = async (data) => {
+  return fetch(`${BASE_URL}/sellers/update_executive_seller.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  }).then((res) => res.json());
+};
+
+
+/* ============================
+   UPDATE SELLER STATUS
+============================ */
+export const updateExecutiveSellerStatus = async (
+  seller_id,
+  executive_id,
+  status
+) => {
+  return fetch(`${BASE_URL}/sellers/update_executive_seller_status.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      seller_id,
+      executive_id,
+      status, // active | suspended
+    }),
+  }).then((res) => res.json());
+};
+
+
+
+/* ================= Executive SERVICES ================= */
+export const getExecutiveServices = async (executiveId) => {
+  const res = await fetch(
+    `${BASE_URL}/services/get_executive_services.php?executive_id=${executiveId}`
+  );
+  return res.json();
+};
+
+export const addExecutiveService = async (data) => {
+  const res = await fetch(
+    `${BASE_URL}/services/add_executive_services.php`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    }
+  );
+  return res.json();
+};
+
+export const updateExecutiveService = async (data) => {
+  const res = await fetch(
+    `${BASE_URL}/services/update_executive_services.php`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    }
+  );
+  return res.json();
+};
+
+export const updateExecutiveServiceStatus = async (
+  serviceId,
+  executiveId,
+  status
+) => {
+  const res = await fetch(
+    `${BASE_URL}/services/update_executive_service_status.php`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        service_id: serviceId,
+        executive_id: executiveId,
+        status,
+      }),
+    }
+  );
+  return res.json();
+};
+/* ================= Sellers ================= */  
+export const getSellers = async () => 
+  fetch(`${BASE_URL}/sellers/get_sellers.php`).then(res => res.json());
+
+
+export const updateSellerStatus = async (sellerId, status) => {
+  const res = await fetch(`${BASE_URL}/sellers/update_seller_status.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sellerId, status }),
+  });
+  return res.json();
+};
+/* ================= SERVICES ================= */
+
+export const getServices = async () => {
+  const res = await fetch(`${BASE_URL}/services/get_services.php`);
+  return res.json();
+};
+
+export const updateServiceStatus = async (id, status) => {
+  const res = await fetch(`${BASE_URL}/services/update_service_status.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, status }),
+  });
+  return res.json();
+};
 /* ================= EXECUTIVE DASHBOARD ================= */
 
 export const getExecutiveDashboardStats = async (data) =>
@@ -153,4 +294,15 @@ export const getExecutiveRecentActivities = async (data) =>
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   }).then((res) => res.json());
+/* ================= Near by shop ================= */
+export const getExecutiveNearbyShops = async (executiveId, latitude, longitude) => {
+  const res = await fetch(`${BASE_URL}/shops/get_executive_nearby_shops.php?executive_id=${executiveId}&latitude=${latitude}&longitude=${longitude}`);
+  return res.json();
+};
+
+/* ================= purchase history ================= */
+export const getPurchaseHistory = async (executiveId) => {
+  const res = await fetch(`${BASE_URL}/purchases/get_executive_purchases.php?executive_id=${executiveId}`);
+  return res.json();
+};
 

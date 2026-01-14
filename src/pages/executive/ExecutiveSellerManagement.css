@@ -127,6 +127,33 @@
 .btn-primary:hover {
   background: #0013b8;
 }
+.form-control {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #fff;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+}
+
+/* Remove default select arrow differences */
+.form-control select {
+  appearance: none;
+}
+
+/* Fix select height */
+select.form-control {
+  height: 40px;
+  cursor: pointer;
+}
+
 
 /* =========================
    RESPONSIVE

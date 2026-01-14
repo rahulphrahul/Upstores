@@ -22,6 +22,8 @@ import NearbyShops from './pages/customers/NearbyShops';
 import PurchaseHistory from './pages/customers/PurchaseHistory';
 import WalletRedemption from './pages/customers/WalletRedemption';
 import AddPurchase from './pages/customers/AddPurchase';
+import SellerManagement from './pages/admin/SellerManagement';
+import ServiceManagement from './pages/admin/ServiceManagement';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -102,6 +104,22 @@ function App() {
             element={
               <RoleProtectedRoute user={user} allowedRoles={['admin']}>
                 <ShopManagement />
+              </RoleProtectedRoute>
+            }
+          />
+            <Route
+            path="super-admin/sellers"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['admin']}>
+                <SellerManagement />
+              </RoleProtectedRoute>
+            }
+          />
+                      <Route
+            path="super-admin/services"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['admin']}>
+                <ServiceManagement />
               </RoleProtectedRoute>
             }
           />

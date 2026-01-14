@@ -128,7 +128,10 @@
   background: #fdecea;
   color: #e74c3c;
 }
-
+select.form-control {
+  height: 40px;
+  cursor: pointer;
+}
 /* =========================
    RESPONSIVE
 ========================= */
