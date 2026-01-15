@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { getExecutiveNearbyShops } from "../../service/apiService";
+import ViewShop from "./ViewShop";
 import "./NearbyShops.css";
 
 function NearbyShops({ user }) {
@@ -8,6 +9,7 @@ function NearbyShops({ user }) {
   const [shops, setShops] = useState([]);
   const [loading, setLoading] = useState(false);
   const [coords, setCoords] = useState({ lat: 0, lng: 0 });
+  const [selectedShopId, setSelectedShopId] = useState(null); // For modal
 
   // ================= GET CURRENT LOCATION =================
   const fetchLocationAndShops = () => {
@@ -47,7 +49,6 @@ function NearbyShops({ user }) {
     fetchLocationAndShops();
   }, []);
 
-  // ================= UI =================
   return (
     <div className="customer-page">
       <h2 className="page-title">Nearby Shops</h2>
@@ -73,10 +74,14 @@ function NearbyShops({ user }) {
                 <span>{parseFloat(shop.distance).toFixed(2)} km away</span>
                 <p>Wallet: ₹{shop.wallet_balance}</p>
               </div>
-              <button className="btn btn-primary">View Shop</button>
+              <button
+              className="btn-view"
+                onClick={() => setSelectedShopId(shop.id)}
+              >
+                View Shop
+              </button>
             </div>
           ))}
-
           {shops.length === 0 && <p className="empty">No nearby shops found</p>}
         </div>
       )}
@@ -95,10 +100,25 @@ function NearbyShops({ user }) {
                 {shop.owner_name}
                 <br />
                 {parseFloat(shop.distance).toFixed(2)} km away
+                <br />
+                <button
+                  className="btn btn-sm btn-primary mt-1"
+                  onClick={() => setSelectedShopId(shop.id)}
+                >
+                  View Shop
+                </button>
               </Popup>
             </Marker>
           ))}
         </MapContainer>
+      )}
+
+      {/* ================= VIEW SHOP MODAL ================= */}
+      {selectedShopId && (
+        <ViewShop
+          shopId={selectedShopId}
+          onClose={() => setSelectedShopId(null)}
+        />
       )}
     </div>
   );

@@ -306,3 +306,25 @@ export const getPurchaseHistory = async (executiveId) => {
   return res.json();
 };
 
+// ================== GET SHOP DETAILS ==================
+export const getShopDetails = async (shopId) => {
+  const res = await fetch(`${BASE_URL}/shops/shop_details.php?shop_id=${shopId}`);
+  return res.json();
+};
+
+// ================== OPTIONAL: GET SHOP SERVICES ==================
+export const getShopServices = async (shopId) => {
+  const res = await fetch(`${BASE_URL}/services/get_services.php?shop_id=${shopId}`);
+  return res.json();
+};
+
+// ================== OPTIONAL: UPDATE SHOP STATUS ==================
+export const updateShopStatus = async (shopId, status) => {
+  const res = await fetch(`${BASE_URL}/shops/update_shop_status.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ shop_id: shopId, status }),
+  });
+  return res.json();
+};
+
