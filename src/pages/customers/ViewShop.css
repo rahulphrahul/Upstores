@@ -1,0 +1,96 @@
+.viewshop-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.viewshop-modal {
+  background: #fff;
+  width: 90%;
+  max-width: 700px;
+  border-radius: 10px;
+  overflow-y: auto;
+  max-height: 90vh;
+  padding: 20px;
+  box-shadow: 0px 0px 15px rgba(0,0,0,0.3);
+}
+
+.viewshop-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.viewshop-header h3 {
+  margin: 0;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.viewshop-body {
+  margin-top: 15px;
+}
+
+.shop-info p {
+  margin: 5px 0;
+}
+
+.status.active {
+  color: green;
+  font-weight: bold;
+}
+
+.status.suspended {
+  color: red;
+  font-weight: bold;
+}
+
+.transactions-section {
+  margin-top: 20px;
+}
+
+.transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transactions-table th,
+.transactions-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.transactions-table th {
+  background-color: #f5f5f5;
+}
+
+.transactions-table td.credit {
+  color: green;
+}
+
+.transactions-table td.debit {
+  color: red;
+}
+
+.transactions-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.transactions-table tr:hover {
+  background-color: #f1f1f1;
+}

@@ -15,6 +15,12 @@ const RoleProtectedRoute = ({ user, allowedRoles, children }) => {
         return <Navigate to="/dashboard/executive/home" replace />;
       case 'customer':
         return <Navigate to="/dashboard/customer/home" replace />;
+      case 'shop':
+        return <Navigate to="/dashboard/shop/home" replace />;
+      case 'seller':
+        return <Navigate to="/dashboard/seller/home" replace />;
+      case 'service':
+        return <Navigate to="/dashboard/service/home" replace />;
       default:
         return <Navigate to="/" replace />;
     }

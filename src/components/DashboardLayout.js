@@ -41,14 +41,19 @@ function DashboardLayout({ user, setUser }) {
       { name: "Sellers", path: "/dashboard/executive/sellers" },
       { name: "Services", path: "/dashboard/executive/services" },
       { name: "NearBy Shops", path: "/dashboard/executive/nearby" },
-      { name: "Purchase History", path: "/dashboard/executive/history" },
-      { name: "Wallet & Redemption", path: "/dashboard/executive/redeem" },
-      { name: "Add Purchase", path: "/dashboard/executive/addpurchase" },
-      
+      // { name: "Purchase History", path: "/dashboard/executive/history" },
+      // { name: "Wallet & Redemption", path: "/dashboard/executive/redeem" },
+      // { name: "Add Purchase", path: "/dashboard/executive/addpurchase" },
+
     ],
-    student: [
-      { name: "My Home", path: "/dashboard/student-home" },
-      { name: "Assignments", path: "/dashboard/assignments" },
+    shop: [
+      { name: "My Home", path: "/dashboard/shop/home" },
+    ],
+    seller: [
+      { name: "My Home", path: "/dashboard/seller/home" },
+    ],
+    service: [
+      { name: "My Home", path: "/dashboard/service/home" },
     ],
   };
 

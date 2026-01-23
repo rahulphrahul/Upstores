@@ -1,100 +1,124 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { getExecutiveNearbyShops } from "../../service/apiService";
+import ViewShop from "./ViewShop";
 import "./NearbyShops.css";
 
-/* Mock shops */
-const mockShops = [
-  {
-    id: 1,
-    name: "Green Mart",
-    category: "Grocery",
-    distance: "0.8 km",
-    lat: 12.971598,
-    lng: 77.594566,
-  },
-  {
-    id: 2,
-    name: "Fresh Point",
-    category: "Supermarket",
-    distance: "1.4 km",
-    lat: 12.975,
-    lng: 77.6,
-  },
-  {
-    id: 3,
-    name: "Daily Needs",
-    category: "Convenience",
-    distance: "2.1 km",
-    lat: 12.98,
-    lng: 77.605,
-  },
-];
-
-function NearbyShops() {
+function NearbyShops({ user }) {
   const [view, setView] = useState("list");
+  const [shops, setShops] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [coords, setCoords] = useState({ lat: 0, lng: 0 });
+  const [selectedShopId, setSelectedShopId] = useState(null); // For modal
+
+  // ================= GET CURRENT LOCATION =================
+  const fetchLocationAndShops = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation not supported");
+      return;
+    }
+
+    setLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = parseFloat(pos.coords.latitude.toFixed(8));
+        const lng = parseFloat(pos.coords.longitude.toFixed(8));
+        setCoords({ lat, lng });
+
+        // Fetch nearby shops from API
+        getExecutiveNearbyShops(user.id, lat, lng)
+          .then((res) => {
+            if (res.status === "success") {
+              setShops(res.data);
+            } else {
+              alert(res.message || "Error fetching shops");
+            }
+            setLoading(false);
+          })
+          .catch(() => setLoading(false));
+      },
+      (err) => {
+        setLoading(false);
+        alert("Unable to get location: " + err.message);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  useEffect(() => {
+    fetchLocationAndShops();
+  }, []);
 
   return (
     <div className="customer-page">
       <h2 className="page-title">Nearby Shops</h2>
 
-      {/* VIEW TOGGLE */}
       <div className="view-toggle">
-        <button
-          className={view === "list" ? "active" : ""}
-          onClick={() => setView("list")}
-        >
+        <button className={view === "list" ? "active" : ""} onClick={() => setView("list")}>
           List View
         </button>
-        <button
-          className={view === "map" ? "active" : ""}
-          onClick={() => setView("map")}
-        >
+        <button className={view === "map" ? "active" : ""} onClick={() => setView("map")}>
           Map View
         </button>
       </div>
 
-      {/* LIST VIEW */}
-      {view === "list" && (
+      {loading && <div className="loading">Fetching nearby shops...</div>}
+
+      {view === "list" && !loading && (
         <div className="shop-list">
-          {mockShops.map((shop) => (
+          {shops.map((shop) => (
             <div key={shop.id} className="shop-card">
               <div>
                 <h4>{shop.name}</h4>
-                <p>{shop.category}</p>
-                <span>{shop.distance} away</span>
+                <p>{shop.owner_name}</p>
+                <span>{parseFloat(shop.distance).toFixed(2)} km away</span>
+                <p>Wallet: ₹{shop.wallet_balance}</p>
               </div>
-              <button className="btn btn-primary">
+              <button
+              className="btn-view"
+                onClick={() => setSelectedShopId(shop.id)}
+              >
                 View Shop
               </button>
             </div>
           ))}
+          {shops.length === 0 && <p className="empty">No nearby shops found</p>}
         </div>
       )}
 
-      {/* MAP VIEW */}
-      {view === "map" && (
-        <MapContainer
-          center={[12.971598, 77.594566]}
-          zoom={13}
-          className="map-box"
-        >
+      {view === "map" && !loading && coords.lat && coords.lng && (
+        <MapContainer center={[coords.lat, coords.lng]} zoom={13} className="map-box">
           <TileLayer
             attribution="&copy; OpenStreetMap"
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {mockShops.map((shop) => (
-            <Marker
-              key={shop.id}
-              position={[shop.lat, shop.lng]}
-            >
+          {shops.map((shop) => (
+            <Marker key={shop.id} position={[shop.latitude, shop.longitude]}>
               <Popup>
                 <strong>{shop.name}</strong>
                 <br />
-                {shop.category}
+                {shop.owner_name}
+                <br />
+                {parseFloat(shop.distance).toFixed(2)} km away
+                <br />
+                <button
+                  className="btn btn-sm btn-primary mt-1"
+                  onClick={() => setSelectedShopId(shop.id)}
+                >
+                  View Shop
+                </button>
               </Popup>
             </Marker>
           ))}
         </MapContainer>
+      )}
+
+      {/* ================= VIEW SHOP MODAL ================= */}
+      {selectedShopId && (
+        <ViewShop
+          shopId={selectedShopId}
+          onClose={() => setSelectedShopId(null)}
+        />
       )}
     </div>
   );

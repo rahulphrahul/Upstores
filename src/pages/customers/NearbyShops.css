@@ -76,6 +76,274 @@
   background: #001ae3;
   color: #fff;
 }
+/* extra css */
+.customer-page { padding: 20px; }
+.page-title { font-size: 24px; margin-bottom: 20px; }
+.view-toggle { margin-bottom: 20px; }
+.view-toggle button { margin-right: 8px; padding: 8px 12px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; }
+.view-toggle button.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+
+.shop-list { display: grid; gap: 16px; }
+.shop-card { background: #fff; border-radius: 10px;max-width: 45%; padding: 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+.shop-card h4 { margin: 0 0 4px 0; }
+.shop-card p { margin: 0; color: #6b7280; }
+.shop-card span { color: #374151; font-size: 14px; }
+.shop-card .btn { padding: 6px 12px; }
+
+.map-box { height: 500px; width: 100%; border-radius: 10px; margin-top: 16px; }
+.loading { font-size: 16px; color: #6b7280; margin-top: 20px; }
+.empty { text-align: center; color: #9ca3af; margin-top: 20px; }
+.nearby-page {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.page-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.view-toggle button {
+  padding: 8px 16px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 5px;
+}
+
+.view-toggle button.active {
+  background: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+.shop-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.shop-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background-color: #fff;
+}
+
+.shop-info h3 {
+  margin: 0 0 5px 0;
+  font-size: 1.2rem;
+}
+
+.shop-info p {
+  margin: 3px 0;
+  color: #555;
+}
+
+.status {
+  display: inline-block;
+  margin-top: 5px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: #fff;
+}
+
+.status.active {
+  background-color: #28a745;
+}
+
+.status.suspended {
+  background-color: #dc3545;
+}
+
+.btn-view {
+  padding: 8px 14px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-view:hover {
+  background: #0056b3;
+}
+
+/* MAP */
+.map-container {
+  height: 400px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btn-primary {
+  flex: 1;
+  padding: 8px;
+  background: #007bff;
+  color: #fff;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-outline {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #007bff;
+  color: #007bff;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+.viewshop-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.viewshop-modal {
+  background: #fff;
+  width: 90%;
+  max-width: 700px;
+  border-radius: 10px;
+  overflow-y: auto;
+  max-height: 90vh;
+  padding: 20px;
+  box-shadow: 0px 0px 15px rgba(0,0,0,0.3);
+}
+
+.viewshop-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.viewshop-header h3 {
+  margin: 0;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.viewshop-body {
+  margin-top: 15px;
+}
+
+.shop-info p {
+  margin: 5px 0;
+}
+
+.status.active {
+  color: green;
+  font-weight: bold;
+}
+
+.status.suspended {
+  color: red;
+  font-weight: bold;
+}
+
+.transactions-section {
+  margin-top: 20px;
+}
+
+.transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transactions-table th,
+.transactions-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.transactions-table th {
+  background-color: #f5f5f5;
+}
+
+.transactions-table td.credit {
+  color: green;
+}
+
+.transactions-table td.debit {
+  color: red;
+}
+
+.transactions-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.transactions-table tr:hover {
+  background-color: #f1f1f1;
+}
+
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
