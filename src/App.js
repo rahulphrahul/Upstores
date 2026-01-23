@@ -270,9 +270,9 @@ function App() {
           /> */}
           {/* CUSTOMERS ROUTES */}
           <Route
-            path="customer/home"
+            path="seller/home"
             element={
-              <RoleProtectedRoute user={user} allowedRoles={['customer']}>
+              <RoleProtectedRoute user={user} allowedRoles={['seller']}>
                 <ExecutiveDashboard />
               </RoleProtectedRoute>
             }
