@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import logo from "../assets/logo.png";
 import "./CustomerRegister.css";
+import { registerCustomer } from "../service/apiService";
 
 function CustomerRegister() {
   const [form, setForm] = useState({
@@ -13,32 +14,70 @@ function CustomerRegister() {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+
+    // 🔹 Frontend validations
+    if (!form.name.trim()) {
+      setError("Full name is required");
+      return;
+    }
+
+    if (!/^[6-9]\d{9}$/.test(form.phone)) {
+      setError("Enter a valid 10-digit mobile number");
+      return;
+    }
+
+    if (!form.email.includes("@")) {
+      setError("Enter a valid email address");
+      return;
+    }
+
+    if (form.password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
 
     if (form.password !== form.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
-    // 🔹 API integration will go here later
-    console.log("Register payload:", form);
+    try {
+      setLoading(true);
 
-    setSuccess("Account created successfully. Please login.");
-    setForm({
-      name: "",
-      email: "",
-      phone: "",
-      password: "",
-      confirmPassword: "",
-    });
+      const res = await registerCustomer({
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        password: form.password,
+      });
+
+      if (res.success) {
+        setSuccess("Account created successfully. Please login.");
+        setForm({
+          name: "",
+          email: "",
+          phone: "",
+          password: "",
+          confirmPassword: "",
+        });
+      } else {
+        setError(res.message || "Registration failed");
+      }
+    } catch (err) {
+      setError("Server error. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -67,6 +106,7 @@ function CustomerRegister() {
           {success && <div className="success-text">{success}</div>}
 
           <form onSubmit={handleSubmit}>
+            {/* FULL NAME */}
             <div className="input-group">
               <label>Full Name</label>
               <input
@@ -79,6 +119,7 @@ function CustomerRegister() {
               />
             </div>
 
+            {/* EMAIL */}
             <div className="input-group">
               <label>Email Address</label>
               <input
@@ -91,6 +132,7 @@ function CustomerRegister() {
               />
             </div>
 
+            {/* PHONE */}
             <div className="input-group">
               <label>Mobile Number</label>
               <input
@@ -103,6 +145,7 @@ function CustomerRegister() {
               />
             </div>
 
+            {/* PASSWORD */}
             <div className="input-group">
               <label>Password</label>
               <input
@@ -115,6 +158,7 @@ function CustomerRegister() {
               />
             </div>
 
+            {/* CONFIRM PASSWORD */}
             <div className="input-group">
               <label>Confirm Password</label>
               <input
@@ -127,8 +171,8 @@ function CustomerRegister() {
               />
             </div>
 
-            <button type="submit" className="login-btn">
-              Create Account
+            <button type="submit" className="login-btn" disabled={loading}>
+              {loading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
 

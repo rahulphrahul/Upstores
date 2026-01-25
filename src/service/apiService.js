@@ -328,3 +328,21 @@ export const updateShopStatus = async (shopId, status) => {
   return res.json();
 };
 
+export const registerCustomer = async (data) =>
+  fetch(`${BASE_URL}/customers/register.php`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  }).then((res) => res.json());
+
+// ===== CAROUSELS =====
+export const getTopCarouselImages = async () =>
+  fetch(`${BASE_URL}/customers/carousel.php?type=top`)
+    .then(res => res.json());
+
+export const getBottomCarouselImages = async () =>
+  fetch(`${BASE_URL}/customers/carousel.php?type=bottom`)
+    .then(res => res.json());
+
