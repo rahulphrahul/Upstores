@@ -4,6 +4,7 @@ import { Button } from "react-bootstrap";
 import { FiMenu, FiX } from "react-icons/fi";
 import "./DashboardLayout.css";
 import logo from "../assets/logo.png";
+import Header from "./Header";
 
 function DashboardLayout({ user, setUser }) {
   const navigate = useNavigate();
@@ -62,16 +63,8 @@ function DashboardLayout({ user, setUser }) {
   return (
     <div className="layout-wrapper">
       {/* TOP BAR (MOBILE) */}
-      <header className="topbar">
-        <button className="menu-toggle" onClick={toggleSidebar}>
-          {isSidebarOpen ? <FiX size={22} /> : <FiMenu size={22} />}
-        </button>
-
-        <img src={logo} alt="Company Logo" className="topbar-logo" />
-
-        <span className="topbar-user">{user?.name}</span>
-      </header>
-
+      <Header toggleSidebar ={toggleSidebar} isSidebarOpen = {isSidebarOpen}user={user} logo={logo} />
+      
       {/* OVERLAY */}
       {isSidebarOpen && (
         <div className="sidebar-overlay" onClick={toggleSidebar} />

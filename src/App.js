@@ -24,6 +24,7 @@ import WalletRedemption from './pages/customers/WalletRedemption';
 import AddPurchase from './pages/customers/AddPurchase';
 import SellerManagement from './pages/admin/SellerManagement';
 import ServiceManagement from './pages/admin/ServiceManagement';
+import CustomerHome from './pages/customers/CustomerHome';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -40,7 +41,7 @@ function App() {
         return '/dashboard/super-admin/home';
       case 'executive':
         return '/dashboard/executive/home';
-      case 'student':
+      case 'customer':
         return '/dashboard/customer/home';
       default:
         return '/';
@@ -277,15 +278,14 @@ function App() {
               </RoleProtectedRoute>
             }
           />
-          {/* 
           <Route
-            path="assignments"
+            path="customer/home"
             element={
-              <RoleProtectedRoute user={user} allowedRoles={['student']}>
-                <Assignments />
+              <RoleProtectedRoute user={user} allowedRoles={['customer']}>
+                <CustomerHome />
               </RoleProtectedRoute>
             }
-          /> */}
+          /> 
         </Route>
 
         {/* CATCH-ALL */}

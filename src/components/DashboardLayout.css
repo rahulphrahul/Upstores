@@ -247,3 +247,53 @@
     display: flex;
   }
 }
+.topbar {
+  background: #fff;
+  padding: 10px 14px;
+}
+
+/* default layout */
+.topbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topbar-logo {
+  height: 32px;
+  transition: height 0.3s ease;
+}
+
+.logo-large {
+  height: 48px;
+}
+
+/* customer dashboard header layout */
+.customer-header {
+  display: flex;
+  flex-direction: column;
+}
+
+/* search bar inside header */
+.header-search {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  background: #f2f2f2;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.search-icon {
+  font-size: 18px;
+  color: #888;
+  margin-right: 8px;
+}
+
+.search-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+}
