@@ -1,6 +1,7 @@
 import { FiMenu, FiX, FiSearch } from "react-icons/fi";
 import { useLocation } from "react-router-dom";
 import NotificationPanel from './NotificationPanel';
+import Drawer from "./Drawer";
 import React, { useState } from 'react';
 function Header({ toggleSidebar, isSidebarOpen, user, logo }) {
   const location = useLocation();
@@ -35,9 +36,18 @@ function Header({ toggleSidebar, isSidebarOpen, user, logo }) {
 
       <header className="topbar">
         <div className="topbar-row-1">
+          {!isCustomerDashboard && (
         <button className="menu-toggle" onClick={toggleSidebar}>
           {isSidebarOpen ? <FiX size={22} /> : <FiMenu size={22} />}
         </button>
+          )}
+          {isCustomerDashboard && (
+ <button className="menu-btn" onClick={toggleDrawer}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12H21M3 6H21M3 18H21" stroke="#333" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </button>
+          )}
         <img
           src={logo}
           alt="Company Logo"
@@ -57,6 +67,7 @@ function Header({ toggleSidebar, isSidebarOpen, user, logo }) {
       <NotificationPanel isOpen={isNotificationOpen} onClose={toggleNotification} />
        
         </div>
+         <Drawer isOpen={isDrawerOpen} onClose={toggleDrawer} />
          {/* Search bar only for customer dashboard */}
       {isCustomerDashboard && (
       <div className="topbar-row-2">

@@ -362,6 +362,17 @@
 /* notification */
 
 /* Notification Panel */
+.menu-btn,
+.notification-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
 .notification-panel {
   position: fixed;
   top: 0;
@@ -453,4 +464,14 @@
 .notification-time {
   font-size: 12px;
   color: #999;
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* background: rgba(0, 0, 0, 0.5); */
+  z-index: 998;
+  animation: fadeIn 0.3s ease;
 }
