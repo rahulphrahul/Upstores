@@ -2,7 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  
+
 }
 
 .upstores-container {
@@ -30,6 +30,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -340,25 +341,26 @@
 
 .banner-carousel {
   display: flex;
-  gap: 16px;
-  padding: 0 16px;
+  gap: 2px;
   padding-bottom: 20px;
- overflow-x: auto;
+  overflow-x: auto;
   overflow-y: visible !important;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
 }
 
 .banner-carousel::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
+  /* Chrome, Safari, Opera */
 }
 
 .banner {
-  width: 45%;
-   min-height: 200px;
+  min-height: 200px;
   scroll-snap-align: start;
   background: linear-gradient(135deg, #3355FF 0%, #5577FF 100%);
   border-radius: 16px;
@@ -369,7 +371,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
- box-shadow: 0 4px 0 #7f7a7a;
+  box-shadow: 0 4px 0 #7f7a7a;
   flex-shrink: 0;
 }
 
@@ -464,17 +466,20 @@
   gap: 16px;
   padding: 0 16px;
   align-items: center;
-   justify-content: space-between;
+  justify-content: space-between;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
 }
 
 .category-scroll::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
+  /* Chrome, Safari, Opera */
 }
 
 .category-item {
@@ -524,11 +529,12 @@
   .upstores-container {
     max-width: 100%;
   }
-.banner-section {
-  margin: 0 0 24px 0;
-  overflow: hidden;
-}
-  
+
+  .banner-section {
+    margin: 0 0 24px 0;
+    overflow: hidden;
+  }
+
   .notification-panel {
     width: 280px;
     right: -280px;
@@ -540,8 +546,9 @@
 
   .banner {
     min-width: calc(100% - 32px);
-     /* max-height: 120px;      ↓ smaller height */
-    padding: 16px;          /* ↓ less padding */
+    /* max-height: 120px;      ↓ smaller height */
+    padding: 16px;
+    /* ↓ less padding */
     border-radius: 12px;
     margin-top: 22%;
   }
