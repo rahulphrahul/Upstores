@@ -118,12 +118,18 @@ export const getExecutiveShops = async (executiveId) =>
     `${BASE_URL}/executives/shops/list.php?executive_id=${executiveId}`
   ).then(res => res.json());
 
-export const createExecutiveShop = async (data) =>
-  fetch(`${BASE_URL}/executives/shops/create.php`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  }).then(res => res.json());
+export const createExecutiveShop = async (formData) => {
+  const res = await fetch(
+    `${BASE_URL}/executives/shops/create.php`,
+    {
+      method: "POST",
+      body: formData, // ✅ send FormData directly
+    }
+  );
+
+  return res.json();
+};
+
 
 export const toggleExecutiveShopStatus = async (data) =>
   fetch(`${BASE_URL}/executives/shops/toggle-status.php`, {
@@ -151,13 +157,18 @@ export const getCategories = async () =>
 /* ============================
    ADD EXECUTIVE SELLER
 ============================ */
-export const addExecutiveSeller = async (data) => {
-  return fetch(`${BASE_URL}/sellers/add_executive_seller.php`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  }).then((res) => res.json());
+export const addExecutiveSeller = async (formData) => {
+  const res = await fetch(
+    `${BASE_URL}/sellers/add_executive_seller.php`,
+    {
+      method: "POST",
+      body: formData, // ✅ FormData
+    }
+  );
+
+  return res.json();
 };
+
 
 
 /* ============================
