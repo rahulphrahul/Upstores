@@ -3,12 +3,18 @@ import { Container, Row, Col, Card, Form, Button, Alert } from "react-bootstrap"
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../service/apiService";
 import logo from "../assets/logo.png";
+import ChangePasswordModal from "./ChangePasswordModal";
+
 
 function LoginPage({ setUser }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [loggedUser, setLoggedUser] = useState(null);
+
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -20,6 +26,10 @@ function LoginPage({ setUser }) {
       if (res.status === "success") {
         localStorage.setItem("user", JSON.stringify(res.user));
         setUser(res.user);
+        setLoggedUser(res.user);
+        if (res.user.force_password_change === 1) {
+        setShowChangePassword(true);
+      }
       } else {
         setError(res.message || "Invalid credentials");
       }
@@ -124,7 +134,26 @@ function LoginPage({ setUser }) {
           </Col>
         </Row>
       </Container>
+          {showChangePassword && loggedUser && (
+  <ChangePasswordModal
+    show={showChangePassword}
+    userId={loggedUser.id}
+    onSuccess={() => {
+      setShowChangePassword(false);
+
+      // Update local user flag
+      const updatedUser = {
+        ...loggedUser,
+        force_password_change: 0,
+      };
+
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    }}
+  />
+)}
     </div>
+
   );
 }
 

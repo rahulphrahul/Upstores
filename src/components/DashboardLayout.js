@@ -48,13 +48,23 @@ function DashboardLayout({ user, setUser }) {
 
     ],
     shop: [
-      { name: "My Home", path: "/dashboard/shop/home" },
+      { name: "Dashboard", path: "/dashboard/shop/home" },
+          { name: "Customer QR", path: "/dashboard/shop/customer_qr" },
+            { name: "Purchase", path: "/dashboard/shop/purchase_history" },
+                { name: "Wallet Management", path: "/dashboard/shop/wallet_management" },
+                  // { name: "Security", path: "/dashboard/shop/security" },
     ],
     seller: [
-      { name: "My Home", path: "/dashboard/seller/home" },
+      { name: "Dashboard", path: "/dashboard/seller/home" },
+        { name: "Customer QR", path: "/dashboard/seller/customer_qr" },
+            { name: "Purchase", path: "/dashboard/seller/purchase_history" },
+                { name: "Wallet Management", path: "/dashboard/seller/wallet_management" },
     ],
     service: [
-      { name: "My Home", path: "/dashboard/service/home" },
+      { name: "Dashboard", path: "/dashboard/service/home" },
+        { name: "Customer QR", path: "/dashboard/service/customer_qr" },
+            { name: "Purchase", path: "/dashboard/service/purchase_history" },
+                { name: "Wallet Management", path: "/dashboard/service/wallet_management" },
     ],
   };
 

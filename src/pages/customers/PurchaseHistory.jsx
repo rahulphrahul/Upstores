@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./PurchaseHistory.css";
-import { getPurchaseHistory } from "../../service/apiService"; // Your API service
+import { getPurchaseHistorys } from "../../service/apiService"; // Your API service
 
 function PurchaseHistory() {
   const [purchases, setPurchases] = useState([]);
@@ -16,7 +16,7 @@ function PurchaseHistory() {
 
     setLoading(true);
     try {
-      const res = await getPurchaseHistory(executiveId);
+      const res = await getPurchaseHistorys(executiveId);
       if (res.status === "success") {
         setPurchases(res.data);
       } else {
