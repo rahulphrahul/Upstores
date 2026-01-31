@@ -143,11 +143,18 @@ export const toggleExecutiveShopStatus = async (data) =>
 /* ============================
    GET EXECUTIVE SELLERS
 ============================ */
-export const getExecutiveSellers = async (executive_id) => {
-  return fetch(
-    `${BASE_URL}/sellers/get_executive_seller.php?executive_id=${executive_id}`
-  ).then((res) => res.json());
+export const getExecutiveSellers = async (executiveId) => {
+  const res = await fetch(
+    `${BASE_URL}/sellers/get_executive_seller.php?executive_id=${executiveId}`
+  );
+
+  if (!res.ok) {
+    throw new Error("API failed");
+  }
+
+  return res.json();
 };
+
 /* ============================
    GET Categories
 ============================ */
@@ -212,15 +219,15 @@ export const getExecutiveServices = async (executiveId) => {
   return res.json();
 };
 
-export const addExecutiveService = async (data) => {
-  const res = await fetch(
-    `${BASE_URL}/services/add_executive_services.php`,
+export const addExecutiveService = async (formData) => {
+const res = await fetch(
+    `${BASE_URL}/sellers/add_executive_seller.php`,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: formData, // ✅ FormData
     }
   );
+
   return res.json();
 };
 

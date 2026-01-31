@@ -40,10 +40,15 @@ function ExecutiveSellerManagement({ user }) {
   /* =========================
      LOAD SELLERS
   ========================= */
-  const loadSellers = async () => {
+const loadSellers = async () => {
+  try {
     const res = await getExecutiveSellers(executiveId);
-    if (res?.status === "success") setSellers(res.data || []);
-  };
+    setSellers(res.data || []);
+  } catch (err) {
+    console.error(err);
+    setSellers([]);
+  }
+};
 
   const loadCategories = async () => {
     const res = await getCategories();

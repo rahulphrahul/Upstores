@@ -40,7 +40,7 @@ function ExecutiveShopManagement({ user }) {
   ========================= */
   const loadShops = async () => {
     const res = await getExecutiveShops(executiveId);
-    setShops(res || []);
+    setShops(res.data || []);
   };
 
   useEffect(() => {
@@ -254,7 +254,7 @@ function ExecutiveShopManagement({ user }) {
           <tbody>
             {shops.map((s) => (
               <tr key={s.id}>
-                <td>{s.name}</td>
+                <td>{s.shop_name}</td>
                 <td>{s.owner_name}</td>
                 <td>{s.phone}</td>
                 <td>₹ {s.wallet_balance}</td>
