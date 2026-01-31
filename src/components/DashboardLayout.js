@@ -56,6 +56,16 @@ function DashboardLayout({ user, setUser }) {
     service: [
       { name: "My Home", path: "/dashboard/service/home" },
     ],
+    customer: [
+      { name: "My Home", path: "/dashboard/customer/home" },
+      { name: "Share", path: "/dashboard/customer/share" },
+      { name: "Scan Qr", path: "/dashboard/customer/scan-qr" },
+      { name: "Customer Tree", path: "/dashboard/customer/customer-tree" },
+      { name: "Customer Purchase", path: "/dashboard/customer/customer-purchase" },
+      { name: "My Purchase", path: "/dashboard/customer/my-purchase" },
+      { name: "Wallet", path: "/dashboard/customer/wallet" },
+      { name: "Shops", path: "/dashboard/customer/shops" },
+    ],
   };
 
   const menuItems = menus[user?.role] || [];
@@ -63,7 +73,7 @@ function DashboardLayout({ user, setUser }) {
   return (
     <div className="layout-wrapper">
       {/* TOP BAR (MOBILE) */}
-      <Header toggleSidebar ={toggleSidebar} isSidebarOpen = {isSidebarOpen}user={user} logo={logo} />
+      <Header toggleSidebar ={toggleSidebar} isSidebarOpen = {isSidebarOpen} user={user} logo={logo} />
       
       {/* OVERLAY */}
       {isSidebarOpen && (

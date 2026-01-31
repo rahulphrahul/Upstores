@@ -25,6 +25,8 @@ import AddPurchase from './pages/customers/AddPurchase';
 import SellerManagement from './pages/admin/SellerManagement';
 import ServiceManagement from './pages/admin/ServiceManagement';
 import CustomerHome from './pages/customers/CustomerHome';
+import ScanQR from './pages/customer/ScanQR';
+import ShopDetails from './pages/customer/ShopDetails';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -283,6 +285,46 @@ function App() {
             element={
               <RoleProtectedRoute user={user} allowedRoles={['customer']}>
                 <CustomerHome />
+              </RoleProtectedRoute>
+            }
+          /> 
+          <Route
+            path="customer/my-purchase"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['customer']}>
+                <PurchaseHistory />
+              </RoleProtectedRoute>
+            }
+          /> 
+          <Route
+            path="customer/wallet"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['customer']}>
+                <WalletRedemption />
+              </RoleProtectedRoute>
+            }
+          /> 
+          <Route
+            path="customer/shops"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['customer']}>
+                <NearbyShops />
+              </RoleProtectedRoute>
+            }
+          /> 
+           <Route
+            path="customer/scan-qr"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['customer']}>
+                <ScanQR />
+              </RoleProtectedRoute>
+            }
+          /> 
+           <Route
+            path="scan-qr/customer/shop/:id"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['customer']}>
+                <ShopDetails />
               </RoleProtectedRoute>
             }
           /> 

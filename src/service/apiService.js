@@ -346,3 +346,33 @@ export const getBottomCarouselImages = async () =>
   fetch(`${BASE_URL}/customers/carousel.php?type=bottom`)
     .then(res => res.json());
 
+
+export const getCustomerDashboard = () =>
+  fetch(`${BASE_URL}/customers/dashboard.php`);
+export const getNearbyShops = (lat, lng, distance = 5) =>
+  fetch(
+    `${BASE_URL}/customers/shops.php?lat=${lat}&lng=${lng}&distance=${distance}`
+  );
+export const addPurchase = (formData) =>
+  fetch(`${BASE_URL}/customers/add_purchase.php`, formData);
+export const getCustomerPurchaseHistory = () =>
+  fetch(`${BASE_URL}/customers/purchases.php`);
+
+export const getCustomerWallet = () =>
+  fetch(`${BASE_URL}/customers/wallet.php`);
+
+export const redeemWallet = (data) =>
+  fetch(`${BASE_URL}/customers/redeem.php`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+export const getCustomerProfile = () =>
+  fetch(`${BASE_URL}/customers/profile.php`);
+
+export const updateCustomerProfile = (data) =>
+  fetch(`${BASE_URL}/customers/update_profile.php`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+export const getCustomerQR = () =>
+  fetch(`${BASE_URL}/customers/customer_qr.php`);
