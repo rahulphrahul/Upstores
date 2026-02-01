@@ -262,24 +262,38 @@ function ExecutiveServiceManagement({ user }) {
         <table className="data-table">
           <thead>
             <tr>
-              <th>Owner</th>
-              <th>Service</th>
-              <th>Category</th>
-              <th>Commission</th>
+               <th>Service</th>
+              <th>Owner</th>             
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Wallet</th>
               <th>Status</th>
+              <th>Location</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {services.map((s) => (
               <tr key={s.id}>
-                <td>{s.owner_name}</td>
                 <td>{s.name}</td>
-                <td>{s.category_name || "—"}</td>
-                <td>{s.commission}%</td>
+                <td>{s.owner_name}</td>
+                 <td>{s.phone || "—"}</td>
+                <td>{s.email}</td>
+                <td>{s.wallet_balance}</td>
                 <td><span className={`status ${s.status}`}>{s.status}</span></td>
+                 <td>
+  {s.latitude ? (
+    <a
+      href={`https://www.google.com/maps?q=${s.latitude},${s.longitude}`}
+      target="_blank"
+      rel="noreferrer"
+    >
+      View on Map
+    </a>
+  ) : "—"}
+</td>
                 <td>
-                  <button className="btn btn-danger" onClick={() => handleEdit(s)}>Edit</button>
+                 {/*} <button className="btn btn-danger" onClick={() => handleEdit(s)}>Edit</button>*/}
                   <button className="btn btn-warning m-1" onClick={() => toggleStatus(s)}>
                     {s.status === "active" ? "Disable" : "Enable"}
                   </button>

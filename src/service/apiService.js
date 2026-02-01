@@ -232,16 +232,23 @@ const res = await fetch(
 };
 
 export const updateExecutiveService = async (data) => {
+  const fd = new FormData();
+
+  Object.keys(data).forEach(key => {
+    fd.append(key, data[key]);
+  });
+
   const res = await fetch(
-    `${BASE_URL}/services/update_executive_services.php`,
+    `${BASE_URL}/services/update_executive_service.php`,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: fd, // ✅ no headers needed
     }
   );
-  return res.json();
+
+  return await res.json();
 };
+
 
 export const updateExecutiveServiceStatus = async (
   serviceId,

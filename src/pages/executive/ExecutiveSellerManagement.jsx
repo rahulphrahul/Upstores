@@ -269,28 +269,38 @@ const loadSellers = async () => {
         <table className="data-table">
           <thead>
             <tr>
-              <th>Owner</th>
-              <th>Name</th>
+               <th>Seller</th>
+              <th>Owner</th>             
               <th>Phone</th>
               <th>Email</th>
-              <th>Category</th>
               <th>Wallet</th>
               <th>Status</th>
+              <th>Location</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {sellers.map((s) => (
               <tr key={s.id}>
-                <td>{s.owner_name}</td>
                 <td>{s.name}</td>
+                <td>{s.owner_name}</td>
                 <td>{s.phone}</td>
                 <td>{s.email || "—"}</td>
-                <td>{s.category_name || "—"}</td>
                 <td>₹ {s.wallet_balance}</td>
-                <td><span className={`status ${s.status}`}>{s.status}</span></td>
+                  <td><span className={`status ${s.status}`}>{s.status}</span></td>
+              <td>
+  {s.latitude ? (
+    <a
+      href={`https://www.google.com/maps?q=${s.latitude},${s.longitude}`}
+      target="_blank"
+      rel="noreferrer"
+    >
+      View on Map
+    </a>
+  ) : "—"}
+</td>
                 <td className="actions">
-                  <button className="btn btn-danger" onClick={() => handleEdit(s)}>Edit</button>
+                {/* <button className="btn btn-danger" onClick={() => handleEdit(s)}>Edit</button>*/}
                   <button className={`btn ${s.status === "active" ? "btn-warning" : "btn-success"}`} onClick={() => toggleStatus(s)}>
                     {s.status === "active" ? "Suspend" : "Activate"}
                   </button>

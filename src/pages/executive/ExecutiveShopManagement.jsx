@@ -245,6 +245,7 @@ function ExecutiveShopManagement({ user }) {
               <th>Shop</th>
               <th>Owner</th>
               <th>Phone</th>
+               <th>Email</th>
               <th>Wallet</th>
               <th>Status</th>
               <th>Location</th>
@@ -257,9 +258,21 @@ function ExecutiveShopManagement({ user }) {
                 <td>{s.shop_name}</td>
                 <td>{s.owner_name}</td>
                 <td>{s.phone}</td>
+                 <td>{s.email}</td>
                 <td>₹ {s.wallet_balance}</td>
-                <td>{s.status}</td>
-                <td>{s.latitude ? `${s.latitude}, ${s.longitude}` : "—"}</td>
+                 <td><span className={`status ${s.status}`}>{s.status}</span></td>
+              <td>
+  {s.latitude ? (
+    <a
+      href={`https://www.google.com/maps?q=${s.latitude},${s.longitude}`}
+      target="_blank"
+      rel="noreferrer"
+    >
+      View on Map
+    </a>
+  ) : "—"}
+</td>
+
                 <td>
                   <button className="btn" onClick={() => toggleStatus(s)}>
                     {s.status === "active" ? "Suspend" : "Activate"}
