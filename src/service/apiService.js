@@ -158,8 +158,18 @@ export const getExecutiveSellers = async (executiveId) => {
 /* ============================
    GET Categories
 ============================ */
-export const getCategories = async () =>
-  fetch(`${BASE_URL}/categories/getCategories.php`).then(res => res.json());
+export const getCategories = async (main_type) => {
+  const res = await fetch(
+    `${BASE_URL}/categories/getCategories.php?main_type=${main_type}`
+  );
+
+  if (!res.ok) {
+    throw new Error("API failed");
+  }
+
+  return res.json();
+};
+
 
 /* ============================
    ADD EXECUTIVE SELLER

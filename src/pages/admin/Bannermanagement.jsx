@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { createBanner } from "../../service/apiService";
+import "./SellerManagement.css"; // reuse same CSS
 
-const BannerManagement = () => {
+function BannerManagement() {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     title: "",
@@ -30,10 +31,14 @@ const BannerManagement = () => {
       return;
     }
 
-    setLoading(true);
+    const fd = new FormData();
+    Object.keys(form).forEach((key) => {
+      fd.append(key, form[key]);
+    });
 
+    setLoading(true);
     try {
-      const res = await createBanner(form);
+      const res = await createBanner(fd);
       if (res.status === "success") {
         alert("Banner created successfully");
         setForm({
@@ -49,7 +54,6 @@ const BannerManagement = () => {
         alert(res.message || "Failed to create banner");
       }
     } catch (err) {
-      console.error(err);
       alert("Server error");
     } finally {
       setLoading(false);
@@ -57,131 +61,141 @@ const BannerManagement = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow">
-      <div className="p-5 ">
-      <h2 className="text-xl font-semibold mb-6">Create Banner</h2>
+    <div className="seller-page">
+      {/* Page Header */}
+      <h2 className="page-title">Banner Management</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Title */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Title</label>
-          <input
-            type="text"
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            className="w-full border rounded-md px-3 py-2 text-sm"
-            required
-          />
-        </div>
+      {/* Card – same as Seller page */}
+      <div className="card shadow-sm p-4 bg-white rounded-lg">
+        <h4 className="mb-4 font-semibold text-lg">
+          Create New Banner
+        </h4>
 
-        {/* Text */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Text</label>
-          <textarea
-            name="text"
-            value={form.text}
-            onChange={handleChange}
-            className="w-full border rounded-md px-3 py-2 text-sm"
-            rows={3}
-          />
-        </div>
-
-        {/* Button Text */}
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Button Text
-          </label>
-          <input
-            type="text"
-            name="button_text"
-            value={form.button_text}
-            onChange={handleChange}
-            className="w-full border rounded-md px-3 py-2 text-sm"
-          />
-        </div>
-
-        {/* Gradient */}
-        <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Title */}
           <div>
             <label className="block text-sm font-medium mb-1">
-              Gradient Start
+              Title
             </label>
             <input
-              type="color"
-              name="gradient_start"
-              value={form.gradient_start}
+              type="text"
+              name="title"
+              value={form.title}
               onChange={handleChange}
-              className="w-full h-10"
+              className="w-full border rounded-md px-3 py-2 text-sm"
+              required
             />
           </div>
 
+          {/* Text */}
           <div>
             <label className="block text-sm font-medium mb-1">
-              Gradient End
+              Text
             </label>
-            <input
-              type="color"
-              name="gradient_end"
-              value={form.gradient_end}
+            <textarea
+              name="text"
+              value={form.text}
               onChange={handleChange}
-              className="w-full h-10"
+              className="w-full border rounded-md px-3 py-2 text-sm"
+              rows={3}
             />
           </div>
-        </div>
 
-        {/* Position */}
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Position
-          </label>
-          <select
-            name="position"
-            value={form.position}
-            onChange={handleChange}
-            className="w-full border rounded-md px-3 py-2 text-sm"
+          {/* Button Text */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Button Text
+            </label>
+            <input
+              type="text"
+              name="button_text"
+              value={form.button_text}
+              onChange={handleChange}
+              className="w-full border rounded-md px-3 py-2 text-sm"
+            />
+          </div>
+
+          {/* Gradients */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Gradient Start
+              </label>
+              <input
+                type="color"
+                name="gradient_start"
+                value={form.gradient_start}
+                onChange={handleChange}
+                className="w-full h-10"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Gradient End
+              </label>
+              <input
+                type="color"
+                name="gradient_end"
+                value={form.gradient_end}
+                onChange={handleChange}
+                className="w-full h-10"
+              />
+            </div>
+          </div>
+
+          {/* Position */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Position
+            </label>
+            <select
+              name="position"
+              value={form.position}
+              onChange={handleChange}
+              className="w-full border rounded-md px-3 py-2 text-sm"
+            >
+              <option value="top">Top</option>
+              <option value="bottom">Bottom</option>
+            </select>
+          </div>
+
+          {/* Image */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Banner Image
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="text-sm"
+              required
+            />
+          </div>
+
+          {/* Preview */}
+          <div
+            className="h-32 rounded-lg flex items-center justify-center text-white font-semibold"
+            style={{
+              background: `linear-gradient(90deg, ${form.gradient_start}, ${form.gradient_end})`,
+            }}
           >
-            <option value="top">Top</option>
-            <option value="bottom">Bottom</option>
-          </select>
-        </div>
+            Banner Preview
+          </div>
 
-        {/* Image */}
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Banner Image
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="text-sm"
-            required
-          />
-        </div>
-
-        {/* Preview */}
-        <div
-          className="h-32 mt-3 rounded-lg flex items-center justify-center text-white font-semibold"
-          style={{
-            background: `linear-gradient(90deg, ${form.gradient_start}, ${form.gradient_end})`,
-          }}
-        >
-          Banner Preview
-        </div>
-
-        {/* Submit */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full btn mt-3 btn-primary text-white py-2 rounded-md text-sm font-medium hover:opacity-90"
-        >
-          {loading ? "Creating..." : "Create Banner"}
-        </button>
-      </form>
-    </div>
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn btn-primary px-6"
+          >
+            {loading ? "Creating..." : "Create Banner"}
+          </button>
+        </form>
+      </div>
     </div>
   );
-};
+}
 
 export default BannerManagement;

@@ -18,7 +18,7 @@ function ExecutiveShopManagement({ user }) {
   const [showAdd, setShowAdd] = useState(false);
   const [locating, setLocating] = useState(false);
   const [categories, setCategories] = useState([]);
-
+const shop_type="shop";
   const [form, setForm] = useState({
     name: "",
     owner_name: "",
@@ -45,7 +45,7 @@ function ExecutiveShopManagement({ user }) {
 
   useEffect(() => {
     loadShops();
-    getCategories().then((res) => {
+    getCategories(shop_type).then((res) => {
       if (res.status === "success") setCategories(res.data);
     });
   }, []);

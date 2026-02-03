@@ -20,7 +20,7 @@ function ExecutiveSellerManagement({ user }) {
   const [showForm, setShowForm] = useState(false);
   const [editingSeller, setEditingSeller] = useState(null);
   const [locating, setLocating] = useState(false);
-
+const shop_type ="seller";
   const [form, setForm] = useState({
     category_id: "",
     owner_name: "",
@@ -51,7 +51,7 @@ const loadSellers = async () => {
 };
 
   const loadCategories = async () => {
-    const res = await getCategories();
+    const res = await getCategories(shop_type);
     if (res?.status === "success") setCategories(res.data || []);
   };
 

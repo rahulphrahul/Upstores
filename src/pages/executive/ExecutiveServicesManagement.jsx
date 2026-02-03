@@ -34,7 +34,7 @@ function ExecutiveServiceManagement({ user }) {
 
   const [logo, setLogo] = useState(null);
   const [images, setImages] = useState([]);
-
+ const shop_type ="service";
   /* =========================
      LOAD SERVICES
   ========================= */
@@ -45,7 +45,7 @@ function ExecutiveServiceManagement({ user }) {
 
   useEffect(() => {
     loadServices();
-    getCategories().then((res) => {
+    getCategories(shop_type).then((res) => {
       if (res.status === "success") setCategories(res.data || []);
     });
   }, []);
