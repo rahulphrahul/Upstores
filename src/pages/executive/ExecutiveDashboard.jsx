@@ -27,7 +27,7 @@ function ExecutiveDashboard({ user }) {
       getExecutiveMonthlyTransactions({executive_id: execId}),
       getExecutiveRecentActivities({executive_id: execId}),
     ]).then(([s, m, a]) => {
-      setStats(s);
+      setStats(s.data);
       setMonthlyData(m.map(x => ({
         month: x.month,
         total: Number(x.total),
@@ -35,7 +35,7 @@ function ExecutiveDashboard({ user }) {
       setActivities(a);
     });
   }, []);
-
+console.log("stats",stats);
   /* ================= CHART ================= */
   useLayoutEffect(() => {
     if (!chartDiv.current || monthlyData.length === 0) return;
@@ -92,11 +92,11 @@ function ExecutiveDashboard({ user }) {
       <div className="stats-grid">
         <div className="stat-card">
           <p>My Shops</p>
-          <h3>{stats.shops}</h3>
+          <h3>{stats.total_entities}</h3>
         </div>
         <div className="stat-card">
           <p>Total Wallet</p>
-          <h3>₹ {stats.wallet}</h3>
+          <h3>₹ {stats.wallet_balance}</h3>
         </div>
         <div className="stat-card">
           <p>Monthly Transactions</p>
@@ -104,7 +104,7 @@ function ExecutiveDashboard({ user }) {
         </div>
         <div className="stat-card">
           <p>Pending Requests</p>
-          <h3>{stats.pending}</h3>
+          <h3>{stats.pending_requests}</h3>
         </div>
       </div>
 

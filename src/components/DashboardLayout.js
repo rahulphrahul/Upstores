@@ -34,6 +34,8 @@ function DashboardLayout({ user, setUser }) {
       { name: "Sellers", path: "/dashboard/super-admin/sellers" },
       { name: "Services", path: "/dashboard/super-admin/services" },
       { name: "Customers", path: "/dashboard/super-admin/customers" },
+        { name: "Category", path: "/dashboard/super-admin/categories" },
+          { name: "Banners", path: "/dashboard/super-admin/banners" },
       { name: "Settings", path: "/dashboard/super-admin/settings" }
     ],
     executive: [

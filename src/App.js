@@ -41,6 +41,7 @@ import PurchaseSellerHistory from './pages/seller/PurchaseSellerHistory';
 import WalletService from './pages/service/WalletService';
 import ScanCustomerServiceQR from './pages/service/ScanCustomerServiceQR';
 import PurchaseServiceHistory from './pages/service/PurchaseServiceHistory';
+import BannerManagement from './pages/admin/Bannermanagement';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -166,7 +167,7 @@ function App() {
             path="super-admin/banners"
             element={
               <RoleProtectedRoute user={user} allowedRoles={['admin']}>
-                <CustomerManagement />
+                <BannerManagement />
               </RoleProtectedRoute>
             }
           />

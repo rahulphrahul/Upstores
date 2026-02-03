@@ -121,7 +121,7 @@ const Categorymanagement = () => {
                 </Form.Group>
 
                 <Button type="submit" className="w-100">
-                  Save Category
+                  Submit
                 </Button>
               </Form>
             </Card.Body>

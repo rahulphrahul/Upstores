@@ -1,177 +1,186 @@
 import React, { useState } from "react";
-import { Container, Row, Col, Card, Form, Button, Alert } from "react-bootstrap";
 import { createBanner } from "../../service/apiService";
 
 const BannerManagement = () => {
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     title: "",
     text: "",
     button_text: "",
-    gradient_start: "#000000",
-    gradient_end: "#ffffff",
-    position: "",
+    gradient_start: "#FF512F",
+    gradient_end: "#DD2476",
+    position: "top",
+    image: null,
   });
 
-  const [image, setImage] = useState(null);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
-  const MAX_FILE_SIZE = 2 * 1024 * 1024;
-
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      setError("Only image files allowed");
-      return;
-    }
-
-    if (file.size > MAX_FILE_SIZE) {
-      setError("Image must be under 2MB");
-      return;
-    }
-
-    setImage(file);
-    setError("");
+    setForm((prev) => ({ ...prev, image: e.target.files[0] }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
 
-    if (!form.title || !form.position || !image) {
-      setError("Title, position and image are required");
+    if (!form.image) {
+      alert("Please upload banner image");
       return;
     }
 
-    const fd = new FormData();
-    Object.entries(form).forEach(([key, value]) => {
-      if (value !== "") fd.append(key, value);
-    });
-    fd.append("image", image);
+    setLoading(true);
 
-    const res = await createBanner(fd);
-
-    if (res.status === "success") {
-      setSuccess("Banner created successfully");
-      setForm({
-        title: "",
-        text: "",
-        button_text: "",
-        gradient_start: "#000000",
-        gradient_end: "#ffffff",
-        position: "",
-      });
-      setImage(null);
-    } else {
-      setError(res.message || "Failed to create banner");
+    try {
+      const res = await createBanner(form);
+      if (res.status === "success") {
+        alert("Banner created successfully");
+        setForm({
+          title: "",
+          text: "",
+          button_text: "",
+          gradient_start: "#FF512F",
+          gradient_end: "#DD2476",
+          position: "top",
+          image: null,
+        });
+      } else {
+        alert(res.message || "Failed to create banner");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Container className="mt-4">
-      <Row className="justify-content-center">
-        <Col md={7}>
-          <Card className="shadow-sm">
-            <Card.Body>
-              <h5 className="fw-bold mb-3">Add Banner</h5>
+    <div className="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow">
+      <div className="p-5 ">
+      <h2 className="text-xl font-semibold mb-6">Create Banner</h2>
 
-              {error && <Alert variant="danger">{error}</Alert>}
-              {success && <Alert variant="success">{success}</Alert>}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Title */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Title</label>
+          <input
+            type="text"
+            name="title"
+            value={form.title}
+            onChange={handleChange}
+            className="w-full border rounded-md px-3 py-2 text-sm"
+            required
+          />
+        </div>
 
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Title</Form.Label>
-                  <Form.Control
-                    name="title"
-                    value={form.title}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+        {/* Text */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Text</label>
+          <textarea
+            name="text"
+            value={form.text}
+            onChange={handleChange}
+            className="w-full border rounded-md px-3 py-2 text-sm"
+            rows={3}
+          />
+        </div>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Description Text</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    name="text"
-                    value={form.text}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+        {/* Button Text */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Button Text
+          </label>
+          <input
+            type="text"
+            name="button_text"
+            value={form.button_text}
+            onChange={handleChange}
+            className="w-full border rounded-md px-3 py-2 text-sm"
+          />
+        </div>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Button Text</Form.Label>
-                  <Form.Control
-                    name="button_text"
-                    value={form.button_text}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+        {/* Gradient */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Gradient Start
+            </label>
+            <input
+              type="color"
+              name="gradient_start"
+              value={form.gradient_start}
+              onChange={handleChange}
+              className="w-full h-10"
+            />
+          </div>
 
-                <Row>
-                  <Col>
-                    <Form.Group className="mb-3">
-                      <Form.Label>Gradient Start</Form.Label>
-                      <Form.Control
-                        type="color"
-                        name="gradient_start"
-                        value={form.gradient_start}
-                        onChange={handleChange}
-                      />
-                    </Form.Group>
-                  </Col>
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Gradient End
+            </label>
+            <input
+              type="color"
+              name="gradient_end"
+              value={form.gradient_end}
+              onChange={handleChange}
+              className="w-full h-10"
+            />
+          </div>
+        </div>
 
-                  <Col>
-                    <Form.Group className="mb-3">
-                      <Form.Label>Gradient End</Form.Label>
-                      <Form.Control
-                        type="color"
-                        name="gradient_end"
-                        value={form.gradient_end}
-                        onChange={handleChange}
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
+        {/* Position */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Position
+          </label>
+          <select
+            name="position"
+            value={form.position}
+            onChange={handleChange}
+            className="w-full border rounded-md px-3 py-2 text-sm"
+          >
+            <option value="top">Top</option>
+            <option value="bottom">Bottom</option>
+          </select>
+        </div>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Position</Form.Label>
-                  <Form.Select
-                    name="position"
-                    value={form.position}
-                    onChange={handleChange}
-                  >
-                    <option value="">Select Position</option>
-                    <option value="top">Top</option>
-                    <option value="bottom">Bottom</option>
-                  </Form.Select>
-                </Form.Group>
+        {/* Image */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Banner Image
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="text-sm"
+            required
+          />
+        </div>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Banner Image</Form.Label>
-                  <Form.Control
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                  />
-                  <Form.Text muted>Max 2MB</Form.Text>
-                </Form.Group>
+        {/* Preview */}
+        <div
+          className="h-32 mt-3 rounded-lg flex items-center justify-center text-white font-semibold"
+          style={{
+            background: `linear-gradient(90deg, ${form.gradient_start}, ${form.gradient_end})`,
+          }}
+        >
+          Banner Preview
+        </div>
 
-                <Button type="submit" className="w-100">
-                  Save Banner
-                </Button>
-              </Form>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+        {/* Submit */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full btn mt-3 btn-primary text-white py-2 rounded-md text-sm font-medium hover:opacity-90"
+        >
+          {loading ? "Creating..." : "Create Banner"}
+        </button>
+      </form>
+    </div>
+    </div>
   );
 };
 
