@@ -13,7 +13,8 @@ import {
   getDashboardStats,
   getDailyTransactions,
   getMonthlyTransactions,
-  getPendingFunds,
+  getWalletRequests,
+  handleWalletRequest,
   fundAction,
 } from "../../service/apiService";
 
@@ -38,7 +39,7 @@ function MasterDashboard() {
 
   const dailyRootRef = useRef(null);
   const monthlyRootRef = useRef(null);
-
+const shop_type="all";
   /* =========================
      LOAD DATA
   ========================= */
@@ -55,13 +56,14 @@ function MasterDashboard() {
         getDashboardStats(),
         getDailyTransactions(),
         getMonthlyTransactions(),
-        getPendingFunds(),
+        getWalletRequests(shop_type),
       ]);
 
       setStats(statsRes);
       setDailyData(dailyRes);
       setMonthlyData(monthlyRes);
-      setPending(pendingRes);
+     setPending(pendingRes?.data || []);
+
     } finally {
       setLoading(false);
     }
@@ -217,9 +219,19 @@ function MasterDashboard() {
   /* =========================
      FUND ACTION
   ========================= */
-  const handleAction = async (id, action) => {
-    await fundAction(id, action);
-    loadAll();
+ const onWalletAction = async (req, action) => {
+    try {
+      await handleWalletRequest(
+        req.user_id,        // request_id
+        action,        // approve | rejected
+        "service"       // shop_type
+      );
+  
+      loadAll(); // refresh list
+    } catch (err) {
+      console.error("Wallet action failed", err);
+      alert("Failed to update wallet request");
+    }
   };
 
   /* =========================
@@ -279,19 +291,19 @@ function MasterDashboard() {
           </thead>
           <tbody>
             {pending.map((p) => (
-              <tr key={p.id}>
+              <tr key={p.user_id}>
                 <td>{p.shop}</td>
                 <td>₹ {p.amount}</td>
                 <td>
                   <button
                     className="approve-btn"
-                    onClick={() => handleAction(p.id, "approve")}
+                    onClick={() => onWalletAction(p, "approve")}
                   >
                     Approve
                   </button>
                   <button
                     className="reject-btn"
-                    onClick={() => handleAction(p.id, "reject")}
+                    onClick={() => onWalletAction(p, "reject")}
                   >
                     Reject
                   </button>

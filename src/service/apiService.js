@@ -599,12 +599,13 @@ export const requestWalletFund = async (formData) => {
 /* =========================
    ADMIN: APPROVE WALLET REQUEST
 ========================= */
-export const approveWalletRequest = async (requestId, adminRemark = "") => {
+export const handleWalletRequest = async (requestId, action, shop_type) => {
   const fd = new FormData();
   fd.append("request_id", requestId);
-  fd.append("admin_remark", adminRemark);
+  fd.append("action", action);
+   fd.append("shop_type", shop_type);
 
-  const res = await fetch(`${BASE_URL}/admin/approve_wallet_request.php`, {
+  const res = await fetch(`${BASE_URL}/admin/handle_wallet_request.php`, {
     method: "POST",
     body: fd,
   });
@@ -631,12 +632,15 @@ export const rejectWalletRequest = async (requestId, reason) => {
 /* =========================
    GET WALLET REQUESTS (ADMIN)
 ========================= */
-export const getWalletRequests = async (filters = {}) => {
-  // filters: user_type, status, from, to
-  const query = new URLSearchParams(filters).toString();
-  const res = await fetch(`${BASE_URL}/admin/wallet_requests.php?${query}`);
+
+export const getWalletRequests = async (shop_type) => {
+  const res = await fetch(
+    `${BASE_URL}/admin/get_pending_requests.php?shop_type=${shop_type}`
+  );
   return res.json();
 };
+
+
 
 /*==================================
   service
@@ -688,47 +692,6 @@ export const requestServiceWalletFund = async (formData) => {
   return res.json();
 };
 
-/* =========================
-   ADMIN: APPROVE WALLET REQUEST
-========================= */
-export const approveServiceWalletRequest = async (requestId, adminRemark = "") => {
-  const fd = new FormData();
-  fd.append("request_id", requestId);
-  fd.append("admin_remark", adminRemark);
-
-  const res = await fetch(`${BASE_URL}/admin/approve_wallet_request.php`, {
-    method: "POST",
-    body: fd,
-  });
-
-  return res.json();
-};
-
-/* =========================
-   ADMIN: REJECT WALLET REQUEST
-========================= */
-export const rejectServiceWalletRequest = async (requestId, reason) => {
-  const fd = new FormData();
-  fd.append("request_id", requestId);
-  fd.append("reason", reason);
-
-  const res = await fetch(`${BASE_URL}/admin/reject_wallet_request.php`, {
-    method: "POST",
-    body: fd,
-  });
-
-  return res.json();
-};
-
-/* =========================
-   GET WALLET REQUESTS (ADMIN)
-========================= */
-export const getServiceWalletRequests = async (filters = {}) => {
-  // filters: user_type, status, from, to
-  const query = new URLSearchParams(filters).toString();
-  const res = await fetch(`${BASE_URL}/admin/wallet_requests.php?${query}`);
-  return res.json();
-};
 
 /* =========================
   seller
@@ -780,44 +743,3 @@ export const requestSellerWalletFund = async (formData) => {
   return res.json();
 };
 
-/* =========================
-   ADMIN: APPROVE WALLET REQUEST
-========================= */
-export const approveSellerWalletRequest = async (requestId, adminRemark = "") => {
-  const fd = new FormData();
-  fd.append("request_id", requestId);
-  fd.append("admin_remark", adminRemark);
-
-  const res = await fetch(`${BASE_URL}/admin/approve_wallet_request.php`, {
-    method: "POST",
-    body: fd,
-  });
-
-  return res.json();
-};
-
-/* =========================
-   ADMIN: REJECT WALLET REQUEST
-========================= */
-export const rejectSellerWalletRequest = async (requestId, reason) => {
-  const fd = new FormData();
-  fd.append("request_id", requestId);
-  fd.append("reason", reason);
-
-  const res = await fetch(`${BASE_URL}/admin/reject_wallet_request.php`, {
-    method: "POST",
-    body: fd,
-  });
-
-  return res.json();
-};
-
-/* =========================
-   GET WALLET REQUESTS (ADMIN)
-========================= */
-export const getSellerWalletRequests = async (filters = {}) => {
-  // filters: user_type, status, from, to
-  const query = new URLSearchParams(filters).toString();
-  const res = await fetch(`${BASE_URL}/admin/wallet_requests.php?${query}`);
-  return res.json();
-};

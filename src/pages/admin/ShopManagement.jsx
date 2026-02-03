@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
     getShops,
     getPendingShopFunds,
+    handleWalletRequest,
     shopFundAction,
     toggleShopStatus,
 } from "../../service/apiService";
@@ -29,15 +30,20 @@ function ShopManagement() {
         loadAll();
     }, []);
 
-    const handleFund = async (req, action) => {
-        await shopFundAction({
-            request_id: req.id,
-            shop_id: req.shop_id,
-            amount: req.amount,
-            action,
-        });
-        loadAll();
-    };
+  const onWalletAction = async (req, action) => {
+    try {
+      await handleWalletRequest(
+        req.user_id,        // request_id
+        action,        // approve | rejected
+        "shop"       // shop_type
+      );
+  
+      loadAll(); // refresh list
+    } catch (err) {
+      console.error("Wallet action failed", err);
+      alert("Failed to update wallet request");
+    }
+  };
 
     if (loading) return <ShopManagementSkeleton />;
 
@@ -46,18 +52,63 @@ function ShopManagement() {
             <h2 className="page-title">Shop Management</h2>
 
             {/* Pending Approvals */}
-            <div className="card">
-                <h4>Pending Fund Requests</h4>
-                {pending.map(p => (
-                    <div key={p.id} className="fund-row mb-2">
-                        <span>{p.shop}</span>
-                        <span>₹{p.amount}</span>
-                        <button className="btn btn-primary" onClick={() => handleFund(p, "approve")}>Approve</button>
-                        <button className="btn btn-danger" onClick={() => handleFund(p, "rejected")}>Reject</button>
-                    </div>
-                ))}
-                {pending.length === 0 && <p>No pending requests</p>}
-            </div>
+          <div className="card shadow-sm p-4 bg-white rounded-lg">
+  <h4 className="mb-4 font-semibold text-lg">
+    Pending Fund Requests
+  </h4>
+
+  {pending.length === 0 ? (
+    <p className="text-gray-500 text-sm">No pending requests</p>
+  ) : (
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="bg-gray-100 text-left text-sm text-gray-600">
+            <th className="p-3">Shop</th>
+            <th className="p-3">Amount</th>
+            <th className="p-3 text-center">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {pending.map((p) => (
+            <tr
+              key={p.user_id}
+              className="border-b hover:bg-gray-50 transition"
+            >
+              <td className="p-3 font-medium text-gray-800">
+                {p.shop}
+              </td>
+
+              <td className="p-3 text-gray-700 font-semibold">
+                ₹{p.amount}
+              </td>
+
+              <td className="p-3">
+                <div className="flex justify-center gap-2">
+                  <button
+                    className="btn btn-success btn-sm px-3"
+                    onClick={() => onWalletAction(p, "approve")}
+                  >
+                    Approve
+                  </button>
+
+                  <button
+                    className="btn btn-danger btn-sm px-3"
+                    onClick={() => onWalletAction(p, "rejected")}
+                  >
+                    Reject
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</div>
+
 
             {/* Shops Table */}
             <div className="card">
