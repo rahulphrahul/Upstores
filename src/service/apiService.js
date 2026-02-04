@@ -569,7 +569,7 @@ export const changePassword = async (userId, password) => {
   fd.append("password", password);
 
   const res = await fetch(
-    `${BASE_URL}/change_password.php`,
+    `${BASE_URL}/auth/change_password.php`,
     {
       method: "POST",
       body: fd,

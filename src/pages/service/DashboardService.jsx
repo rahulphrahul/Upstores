@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./DashboardService.css";
 import { getServiceLoginDetails } from "../../service/apiService"; // your API service
 import { QRCodeCanvas } from "qrcode.react";
+import { BASE_IMAGE_URL } from "../../config/config";
 
 const DashboardService = () => {
   const [service, setService] = useState(null);
@@ -9,6 +10,12 @@ const DashboardService = () => {
   // 🔐 Get logged-in user
   const user =  JSON.parse(localStorage.getItem("user"));
   const serviceId = user?.service_id || user?.id; 
+  const logo =
+  service.media?.find(m => m.logo && m.logo !== "")?.logo;
+
+const images =
+  service.media?.filter(m => m.images).map(m => m.images) || [];
+
   useEffect(() => {
     const fetchService = async () => {
       try {
@@ -51,7 +58,20 @@ const DashboardService = () => {
       {/* HEADER */}
       <div className="shop-header">
         <div className="shop-header-content">
-          <img src={service.media.logo} alt={service.service.name} className="shop-logo" />
+          <img  src={
+                  logo
+                    ? `${BASE_IMAGE_URL}/${logo}`
+                    : "/shop-placeholder.png"
+                } alt={service.service.name} className="shop-logo" />
+           <img
+                src={
+                  logo
+                    ? `${BASE_IMAGE_URL}/${logo}`
+                    : "/shop-placeholder.png"
+                }
+                alt={service.service.name}
+                className="shop-logo"
+              />
           <div className="shop-info">
             <h1 className="shop-name">{service.service.name}</h1>
             <p className="shop-description">{service.service.description}</p>
@@ -110,15 +130,25 @@ const DashboardService = () => {
           </section>
 
           {/* IMAGES */}
-          <section className="images-section">
-            <h2 className="section-title">🖼️ Service Gallery</h2>
-            <div className="images-grid">
-              {service.media.images?.map((img, i) => (
-                <div key={i} className="image-card">
-                  <img src={img} alt="service" className="shop-image" />
-                </div>
-              ))}
-            </div>
+            {/* SHOP GALLERY */}
+          <section className="gallery-section">
+            <h2 className="section-title">🖼️ Shop Gallery</h2>
+          
+            {images.length === 0 ? (
+              <p className="text-muted">No shop images uploaded</p>
+            ) : (
+              <div className="shop-gallery">
+                {images.map((img, index) => (
+                  <div key={index} className="gallery-item">
+                    <img
+                      src={`${BASE_IMAGE_URL}/${img}`}
+                      alt={`service image ${index + 1}`}
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
         </div>
 

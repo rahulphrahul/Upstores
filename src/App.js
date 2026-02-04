@@ -75,16 +75,17 @@ function App() {
     <Router>
       <Routes>
         {/* === LOGIN === */}
-        <Route
-          path="/"
-          element={
-            user ? (
-              <Navigate to={getDefaultRoute(user.role)} replace />
-            ) : (
-              <LoginPage setUser={setUser} />
-            )
-          }
-        />
+       <Route
+  path="/"
+  element={
+    user && user.force_password_change === 0 ? (
+      <Navigate to={getDefaultRoute(user.role)} replace />
+    ) : (
+      <LoginPage setUser={setUser} />
+    )
+  }
+/>
+
         <Route
           path="/register"
           element={

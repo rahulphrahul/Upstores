@@ -35,12 +35,15 @@ const handleEmailBlur = async () => {
     try {
       const res = await loginUser(username, password);
       if (res.status === "success") {
-        localStorage.setItem("user", JSON.stringify(res.user));
-        setUser(res.user);
         setLoggedUser(res.user);
         if (res.user.force_password_change === 1) {
         setShowChangePassword(true);
+        return;
       }
+        localStorage.setItem("user", JSON.stringify(res.user));
+        setUser(res.user);
+        console.log("userssss",res.user);
+        
       } else {
         setError(res.message || "Invalid credentials");
       }
@@ -173,6 +176,7 @@ const handleEmailBlur = async () => {
 
       localStorage.setItem("user", JSON.stringify(updatedUser));
       setUser(updatedUser);
+      //  navigate("/dashboard");
     }}
   />
 )}

@@ -4,6 +4,7 @@ import { getShopLoginDetails } from "../../service/apiService";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { shopIcon } from "../../utils/leafletIcon";
 import { QRCodeCanvas } from "qrcode.react";
+import { BASE_IMAGE_URL } from "../../config/config";
 
 
 // Download QR helper
@@ -56,17 +57,29 @@ const ShopDashboard = () => {
   if (loading) return <div className="loader">Loading shop...</div>;
   if (error) return <div className="error">{error}</div>;
   if (!shop) return null;
+const logo =
+  shop.media?.find(m => m.logo && m.logo !== "")?.logo;
+
+const images =
+  shop.media?.filter(m => m.images).map(m => m.images) || [];
+
+  // console.log("shop",shop.media);
 // console.log("ffff",shop.scanner_code[0].scanner_code)
   return (
     <div className="shop-page">
       {/* HEADER */}
       <div className="shop-header">
         <div className="shop-header-content">
-          <img
-            src={shop.shop.logo || "/shop-placeholder.png"}
-            alt={shop.shop.name}
-            className="shop-logo"
-          />
+         {/* Logo */}
+    <img
+      src={
+        logo
+          ? `${BASE_IMAGE_URL}/${logo}`
+          : "/shop-placeholder.png"
+      }
+      alt={shop.shop.name}
+      className="shop-logo"
+    />
           <div className="shop-info">
             <h1 className="shop-name">{shop.shop.name}</h1>
             <p className="shop-description">
@@ -117,6 +130,27 @@ const ShopDashboard = () => {
               ))}
             </div>
           </section>
+          {/* SHOP GALLERY */}
+<section className="gallery-section">
+  <h2 className="section-title">🖼️ Shop Gallery</h2>
+
+  {images.length === 0 ? (
+    <p className="text-muted">No shop images uploaded</p>
+  ) : (
+    <div className="shop-gallery">
+      {images.map((img, index) => (
+        <div key={index} className="gallery-item">
+          <img
+            src={`${BASE_IMAGE_URL}/${img}`}
+            alt={`Shop image ${index + 1}`}
+            loading="lazy"
+          />
+        </div>
+      ))}
+    </div>
+  )}
+</section>
+
         </div>
 
         {/* SIDEBAR */}

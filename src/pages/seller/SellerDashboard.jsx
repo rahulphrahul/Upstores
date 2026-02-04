@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./SellerDashboard.css";
 import { getSellerLoginDetails } from "../../service/apiService";
 import { QRCodeCanvas } from "qrcode.react";
+import { BASE_IMAGE_URL } from "../../config/config";
 
 const SellerDashboard = () => {
   const [seller, setSeller] = useState(null);
@@ -10,6 +11,11 @@ const SellerDashboard = () => {
   // 🔐 Get logged-in user (SAME AS SERVICE)
   const user = JSON.parse(localStorage.getItem("user"));
   const sellerId = user?.seller_id || user?.id;
+const logo =
+  seller.media?.find(m => m.logo && m.logo !== "")?.logo;
+
+const images =
+  seller.media?.filter(m => m.images).map(m => m.images) || [];
 
   useEffect(() => {
     const fetchSeller = async () => {
@@ -46,7 +52,11 @@ console.log("tetet",seller);
       <div className="seller-header">
         <div className="seller-header-content">
           <img
-            src={seller.media?.logo}
+            src={
+                   logo
+                     ? `${BASE_IMAGE_URL}/${logo}`
+                     : "/shop-placeholder.png"
+                 }
             alt={seller.seller?.name}
             className="seller-avatar"
           />
@@ -135,17 +145,26 @@ console.log("tetet",seller);
           </section> */}
 
           {/* STORE IMAGES */}
-          <section className="store-images-section">
-            <h2 className="section-title">🏪 Store Images</h2>
-
-            <div className="store-images-grid">
-              {seller.media?.images?.map((img, i) => (
-                <div key={i} className="store-image-card">
-                  <img src={img} alt="store" className="store-image" />
-                </div>
-              ))}
-            </div>
-          </section>
+         {/* SHOP GALLERY */}
+                <section className="gallery-section">
+                  <h2 className="section-title">🖼️ Shop Gallery</h2>
+                
+                  {images.length === 0 ? (
+                    <p className="text-muted">No shop images uploaded</p>
+                  ) : (
+                    <div className="shop-gallery">
+                      {images.map((img, index) => (
+                        <div key={index} className="gallery-item">
+                          <img
+                            src={`${BASE_IMAGE_URL}/${img}`}
+                            alt={`seller image ${index + 1}`}
+                            loading="lazy"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </section>
         </div>
 
         {/* SIDEBAR */}
