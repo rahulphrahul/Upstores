@@ -57,10 +57,10 @@ function DashboardLayout({ user, setUser }) {
                   // { name: "Security", path: "/dashboard/shop/security" },
     ],
     seller: [
-      { name: "Dashboard", path: "/dashboard/seller/home" },
-        { name: "Customer QR", path: "/dashboard/seller/customer_qr" },
-            { name: "Purchase", path: "/dashboard/seller/purchase_history" },
-                { name: "Wallet Management", path: "/dashboard/seller/wallet_management" },
+      { name: "Dashboard", path: "/dashboard/sellers/home" },
+        { name: "Customer QR", path: "/dashboard/sellers/customer_qr" },
+            { name: "Purchase", path: "/dashboard/sellers/purchase_history" },
+                { name: "Wallet Management", path: "/dashboard/sellers/wallet_management" },
     ],
     service: [
       { name: "Dashboard", path: "/dashboard/service/home" },

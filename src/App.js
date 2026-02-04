@@ -314,7 +314,7 @@ function App() {
             path="seller/home"
             element={
               <RoleProtectedRoute user={user} allowedRoles={['seller']}>
-                <ExecutiveDashboard />
+                <ExecutiveDashboard user={user} />
               </RoleProtectedRoute>
             }
           />

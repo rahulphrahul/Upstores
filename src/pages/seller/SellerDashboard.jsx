@@ -3,6 +3,8 @@ import "./SellerDashboard.css";
 import { getSellerLoginDetails } from "../../service/apiService";
 import { QRCodeCanvas } from "qrcode.react";
 import { BASE_IMAGE_URL } from "../../config/config";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { shopIcon } from "../../utils/leafletIcon";
 
 const SellerDashboard = () => {
   const [seller, setSeller] = useState(null);
@@ -11,12 +13,7 @@ const SellerDashboard = () => {
   // 🔐 Get logged-in user (SAME AS SERVICE)
   const user = JSON.parse(localStorage.getItem("user"));
   const sellerId = user?.seller_id || user?.id;
-const logo =
-  seller.media?.find(m => m.logo && m.logo !== "")?.logo;
-
-const images =
-  seller.media?.filter(m => m.images).map(m => m.images) || [];
-
+  
   useEffect(() => {
     const fetchSeller = async () => {
       try {
@@ -42,9 +39,17 @@ const images =
       setLoading(false);
     }
   }, [sellerId]);
+if (loading) return <p>Loading seller details...</p>;
+if (!seller) return <p>No seller data available.</p>;
 
-  if (loading) return <p>Loading seller details...</p>;
-  if (!seller) return <p>No seller data available.</p>;
+const logo =
+  seller?.media?.find(m => m.logo && m.logo !== "")?.logo || null;
+
+const images =
+  seller?.media?.filter(m => m.images)?.map(m => m.images) || [];
+
+
+
 console.log("tetet",seller);
   return (
     <div className="seller-page">
@@ -93,7 +98,7 @@ console.log("tetet",seller);
                 <div className="balance-amount">
                   <span className="balance-currency">₹</span>
                   <span className="balance-value">
-                    {seller.seller?.wallet_balance?.toFixed(2) || "0.00"}
+                    {seller.seller?.wallet_balance || "0.00"}
                   </span>
                 </div>
               </div>
@@ -101,7 +106,7 @@ console.log("tetet",seller);
               <div className="seller-wallet-stats">
                 <div className="wallet-stat-item">
                   <span>Total Customers</span>
-                  <span>{seller.transactions[0]['customers_count']|| 0}</span>
+                  <span>{seller?.transactions?.[0]?.customers_count || 0}</span>
                 </div>
 
                 {/* <div className="wallet-stat-item">
@@ -114,6 +119,28 @@ console.log("tetet",seller);
                   <span>₹ {seller.total_earnings || 0}</span>
                 </div> */}
               </div>
+            </div>
+          </section>
+          {/* TRANSACTIONS */}
+          <section className="transactions-section">
+            <h2 className="section-title">📊 Transactions</h2>
+            <div className="transactions-list">
+              {seller.transactions.length === 0 && (
+                <p>No transactions</p>
+              )}
+
+              {seller.transactions.map((tx) => (
+                <div key={tx.id} className="transaction-item">
+                  <div>
+                    <span>{tx.created_at}</span>
+                  </div>
+                  <div>
+                    <span className={tx.type}>
+                      {tx.type === "credit" ? "+" : "-"}₹{tx.amount}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
 
@@ -145,27 +172,25 @@ console.log("tetet",seller);
           </section> */}
 
           {/* STORE IMAGES */}
-         {/* SHOP GALLERY */}
-                <section className="gallery-section">
-                  <h2 className="section-title">🖼️ Shop Gallery</h2>
-                
-                  {images.length === 0 ? (
-                    <p className="text-muted">No shop images uploaded</p>
-                  ) : (
-                    <div className="shop-gallery">
-                      {images.map((img, index) => (
-                        <div key={index} className="gallery-item">
-                          <img
-                            src={`${BASE_IMAGE_URL}/${img}`}
-                            alt={`seller image ${index + 1}`}
-                            loading="lazy"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </section>
+<section className="gallery-section">
+  <h2 className="section-title">🖼️ Shop Gallery</h2>
+
+  {images.length === 0 ? (
+    <p className="text-muted">No shop images uploaded</p>
+  ) : (
+    <div className="shop-gallery">
+      {images.map((img, index) => (
+        <div key={index} className="gallery-item">
+          <img
+            src={`${BASE_IMAGE_URL}/${img}`}
+            alt={`seller image ${index + 1}`}
+            loading="lazy"
+          />
         </div>
+      ))}
+    </div>
+  )}
+</section>        </div>
 
         {/* SIDEBAR */}
         <div className="seller-sidebar">
@@ -177,7 +202,7 @@ console.log("tetet",seller);
               <QRCodeCanvas
                 id="seller-qr"
                 value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
-                  seller.scanner_code[0]['scanner_code']
+                 seller?.scanner_code?.[0]?.scanner_code
                 )}&type=seller`}
                 size={200}
                 level="H"
@@ -218,6 +243,34 @@ console.log("tetet",seller);
                 ✉️ {seller.user?.[0]?.email || "-"}
               </div>
             </div>
+          </section>
+            {/* location map */}
+                    <section className="map-section">
+            <h2 className="section-title">📍 Seller Location</h2>
+          
+            {seller.seller.latitude && seller.seller.longitude ? (
+              <MapContainer
+                center={[seller.seller.latitude, seller.seller.longitude]}
+                zoom={16}
+                style={{ height: "250px", width: "100%", borderRadius: "12px" }}
+              >
+                <TileLayer
+                  attribution='&copy; OpenStreetMap contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+          
+                <Marker
+                  position={[seller.seller.latitude, seller.seller.longitude]}
+                  icon={shopIcon}
+                >
+                  <Popup>
+                    <strong>{seller.seller.name}</strong>
+                  </Popup>
+                </Marker>
+              </MapContainer>
+            ) : (
+              <p>Location not available</p>
+            )}
           </section>
         </div>
       </div>

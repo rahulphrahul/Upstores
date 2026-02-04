@@ -3,6 +3,8 @@ import "./DashboardService.css";
 import { getServiceLoginDetails } from "../../service/apiService"; // your API service
 import { QRCodeCanvas } from "qrcode.react";
 import { BASE_IMAGE_URL } from "../../config/config";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { shopIcon } from "../../utils/leafletIcon";
 
 const DashboardService = () => {
   const [service, setService] = useState(null);
@@ -10,11 +12,6 @@ const DashboardService = () => {
   // 🔐 Get logged-in user
   const user =  JSON.parse(localStorage.getItem("user"));
   const serviceId = user?.service_id || user?.id; 
-  const logo =
-  service.media?.find(m => m.logo && m.logo !== "")?.logo;
-
-const images =
-  service.media?.filter(m => m.images).map(m => m.images) || [];
 
   useEffect(() => {
     const fetchService = async () => {
@@ -35,8 +32,14 @@ const images =
 
     fetchService();
   }, [serviceId]);
+  if (loading) return <p>Loading seller details...</p>;
+if (!service) return <p>No seller data available.</p>;
+  const logo =
+  service.media?.find(m => m.logo && m.logo !== "")?.logo;
 
-  // Download QR code
+const images =
+  service.media?.filter(m => m.images).map(m => m.images) || [];
+  // Download QR codelogo
   const downloadQr = (url) => {
     fetch(url)
       .then((res) => res.blob())
@@ -205,6 +208,34 @@ const images =
               <div className="contact-item">✉️ {service.user[0]['email'] || "-"}</div>
             </div>
           </section>
+           {/* location map */}
+                              <section className="map-section">
+                      <h2 className="section-title">📍 Service Location</h2>
+                    
+                      {service.service.latitude && service.service.longitude ? (
+                        <MapContainer
+                          center={[service.service.latitude, service.service.longitude]}
+                          zoom={16}
+                          style={{ height: "250px", width: "100%", borderRadius: "12px" }}
+                        >
+                          <TileLayer
+                            attribution='&copy; OpenStreetMap contributors'
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                          />
+                    
+                          <Marker
+                            position={[service.service.latitude, service.service.longitude]}
+                            icon={shopIcon}
+                          >
+                            <Popup>
+                              <strong>{service.service.name}</strong>
+                            </Popup>
+                          </Marker>
+                        </MapContainer>
+                      ) : (
+                        <p>Location not available</p>
+                      )}
+                    </section>
         </div>
       </div>
     </div>

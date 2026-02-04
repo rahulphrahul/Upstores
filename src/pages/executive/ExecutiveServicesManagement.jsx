@@ -4,9 +4,13 @@ import {
   addExecutiveService,
   updateExecutiveService,
   updateExecutiveServiceStatus,
+  getServiceLoginDetails,
   getCategories,
 } from "../../service/apiService";
-
+import { BASE_IMAGE_URL } from "../../config/config";
+import { QRCodeCanvas } from "qrcode.react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { shopIcon } from "../../utils/leafletIcon";
 import "./ExecutiveServicesManagement.css";
 
 function ExecutiveServiceManagement({ user }) {
@@ -34,6 +38,10 @@ function ExecutiveServiceManagement({ user }) {
 
   const [logo, setLogo] = useState(null);
   const [images, setImages] = useState([]);
+  const [showServiceModal, setShowServiceModal] = useState(false);
+const [selectedService, setSelectedService] = useState(null);
+const [serviceLoading, setServiceLoading] = useState(false);
+
  const shop_type ="service";
   /* =========================
      LOAD SERVICES
@@ -95,6 +103,22 @@ function ExecutiveServiceManagement({ user }) {
     setEditingService(null);
     setShowForm(false);
   };
+const openServiceModal = async (serviceId) => {
+  setShowServiceModal(true);
+  setServiceLoading(true);
+  setSelectedService(null);
+
+  try {
+    const res = await getServiceLoginDetails(serviceId);
+    if (res.status === "success") {
+      setSelectedService(res.data);
+    }
+  } catch (e) {
+    console.error("Failed to load service details", e);
+  } finally {
+    setServiceLoading(false);
+  }
+};
 
   /* =========================
      GEO LOCATION
@@ -274,7 +298,12 @@ function ExecutiveServiceManagement({ user }) {
           </thead>
           <tbody>
             {services.map((s) => (
-              <tr key={s.id}>
+             <tr
+  key={s.user_id}
+  className="clickable-row"
+  onClick={() => openServiceModal(s.user_id)}
+>
+
                 <td>{s.name}</td>
                 <td>{s.owner_name}</td>
                  <td>{s.phone || "—"}</td>
@@ -294,7 +323,10 @@ function ExecutiveServiceManagement({ user }) {
 </td>
                 <td>
                  {/*} <button className="btn btn-danger" onClick={() => handleEdit(s)}>Edit</button>*/}
-                  <button className="btn btn-warning m-1" onClick={() => toggleStatus(s)}>
+                  <button className="btn btn-warning m-1" onClick={(e) => {
+    e.stopPropagation();
+    toggleStatus(s);
+  }}>
                     {s.status === "active" ? "Disable" : "Enable"}
                   </button>
                 </td>
@@ -306,6 +338,146 @@ function ExecutiveServiceManagement({ user }) {
           </tbody>
         </table>
       </div>
+      {/* SERVICE DETAILS MODAL */}
+{showServiceModal && (
+  <div className="shop-modal-overlay">
+    <div className="shop-modal-container">
+
+      {/* CLOSE */}
+      <button
+        className="shop-modal-close"
+        onClick={() => setShowServiceModal(false)}
+      >
+        ✕
+      </button>
+
+      {serviceLoading && (
+        <p className="modal-loading">Loading service details...</p>
+      )}
+
+      {!serviceLoading && selectedService && (() => {
+
+        const logo =
+          selectedService.media?.find(m => m.logo && m.logo !== "")?.logo;
+
+        const images =
+          selectedService.media?.filter(m => m.images).map(m => m.images) || [];
+
+        return (
+          <div className="shop-modal-content">
+
+            {/* ================= HEADER ================= */}
+            <div className="modal-header">
+              <img
+                src={
+                  logo
+                    ? `${BASE_IMAGE_URL}/${logo}`
+                    : "/shop-placeholder.png"
+                }
+                className="modal-shop-logo"
+                alt="service Logo"
+              />
+
+              <div>
+                <h2>{selectedService.service.name}</h2>
+                <p>Owner: {selectedService.service.owner_name}</p>
+              </div>
+            </div>
+
+            {/* ================= STATS ================= */}
+            <div className="modal-stats">
+              <div className="stat-card">
+                <span>💰 Wallet</span>
+                <strong>₹ {selectedService.service.wallet_balance}</strong>
+              </div>
+              <div className="stat-card">
+                <span>📦 Orders</span>
+                <strong>{selectedService.service.total_orders}</strong>
+              </div>
+            </div>
+
+            {/* ================= CONTACT ================= */}
+            <div className="modal-section">
+              <h4>📞 Contact Details</h4>
+              <div>📍 {selectedService.service.address || "Not set"}</div>
+              <div>📞 {selectedService.user?.[0]?.phone || "Not set"}</div>
+              <div>✉️ {selectedService.user?.[0]?.email || "Not set"}</div>
+            </div>
+
+            {/* ================= QR ================= */}
+            {selectedService.scanner_code?.[0]?.scanner_code && (
+              <div className="modal-section center">
+                <h4>📱 service QR</h4>
+                <QRCodeCanvas
+                  value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+                    selectedService.scanner_code[0].scanner_code
+                  )}&type=service`}
+                  size={160}
+                  level="H"
+                />
+              </div>
+            )}
+
+            {/* ================= GALLERY ================= */}
+            <div className="modal-section">
+              <h4>🖼️ service Gallery</h4>
+
+              {images.length === 0 ? (
+                <p>No images uploaded</p>
+              ) : (
+                <div className="modal-gallery">
+                  {images.map((img, i) => (
+                    <img
+                      key={i}
+                      src={`${BASE_IMAGE_URL}/${img}`}
+                      alt="service"
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ================= MAP ================= */}
+            <div className="modal-section">
+              <h4>📍 service Location</h4>
+
+              {selectedService.service.latitude && selectedService.service.longitude ? (
+                <MapContainer
+                  center={[
+                    selectedService.service.latitude,
+                    selectedService.service.longitude
+                  ]}
+                  zoom={16}
+                  style={{
+                    height: "220px",
+                    borderRadius: "12px"
+                  }}
+                >
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  <Marker
+                    position={[
+                      selectedService.service.latitude,
+                      selectedService.service.longitude
+                    ]}
+                    icon={shopIcon}
+                  >
+                    <Popup>
+                      <strong>{selectedService.service.name}</strong>
+                    </Popup>
+                  </Marker>
+                </MapContainer>
+              ) : (
+                <p>Location not available</p>
+              )}
+            </div>
+
+          </div>
+        );
+      })()}
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

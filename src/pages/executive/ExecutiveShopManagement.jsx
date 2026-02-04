@@ -3,9 +3,13 @@ import {
   getExecutiveShops,
   createExecutiveShop,
   toggleExecutiveShopStatus,
-  getCategories
+  getCategories,
+  getShopLoginDetails
 } from "../../service/apiService";
-
+import { BASE_IMAGE_URL } from "../../config/config";
+import { QRCodeCanvas } from "qrcode.react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { shopIcon } from "../../utils/leafletIcon";
 import "./ExecutiveShopManagement.css";
 
 const MAX_IMAGE_MB = 2;
@@ -18,6 +22,10 @@ function ExecutiveShopManagement({ user }) {
   const [showAdd, setShowAdd] = useState(false);
   const [locating, setLocating] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [showShopModal, setShowShopModal] = useState(false);
+const [selectedShop, setSelectedShop] = useState(null);
+const [shopLoading, setShopLoading] = useState(false);
+
 const shop_type="shop";
   const [form, setForm] = useState({
     name: "",
@@ -49,6 +57,22 @@ const shop_type="shop";
       if (res.status === "success") setCategories(res.data);
     });
   }, []);
+const openShopModal = async (shopId) => {
+  setShowShopModal(true);
+  setShopLoading(true);
+  setSelectedShop(null);
+
+  try {
+    const res = await getShopLoginDetails(shopId);
+    if (res.status === "success") {
+      setSelectedShop(res.data);
+    }
+  } catch (e) {
+    console.error("Failed to load shop details", e);
+  } finally {
+    setShopLoading(false);
+  }
+};
 
   /* =========================
      INPUT HANDLERS
@@ -241,7 +265,7 @@ const shop_type="shop";
       <div className="card">
         <table className="data-table">
           <thead>
-            <tr>
+          <tr>
               <th>Shop</th>
               <th>Owner</th>
               <th>Phone</th>
@@ -254,7 +278,9 @@ const shop_type="shop";
           </thead>
           <tbody>
             {shops.map((s) => (
-              <tr key={s.id}>
+              <tr  key={s.user_id}
+  className="clickable-row"
+  onClick={() => openShopModal(s.user_id)}>
                 <td>{s.shop_name}</td>
                 <td>{s.owner_name}</td>
                 <td>{s.phone}</td>
@@ -274,7 +300,10 @@ const shop_type="shop";
 </td>
 
                 <td>
-                  <button className="btn" onClick={() => toggleStatus(s)}>
+                  <button className="btn" onClick={(e) => {
+    e.stopPropagation();
+    toggleStatus(s);
+  }}>
                     {s.status === "active" ? "Suspend" : "Activate"}
                   </button>
                 </td>
@@ -288,6 +317,147 @@ const shop_type="shop";
           </tbody>
         </table>
       </div>
+     {/* SHOP DETAILS MODAL */}
+{showShopModal && (
+  <div className="shop-modal-overlay">
+    <div className="shop-modal-container">
+
+      {/* CLOSE */}
+      <button
+        className="shop-modal-close"
+        onClick={() => setShowShopModal(false)}
+      >
+        ✕
+      </button>
+
+      {shopLoading && (
+        <p className="modal-loading">Loading shop details...</p>
+      )}
+
+      {!shopLoading && selectedShop && (() => {
+
+        const logo =
+          selectedShop.media?.find(m => m.logo && m.logo !== "")?.logo;
+
+        const images =
+          selectedShop.media?.filter(m => m.images).map(m => m.images) || [];
+
+        return (
+          <div className="shop-modal-content">
+
+            {/* ================= HEADER ================= */}
+            <div className="modal-header">
+              <img
+                src={
+                  logo
+                    ? `${BASE_IMAGE_URL}/${logo}`
+                    : "/shop-placeholder.png"
+                }
+                className="modal-shop-logo"
+                alt="Shop Logo"
+              />
+
+              <div>
+                <h2>{selectedShop.shop.name}</h2>
+                <p>Owner: {selectedShop.shop.owner_name}</p>
+              </div>
+            </div>
+
+            {/* ================= STATS ================= */}
+            <div className="modal-stats">
+              <div className="stat-card">
+                <span>💰 Wallet</span>
+                <strong>₹ {selectedShop.shop.wallet_balance}</strong>
+              </div>
+              <div className="stat-card">
+                <span>📦 Orders</span>
+                <strong>{selectedShop.shop.total_orders}</strong>
+              </div>
+            </div>
+
+            {/* ================= CONTACT ================= */}
+            <div className="modal-section">
+              <h4>📞 Contact Details</h4>
+              <div>📍 {selectedShop.shop.address || "Not set"}</div>
+              <div>📞 {selectedShop.user?.[0]?.phone || "Not set"}</div>
+              <div>✉️ {selectedShop.user?.[0]?.email || "Not set"}</div>
+            </div>
+
+            {/* ================= QR ================= */}
+            {selectedShop.scanner_code?.[0]?.scanner_code && (
+              <div className="modal-section center">
+                <h4>📱 Shop QR</h4>
+                <QRCodeCanvas
+                  value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+                    selectedShop.scanner_code[0].scanner_code
+                  )}&type=shop`}
+                  size={160}
+                  level="H"
+                />
+              </div>
+            )}
+
+            {/* ================= GALLERY ================= */}
+            <div className="modal-section">
+              <h4>🖼️ Shop Gallery</h4>
+
+              {images.length === 0 ? (
+                <p>No images uploaded</p>
+              ) : (
+                <div className="modal-gallery">
+                  {images.map((img, i) => (
+                    <img
+                      key={i}
+                      src={`${BASE_IMAGE_URL}/${img}`}
+                      alt="Shop"
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ================= MAP ================= */}
+            <div className="modal-section">
+              <h4>📍 Shop Location</h4>
+
+              {selectedShop.shop.latitude && selectedShop.shop.longitude ? (
+                <MapContainer
+                  center={[
+                    selectedShop.shop.latitude,
+                    selectedShop.shop.longitude
+                  ]}
+                  zoom={16}
+                  style={{
+                    height: "220px",
+                    borderRadius: "12px"
+                  }}
+                >
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  <Marker
+                    position={[
+                      selectedShop.shop.latitude,
+                      selectedShop.shop.longitude
+                    ]}
+                    icon={shopIcon}
+                  >
+                    <Popup>
+                      <strong>{selectedShop.shop.name}</strong>
+                    </Popup>
+                  </Marker>
+                </MapContainer>
+              ) : (
+                <p>Location not available</p>
+              )}
+            </div>
+
+          </div>
+        );
+      })()}
+    </div>
+  </div>
+)}
+
+{/* end popup modal */}
     </div>
   );
 }

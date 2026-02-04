@@ -4,9 +4,13 @@ import {
   addExecutiveSeller,
   updateExecutiveSeller,
   updateExecutiveSellerStatus,
+  getSellerLoginDetails,
   getCategories,
 } from "../../service/apiService";
-
+import { BASE_IMAGE_URL } from "../../config/config";
+import { QRCodeCanvas } from "qrcode.react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { shopIcon } from "../../utils/leafletIcon";
 import "./ExecutiveSellerManagement.css";
 
 const MAX_IMAGE_MB = 2;
@@ -15,11 +19,16 @@ const MAX_IMAGE_SIZE = MAX_IMAGE_MB * 1024 * 1024;
 function ExecutiveSellerManagement({ user }) {
   const executiveId = user.id;
 
+
   const [sellers, setSellers] = useState([]);
   const [categories, setCategories] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingSeller, setEditingSeller] = useState(null);
   const [locating, setLocating] = useState(false);
+  const [showSellerModal, setShowSellerModal] = useState(false);
+const [selectedSeller, setSelectedSeller] = useState(null);
+const [sellerLoading, setSellerLoading] = useState(false);
+
 const shop_type ="seller";
   const [form, setForm] = useState({
     category_id: "",
@@ -59,6 +68,23 @@ const loadSellers = async () => {
     loadSellers();
     loadCategories();
   }, []);
+
+const openSellerModal = async (sellerId) => {
+  setShowSellerModal(true);
+  setSellerLoading(true);
+  setSelectedSeller(null);
+
+  try {
+    const res = await getSellerLoginDetails(sellerId);
+    if (res.status === "success") {
+      setSelectedSeller(res.data);
+    }
+  } catch (e) {
+    console.error("Failed to load seller details", e);
+  } finally {
+    setSellerLoading(false);
+  }
+};
 
   /* =========================
      FORM HANDLERS
@@ -281,7 +307,12 @@ const loadSellers = async () => {
           </thead>
           <tbody>
             {sellers.map((s) => (
-              <tr key={s.id}>
+             <tr
+  key={s.user_id}
+  className="clickable-row"
+  onClick={() => openSellerModal(s.user_id)}
+>
+
                 <td>{s.name}</td>
                 <td>{s.owner_name}</td>
                 <td>{s.phone}</td>
@@ -301,7 +332,11 @@ const loadSellers = async () => {
 </td>
                 <td className="actions">
                 {/* <button className="btn btn-danger" onClick={() => handleEdit(s)}>Edit</button>*/}
-                  <button className={`btn ${s.status === "active" ? "btn-warning" : "btn-success"}`} onClick={() => toggleStatus(s)}>
+                  <button className={`btn ${s.status === "active" ? "btn-warning" : "btn-success"}`} onClick={(e) => {
+    e.stopPropagation();
+    toggleStatus(s);
+  }}
+>
                     {s.status === "active" ? "Suspend" : "Activate"}
                   </button>
                 </td>
@@ -315,6 +350,146 @@ const loadSellers = async () => {
           </tbody>
         </table>
       </div>
+      {/* SHOP DETAILS MODAL */}
+{showSellerModal && (
+  <div className="shop-modal-overlay">
+    <div className="shop-modal-container">
+
+      {/* CLOSE */}
+      <button
+        className="shop-modal-close"
+        onClick={() => setShowSellerModal(false)}
+      >
+        ✕
+      </button>
+
+      {sellerLoading && (
+        <p className="modal-loading">Loading seller details...</p>
+      )}
+
+      {!sellerLoading && selectedSeller && (() => {
+
+        const logo =
+          selectedSeller.media?.find(m => m.logo && m.logo !== "")?.logo;
+
+        const images =
+          selectedSeller.media?.filter(m => m.images).map(m => m.images) || [];
+
+        return (
+          <div className="shop-modal-content">
+
+            {/* ================= HEADER ================= */}
+            <div className="modal-header">
+              <img
+                src={
+                  logo
+                    ? `${BASE_IMAGE_URL}/${logo}`
+                    : "/shop-placeholder.png"
+                }
+                className="modal-shop-logo"
+                alt="seller Logo"
+              />
+
+              <div>
+                <h2>{selectedSeller.seller.name}</h2>
+                <p>Owner: {selectedSeller.seller.owner_name}</p>
+              </div>
+            </div>
+
+            {/* ================= STATS ================= */}
+            <div className="modal-stats">
+              <div className="stat-card">
+                <span>💰 Wallet</span>
+                <strong>₹ {selectedSeller.seller.wallet_balance}</strong>
+              </div>
+              <div className="stat-card">
+                <span>📦 Orders</span>
+                <strong>{selectedSeller.seller.total_orders}</strong>
+              </div>
+            </div>
+
+            {/* ================= CONTACT ================= */}
+            <div className="modal-section">
+              <h4>📞 Contact Details</h4>
+              <div>📍 {selectedSeller.seller.address || "Not set"}</div>
+              <div>📞 {selectedSeller.user?.[0]?.phone || "Not set"}</div>
+              <div>✉️ {selectedSeller.user?.[0]?.email || "Not set"}</div>
+            </div>
+
+            {/* ================= QR ================= */}
+            {selectedSeller.scanner_code?.[0]?.scanner_code && (
+              <div className="modal-section center">
+                <h4>📱 seller QR</h4>
+                <QRCodeCanvas
+                  value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+                    selectedSeller.scanner_code[0].scanner_code
+                  )}&type=seller`}
+                  size={160}
+                  level="H"
+                />
+              </div>
+            )}
+
+            {/* ================= GALLERY ================= */}
+            <div className="modal-section">
+              <h4>🖼️ seller Gallery</h4>
+
+              {images.length === 0 ? (
+                <p>No images uploaded</p>
+              ) : (
+                <div className="modal-gallery">
+                  {images.map((img, i) => (
+                    <img
+                      key={i}
+                      src={`${BASE_IMAGE_URL}/${img}`}
+                      alt="seller"
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ================= MAP ================= */}
+            <div className="modal-section">
+              <h4>📍 seller Location</h4>
+
+              {selectedSeller.seller.latitude && selectedSeller.seller.longitude ? (
+                <MapContainer
+                  center={[
+                    selectedSeller.seller.latitude,
+                    selectedSeller.seller.longitude
+                  ]}
+                  zoom={16}
+                  style={{
+                    height: "220px",
+                    borderRadius: "12px"
+                  }}
+                >
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  <Marker
+                    position={[
+                      selectedSeller.seller.latitude,
+                      selectedSeller.seller.longitude
+                    ]}
+                    icon={shopIcon}
+                  >
+                    <Popup>
+                      <strong>{selectedSeller.seller.name}</strong>
+                    </Popup>
+                  </Marker>
+                </MapContainer>
+              ) : (
+                <p>Location not available</p>
+              )}
+            </div>
+
+          </div>
+        );
+      })()}
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
