@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { loginUser } from "../service/apiService";
 import logo from "../assets/logo.png";
 import ChangePasswordModal from "./ChangePasswordModal";
+import { checkEmailExists } from "../service/apiService";
 
 
 function LoginPage({ setUser }) {
@@ -13,9 +14,19 @@ function LoginPage({ setUser }) {
   const [rememberMe, setRememberMe] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [loggedUser, setLoggedUser] = useState(null);
-
+const [firstLogin, setFirstLogin] = useState(false);
 
   const navigate = useNavigate();
+const handleEmailBlur = async () => {
+  if (!username) return;
+
+  const res = await checkEmailExists(username);
+  if (res.exists && res.force_password_change === 1) {
+    setFirstLogin(true);
+  } else {
+    setFirstLogin(false);
+  }
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,6 +81,7 @@ function LoginPage({ setUser }) {
                       placeholder="Enter username"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
+                      onBlur={handleEmailBlur}
                       required
                     />
                   </Form.Group>
@@ -84,6 +96,18 @@ function LoginPage({ setUser }) {
                       required
                     />
                   </Form.Group>
+                  {firstLogin && (
+<div className="text-danger small mt-1">
+  * This is your first login.  
+  Use your temporary password:
+  <br />
+  <strong>Email@123</strong> (example: <strong>rahul@gmail.com@123</strong>)
+  <br />
+  or <strong>Name@123</strong> (example: <strong>rahul haridas: rahulharidas@gmail.com@123</strong>) if email was not provided.
+</div>
+
+)}
+
 
                   <div className="d-flex justify-content-between align-items-center mb-3">
                     <Form.Check

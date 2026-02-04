@@ -231,7 +231,7 @@ export const getExecutiveServices = async (executiveId) => {
 
 export const addExecutiveService = async (formData) => {
 const res = await fetch(
-    `${BASE_URL}/sellers/add_executive_seller.php`,
+    `${BASE_URL}/services/add_executive_services.php`,
     {
       method: "POST",
       body: formData, // ✅ FormData
@@ -239,6 +239,13 @@ const res = await fetch(
   );
 
   return res.json();
+};
+export const checkEmailExists = async (email) => {
+  return fetch(`${BASE_URL}/auth/check-email.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  }).then(res => res.json());
 };
 
 export const updateExecutiveService = async (data) => {
