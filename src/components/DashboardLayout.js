@@ -103,7 +103,7 @@ const menus = {
       <aside className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
         <div className="text-center mb-4">
           <img src={logo} alt="Company Logo" className="sidebar-logo" />
-          <h6 className="mt-2 text-white">
+          <h6 className="mt-2 text-black">
             {user?.name?.toUpperCase()}
           </h6>
         </div>
