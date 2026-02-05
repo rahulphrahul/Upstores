@@ -6,3 +6,5 @@ export const BASE_IMAGE_URL =
 
   export const BASE_CATEGORY_URL =
   "https://semicoloninnovations.in/upstores/category-icons"
+  export const BASE_CUSTM_IMG_URL =
+  "https://semicoloninnovations.in/upstores/api/"

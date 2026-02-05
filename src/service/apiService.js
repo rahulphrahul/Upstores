@@ -367,6 +367,31 @@ export const getServiceLoginDetails = async (serviceId) => {
   const res = await fetch(`${BASE_URL}/services/get_login_services.php?service_id=${serviceId}`);
   return res.json();
 };
+// apiService.js
+export const sendPasswordResetEmail = async (email) => {
+  const res = await fetch(`${BASE_URL}/auth/forgot_password.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  return res.json();
+};
+export const getCustomers = async () => {
+  const res = await fetch(`${BASE_URL}/customers/list.php`);
+  return res.json();
+};
+
+export const updateWallet = async (userId, amount) => {
+  const res = await fetch(`${BASE_URL}/customers/update-wallet.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_id: userId,
+      amount
+    }),
+  });
+  return res.json();
+};
 
 export const getSellerLoginDetails = async (sellerId) => {
   const res = await fetch(`${BASE_URL}/sellers/get_login_seller.php?seller_id=${sellerId}`);

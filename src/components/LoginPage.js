@@ -36,10 +36,10 @@ const handleEmailBlur = async () => {
       const res = await loginUser(username, password);
       if (res.status === "success") {
         setLoggedUser(res.user);
-        if (res.user.force_password_change === 1) {
-        setShowChangePassword(true);
-        return;
-      }
+      //   if (res.user.force_password_change === 1) {
+      //   setShowChangePassword(true);
+      //   return;
+      // }
         localStorage.setItem("user", JSON.stringify(res.user));
         setUser(res.user);
         console.log("userssss",res.user);
@@ -99,17 +99,6 @@ const handleEmailBlur = async () => {
                       required
                     />
                   </Form.Group>
-                  {firstLogin && (
-<div className="text-danger small mt-1">
-  * This is your first login.  
-  Use your temporary password:
-  <br />
-  <strong>Email@123</strong> (example: <strong>rahul@gmail.com@123</strong>)
-  <br />
-  or <strong>Name@123</strong> (example: <strong>rahul haridas: rahulharidas@gmail.com@123</strong>) if email was not provided.
-</div>
-
-)}
 
 
                   <div className="d-flex justify-content-between align-items-center mb-3">
@@ -161,7 +150,7 @@ const handleEmailBlur = async () => {
           </Col>
         </Row>
       </Container>
-          {showChangePassword && loggedUser && (
+          {/* {showChangePassword && loggedUser && (
   <ChangePasswordModal
     show={showChangePassword}
     userId={loggedUser.id}
@@ -179,7 +168,7 @@ const handleEmailBlur = async () => {
       //  navigate("/dashboard");
     }}
   />
-)}
+)} */}
     </div>
 
   );

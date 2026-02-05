@@ -28,6 +28,8 @@ import CustomerHome from './pages/customers/CustomerHome';
 import ShopDashboard from './pages/shop/ShopDashboard';
 import PurchaseHistoryShop from './pages/shop/PurchaseHistory';
 import ScanCustomerQR from './pages/shop/ScanCustomerQR';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 
 import Wallet from './pages/shop/Wallet';
 import SellerDashboard from './pages/seller/SellerDashboard';
@@ -78,7 +80,7 @@ function App() {
        <Route
   path="/"
   element={
-    user && user.force_password_change === 0 ? (
+    user? (
       <Navigate to={getDefaultRoute(user.role)} replace />
     ) : (
       <LoginPage setUser={setUser} />
@@ -96,6 +98,16 @@ function App() {
             )
           }
         />
+        <Route
+  path="/forgot-password"
+  element={user ? <Navigate to="/" replace /> : <ForgotPassword />}
+/>
+
+<Route
+  path="/reset-password"
+  element={user ? <Navigate to="/" replace /> : <ResetPassword />}
+/>
+
         {/* === DASHBOARD LAYOUT (Shared) === */}
         <Route
           path="/dashboard/*"

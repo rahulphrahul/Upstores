@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { getSellers,getWalletRequests, updateSellerStatus, handleWalletRequest } from "../../service/apiService";
+import { getSellers,getWalletRequests, updateSellerStatus, handleWalletRequest,getSellerLoginDetails } from "../../service/apiService";
 import "./SellerManagement.css";
+import { BASE_IMAGE_URL } from "../../config/config";
+import { QRCodeCanvas } from "qrcode.react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { shopIcon } from "../../utils/leafletIcon";
+import ShopManagementSkeleton from "./skeletons/ShopManagementSkeleton";
 
 function SellerManagement() {
 const [loading, setLoading] = useState(true);
 const [sellers, setSellers] = useState([]);
 const [pending, setPending] = useState([]);
+ const [showSellerModal, setShowSellerModal] = useState(false);
+const [selectedSeller, setSelectedSeller] = useState(null);
+const [sellerLoading, setSellerLoading] = useState(false);
 
 const shop_type = "seller";
 
@@ -51,6 +59,22 @@ const onWalletAction = async (req, action) => {
     const newStatus = seller.status === "active" ? "suspended" : "active";
     await updateSellerStatus(seller.id, newStatus);
     loadSellers();
+  };
+  const openSellerModal = async (sellerId) => {
+    setShowSellerModal(true);
+    setSellerLoading(true);
+    setSelectedSeller(null);
+  
+    try {
+      const res = await getSellerLoginDetails(sellerId);
+      if (res.status === "success") {
+        setSelectedSeller(res.data);
+      }
+    } catch (e) {
+      console.error("Failed to load seller details", e);
+    } finally {
+      setSellerLoading(false);
+    }
   };
 
   if (loading) return <p>Loading sellers...</p>;
@@ -131,7 +155,11 @@ const onWalletAction = async (req, action) => {
           </thead>
           <tbody>
             {sellers.map(s => (
-              <tr key={s.id}>
+             <tr
+  key={s.seller_id}
+  className="clickable-row"
+  onClick={() => openSellerModal(s.seller_id)}
+>
                 <td>{s.name}</td>
                 <td>{s.owner_name}</td>
                 <td>{s.executive || "-"}</td>
@@ -159,6 +187,144 @@ const onWalletAction = async (req, action) => {
           </tbody>
         </table>
       </div>
+    {/* SHOP DETAILS MODAL */}
+{showSellerModal && (
+  <div className="shop-modal-overlay">
+    <div className="shop-modal-container">
+
+      {/* CLOSE */}
+      <button
+        className="shop-modal-close"
+        onClick={() => setShowSellerModal(false)}
+      >
+        ✕
+      </button>
+
+      {sellerLoading && (
+        <p className="modal-loading">Loading seller details...</p>
+      )}
+
+      {!sellerLoading && selectedSeller && (() => {
+
+        const seller = selectedSeller.seller;
+        const user = selectedSeller.user?.[0];
+        const media = selectedSeller.media || [];
+
+        const logo = media.find(m => m.logo)?.logo;
+        const images = media.filter(m => m.images).map(m => m.images);
+
+        return (
+          <div className="shop-modal-content">
+
+            {/* ===== HEADER ===== */}
+            <div className="modal-header">
+              <img
+                src={logo ? `${BASE_IMAGE_URL}/${logo}` : "/shop-placeholder.png"}
+                className="modal-shop-logo"
+                alt="Seller Logo"
+              />
+
+              <div>
+                <h2>{seller.name}</h2>
+                <p>Owner: {seller.owner_name}</p>
+              </div>
+            </div>
+
+            {/* ===== STATS ===== */}
+            <div className="modal-stats">
+              <div className="stat-card">
+                <span>💰 Wallet</span>
+                <strong>₹ {seller.wallet_balance}</strong>
+              </div>
+
+              <div className="stat-card">
+                <span>👥 Customers</span>
+                <strong>
+                  {selectedSeller.transactions?.[0]?.customers_count || 0}
+                </strong>
+              </div>
+            </div>
+
+            {/* ===== CONTACT ===== */}
+            <div className="modal-section">
+              <h4>📞 Contact Details</h4>
+              <div>📍 {seller.address || "Not set"}</div>
+              <div>📞 {user?.phone || "Not set"}</div>
+              <div>✉️ {user?.email || "Not set"}</div>
+            </div>
+
+            {/* ===== QR CODE ===== */}
+            {selectedSeller.scanner_code?.[0]?.scanner_code && (
+              <div className="modal-section center">
+                <h4>📱 Seller QR</h4>
+
+                <QRCodeCanvas
+                  value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+                    selectedSeller.scanner_code[0].scanner_code
+                  )}&type=seller`}
+                  size={160}
+                  level="H"
+                />
+              </div>
+            )}
+
+            {/* ===== GALLERY ===== */}
+            <div className="modal-section">
+              <h4>🖼️ Seller Gallery</h4>
+
+              {images.length === 0 ? (
+                <p>No images uploaded</p>
+              ) : (
+                <div className="modal-gallery">
+                  {images.map((img, i) => (
+                    <img
+                      key={i}
+                      src={`${BASE_IMAGE_URL}/${img}`}
+                      alt="Seller"
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ===== MAP ===== */}
+            <div className="modal-section">
+              <h4>📍 Seller Location</h4>
+
+              {seller.latitude && seller.longitude ? (
+                <MapContainer
+                  center={[
+                    Number(seller.latitude),
+                    Number(seller.longitude)
+                  ]}
+                  zoom={16}
+                  style={{ height: "220px", borderRadius: "12px" }}
+                >
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  <Marker
+                    position={[
+                      Number(seller.latitude),
+                      Number(seller.longitude)
+                    ]}
+                    icon={shopIcon}
+                  >
+                    <Popup>
+                      <strong>{seller.name}</strong>
+                    </Popup>
+                  </Marker>
+                </MapContainer>
+              ) : (
+                <p>Location not available</p>
+              )}
+            </div>
+
+          </div>
+        );
+      })()}
+    </div>
+  </div>
+)}
+{/* seller modal end */}
     </div>
   );
 }
