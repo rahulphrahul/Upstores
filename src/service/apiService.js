@@ -393,6 +393,13 @@ export const updateWallet = async (userId, amount) => {
   return res.json();
 };
 // shop purchase transaction
+
+export const getPurchasePendingCount = async (shopId) => {
+  const res = await fetch(
+    `${BASE_URL}/customers/get_purchase_pending_count.php?shop_id=${shopId}`
+  );
+  return res.json();
+};
 export const getShopPurchases = async (shopId) => {
   const res = await fetch(
     `${BASE_URL}/shops/get_shop_purchases.php?shop_id=${shopId}`
@@ -419,52 +426,7 @@ export const updatePurchaseStatus = async ({ shop_id, status, reason,shop_type }
 
   return res.json();
 };
-// service purchase transaction
-export const getServicePurchases = async (serviceId) => {
-  const res = await fetch(
-    `${BASE_URL}/services/get_service_purchases.php?shop_id=${serviceId}`
-  );
-  return res.json();
-};
-export const updateServicePurchaseStatus = async ({ service_id, status, reason }) => {
-  const res = await fetch(
-    `${BASE_URL}/sellers/update_purchase_status.php`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        service_id,
-        status,
-        reason
-      })
-    }
-  );
 
-  return res.json();
-};
-// seller purchase transaction
-export const getSellerPurchases = async (sellerId) => {
-  const res = await fetch(
-    `${BASE_URL}/sellers/get_seller_purchases.php?seller_id=${sellerId}`
-  );
-  return res.json();
-};
-export const updateSellerPurchaseStatus = async ({ seller_id, status, reason }) => {
-  const res = await fetch(
-    `${BASE_URL}/sellers/update_purchase_status.php`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        seller_id,
-        status,
-        reason
-      })
-    }
-  );
-
-  return res.json();
-};
 
 export const getSellerLoginDetails = async (sellerId) => {
   const res = await fetch(`${BASE_URL}/sellers/get_login_seller.php?seller_id=${sellerId}`);

@@ -472,3 +472,20 @@
   z-index: 998;
   animation: fadeIn 0.3s ease;
 }
+
+/* badge */
+.pending-badge {
+  background: #dc2626; /* red */
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  line-height: 1;
+}

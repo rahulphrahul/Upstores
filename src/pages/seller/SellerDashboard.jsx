@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./SellerDashboard.css";
-import { getSellerLoginDetails,getSellerPurchases,updateSellerPurchaseStatus } from "../../service/apiService";
+import { getSellerLoginDetails } from "../../service/apiService";
 import { QRCodeCanvas } from "qrcode.react";
 import { BASE_IMAGE_URL } from "../../config/config";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
@@ -9,20 +9,12 @@ import { shopIcon } from "../../utils/leafletIcon";
 const SellerDashboard = () => {
   const [seller, setSeller] = useState(null);
   const [loading, setLoading] = useState(true);
-    const [purchases, setPurchases] = useState([]);
-  const [purchaseLoading, setPurchaseLoading] = useState(true);
 
   // 🔐 Get logged-in user (SAME AS SERVICE)
   const user = JSON.parse(localStorage.getItem("user"));
   const sellerId = user?.seller_id || user?.id;
   
   useEffect(() => {
-     getSellerPurchases(sellerId).then(res => {
-        if (res.status === "success") {
-          setPurchases(res.data);
-        }
-        setPurchaseLoading(false);
-      });
     const fetchSeller = async () => {
       try {
         const data = await getSellerLoginDetails(sellerId);
@@ -47,30 +39,6 @@ const SellerDashboard = () => {
       setLoading(false);
     }
   }, [sellerId]);
-  const handleStatus = async (seller_id, status) => {
-    let reason = null;
-  
-    if (status === "REJECTED") {
-      reason = prompt("Enter rejection reason");
-      if (!reason) return;
-    }
-  
-    const res = await updateSellerPurchaseStatus({
-      seller_id,
-      status,
-      reason
-    });
-  
-    if (res.status === "success") {
-      setPurchases(prev =>
-        prev.map(p =>
-          p.id === seller_id ? { ...p, status, rejection_reason: reason } : p
-        )
-      );
-    } else {
-      alert("Failed to update");
-    }
-  };
 if (loading) return <p>Loading seller details...</p>;
 if (!seller) return <p>No seller data available.</p>;
 
@@ -153,82 +121,6 @@ console.log("tetet",seller);
               </div>
             </div>
           </section>
-           {/* purchaeseb transaction */}
-                    <section className="transactions-section">
-            <h2 className="section-title">🧾 Purchase Transactions</h2>
-          
-            {purchaseLoading ? (
-              <p>Loading purchases...</p>
-            ) : purchases.length === 0 ? (
-              <p>No purchase requests</p>
-            ) : (
-              <div className="table-wrapper">
-                <table className="purchase-table">
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Customer</th>
-                      <th>Amount</th>
-                      <th>Bill</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-          
-                  <tbody>
-                    {purchases.map(p => (
-                      <tr key={p.id}>
-                        <td>{p.created_at}</td>
-                        <td>
-                          <strong>{p.customer_name || "Guest"}</strong><br />
-                          <small>{p.customer_phone}</small>
-                        </td>
-                        <td>₹{p.amount}</td>
-                        <td>
-                          {p.bill_image && (
-                            <a
-                              href={`${BASE_IMAGE_URL}/${p.bill_image}`}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              View
-                            </a>
-                          )}
-                        </td>
-                        <td>
-                          <span className={`status ${p.status.toLowerCase()}`}>
-                            {p.status}
-                          </span>
-                        </td>
-                        <td>
-                          {p.status === "PENDING" ? (
-                            <>
-                              <button
-                                className="btn-accept"
-                                onClick={() => handleStatus(p.seller_id, "CONFIRMED")}
-                              >
-                                Accept
-                              </button>
-          
-                              <button
-                                className="btn-reject"
-                                onClick={() => handleStatus(p.seller_id, "REJECTED")}
-                              >
-                                Reject
-                              </button>
-                            </>
-                          ) : (
-                            <span>—</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
-          {/* end purchase transaction */}
           {/* TRANSACTIONS */}
           <section className="transactions-section">
             <h2 className="section-title">📊 Transactions</h2>
@@ -284,7 +176,7 @@ console.log("tetet",seller);
   <h2 className="section-title">🖼️ Seller Gallery</h2>
 
   {images.length === 0 ? (
-    <p className="text-muted">No seller images uploaded</p>
+    <p className="text-muted">No Seller images uploaded</p>
   ) : (
     <div className="shop-gallery">
       {images.map((img, index) => (
