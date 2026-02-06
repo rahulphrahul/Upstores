@@ -8,3 +8,8 @@ export const BASE_IMAGE_URL =
   "https://semicoloninnovations.in/upstores/category-icons"
   export const BASE_CUSTM_IMG_URL =
   "https://semicoloninnovations.in/upstores/api/"
+   export const Bill_IMG_URL =
+  "https://semicoloninnovations.in/upstores/bills"
+
+   export const BASE_URL =
+  "https://semicoloninnovations.in/upstores/api"

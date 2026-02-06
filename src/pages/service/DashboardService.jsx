@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./DashboardService.css";
-import { getServiceLoginDetails } from "../../service/apiService"; // your API service
+import { getServiceLoginDetails,getServicePurchases,updateServicePurchaseStatus } from "../../service/apiService"; // your API service
 import { QRCodeCanvas } from "qrcode.react";
 import { BASE_IMAGE_URL } from "../../config/config";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
@@ -9,11 +9,19 @@ import { shopIcon } from "../../utils/leafletIcon";
 const DashboardService = () => {
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [purchases, setPurchases] = useState([]);
+    const [purchaseLoading, setPurchaseLoading] = useState(true);
   // 🔐 Get logged-in user
   const user =  JSON.parse(localStorage.getItem("user"));
   const serviceId = user?.service_id || user?.id; 
 
   useEffect(() => {
+        getServicePurchases(serviceId).then(res => {
+            if (res.status === "success") {
+              setPurchases(res.data);
+            }
+            setPurchaseLoading(false);
+          });
     const fetchService = async () => {
       try {
         const data = await getServiceLoginDetails(serviceId);
@@ -32,8 +40,32 @@ const DashboardService = () => {
 
     fetchService();
   }, [serviceId]);
-  if (loading) return <p>Loading seller details...</p>;
-if (!service) return <p>No seller data available.</p>;
+   const handleStatus = async (service_id, status) => {
+    let reason = null;
+  
+    if (status === "REJECTED") {
+      reason = prompt("Enter rejection reason");
+      if (!reason) return;
+    }
+  
+    const res = await updateServicePurchaseStatus({
+      service_id,
+      status,
+      reason
+    });
+  
+    if (res.status === "success") {
+      setPurchases(prev =>
+        prev.map(p =>
+          p.id === service_id ? { ...p, status, rejection_reason: reason } : p
+        )
+      );
+    } else {
+      alert("Failed to update");
+    }
+  };
+  if (loading) return <p>Loading service details...</p>;
+if (!service) return <p>No service data available.</p>;
   const logo =
   service.media?.find(m => m.logo && m.logo !== "")?.logo;
 
@@ -109,7 +141,82 @@ const images =
               </div>
             </div>
           </section>
-
+  {/* purchaeseb transaction */}
+                    <section className="transactions-section">
+            <h2 className="section-title">🧾 Purchase Transactions</h2>
+          
+            {purchaseLoading ? (
+              <p>Loading purchases...</p>
+            ) : purchases.length === 0 ? (
+              <p>No purchase requests</p>
+            ) : (
+              <div className="table-wrapper">
+                <table className="purchase-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Customer</th>
+                      <th>Amount</th>
+                      <th>Bill</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+          
+                  <tbody>
+                    {purchases.map(p => (
+                      <tr key={p.id}>
+                        <td>{p.created_at}</td>
+                        <td>
+                          <strong>{p.customer_name || "Guest"}</strong><br />
+                          <small>{p.customer_phone}</small>
+                        </td>
+                        <td>₹{p.amount}</td>
+                        <td>
+                          {p.bill_image && (
+                            <a
+                              href={`${BASE_IMAGE_URL}/${p.bill_image}`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              View
+                            </a>
+                          )}
+                        </td>
+                        <td>
+                          <span className={`status ${p.status.toLowerCase()}`}>
+                            {p.status}
+                          </span>
+                        </td>
+                        <td>
+                          {p.status === "PENDING" ? (
+                            <>
+                              <button
+                                className="btn-accept"
+                                onClick={() => handleStatus(p.service_id, "CONFIRMED")}
+                              >
+                                Accept
+                              </button>
+          
+                              <button
+                                className="btn-reject"
+                                onClick={() => handleStatus(p.service_id, "REJECTED")}
+                              >
+                                Reject
+                              </button>
+                            </>
+                          ) : (
+                            <span>—</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+          {/* end purchase transaction */}
           {/* TRANSACTIONS */}
           <section className="transactions-section">
             <h2 className="section-title">📊 Service Transactions</h2>

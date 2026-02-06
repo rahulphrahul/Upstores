@@ -44,6 +44,9 @@ import WalletService from './pages/service/WalletService';
 import ScanCustomerServiceQR from './pages/service/ScanCustomerServiceQR';
 import PurchaseServiceHistory from './pages/service/PurchaseServiceHistory';
 import BannerManagement from './pages/admin/Bannermanagement';
+import CustomerPurchase from './pages/shop/CustomerPurchase';
+import CustomerSellerPurchase from './pages/seller/CustomerSellerPurchase';
+import CustomerServicePurchase from './pages/service/CustomerServicePurchase';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -347,6 +350,14 @@ function App() {
               </RoleProtectedRoute>
             }
           /> 
+           <Route
+            path="shop/customer_purchase"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['shop']}>
+                <CustomerPurchase user={user} />
+              </RoleProtectedRoute>
+            }
+          /> 
          
            <Route
             path="shop/customer_qr"
@@ -398,6 +409,14 @@ function App() {
               </RoleProtectedRoute>
             }
           /> 
+          <Route
+            path="sellers/customer_purchase"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['seller']}>
+                <CustomerSellerPurchase user={user}/>
+              </RoleProtectedRoute>
+            }
+          /> 
            <Route
             path="sellers/purchase_history"
             element={
@@ -427,6 +446,14 @@ function App() {
             element={
               <RoleProtectedRoute user={user} allowedRoles={['service']}>
                 <ScanCustomerServiceQR />
+              </RoleProtectedRoute>
+            }
+          /> 
+            <Route
+            path="service/customer_purchase"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['service']}>
+                <CustomerServicePurchase user={user} />
               </RoleProtectedRoute>
             }
           /> 

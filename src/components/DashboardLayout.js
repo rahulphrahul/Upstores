@@ -69,6 +69,7 @@ const menus = {
     { name: "Customer QR", path: "/dashboard/shop/customer_qr", icon: <QrCode {...iconStyle} /> },
     { name: "Purchase", path: "/dashboard/shop/purchase_history", icon: <ShoppingCart {...iconStyle} /> },
     { name: "Wallet Management", path: "/dashboard/shop/wallet_management", icon: <Wallet {...iconStyle} /> },
+    { name: "Customer Purchase", path: "/dashboard/shop/customer_purchase", icon: <Wallet {...iconStyle} /> },
   ],
 
   seller: [
@@ -76,6 +77,7 @@ const menus = {
     { name: "Customer QR", path: "/dashboard/sellers/customer_qr", icon: <QrCode {...iconStyle} /> },
     { name: "Purchase", path: "/dashboard/sellers/purchase_history", icon: <ShoppingCart {...iconStyle} /> },
     { name: "Wallet Management", path: "/dashboard/sellers/wallet_management", icon: <Wallet {...iconStyle} /> },
+    { name: "Customer Purchase", path: "/dashboard/sellers/customer_purchase", icon: <Wallet {...iconStyle} /> },
   ],
 
   service: [
@@ -83,6 +85,7 @@ const menus = {
     { name: "Customer QR", path: "/dashboard/service/customer_qr", icon: <QrCode {...iconStyle} /> },
     { name: "Purchase", path: "/dashboard/service/purchase_history", icon: <ShoppingCart {...iconStyle} /> },
     { name: "Wallet Management", path: "/dashboard/service/wallet_management", icon: <Wallet {...iconStyle} /> },
+    { name: "Customer Purchase", path: "/dashboard/service/customer_purchase", icon: <Wallet {...iconStyle} /> },
   ],
 };
 
