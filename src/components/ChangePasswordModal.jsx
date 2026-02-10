@@ -6,7 +6,7 @@ function ChangePasswordModal({ show, userId, onSuccess }) {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); 
 
   const handleSubmit = async () => {
     setError("");

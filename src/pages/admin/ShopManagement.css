@@ -9,8 +9,10 @@
   font-size: 24px;
   font-weight: 600;
   color: #001ae3;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
+  letter-spacing: 0.3px;
 }
+
 
 /* =========================
    CARD
@@ -19,9 +21,16 @@
   background: #ffffff;
   border-radius: 14px;
   padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 8px 24px rgba(0, 26, 227, 0.12);
+  margin-bottom: 14px;
+  box-shadow: 0 8px 22px rgba(0, 26, 227, 0.10);
+  transition: all 0.25s ease;
 }
+
+.card:hover {
+  box-shadow: 0 14px 34px rgba(0, 26, 227, 0.15);
+  transform: translateY(-2px);
+}
+
 
 /* =========================
    PENDING FUND REQUESTS
@@ -29,16 +38,22 @@
 .fund-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .fund-row {
   display: grid;
   grid-template-columns: 2fr 1fr auto auto;
   align-items: center;
-  padding: 12px 16px;
+  padding: 12px 14px;
   border-radius: 10px;
   background: #f4f6ff;
+  transition: all 0.2s ease;
+}
+
+.fund-row:hover {
+  background: #eef1ff;
+  transform: scale(1.01);
 }
 
 .fund-row span {
@@ -51,6 +66,7 @@
   color: #001ae3;
   font-weight: 600;
 }
+
 
 /* =========================
    TABLE
@@ -67,28 +83,33 @@
 
 .data-table th {
   text-align: left;
-  padding: 14px 12px;
+  padding: 12px;
   color: #001ae3;
   font-weight: 600;
   border-bottom: 1px solid #e0e5ff;
 }
 
 .data-table td {
-  padding: 14px 12px;
-  border-bottom: 1px solid #eee;
+  padding: 12px;
+  border-bottom: 1px solid #f1f1f1;
   color: #333;
 }
 
-.data-table tbody tr:hover {
-  background: #fafbff;
+.data-table tbody tr {
+  transition: background 0.2s ease;
 }
+
+.data-table tbody tr:hover {
+  background: #f4f5f9;
+}
+
 
 /* =========================
    STATUS BADGES
 ========================= */
 .status {
   display: inline-block;
-  padding: 4px 12px;
+  padding: 5px 12px;
   border-radius: 14px;
   font-size: 12px;
   font-weight: 600;
@@ -105,13 +126,14 @@
   color: #e74c3c;
 }
 
+
 /* =========================
    BUTTONS
 ========================= */
 .btn {
   border: none;
-  padding: 6px 14px;
-  border-radius: 6px;
+  padding: 7px 15px;
+  border-radius: 7px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -147,6 +169,29 @@
   background: #c0392b;
 }
 
+.btn-activate {
+  background: #e6f4ea;
+  color: #1e7e34;
+  border: 1px solid #1e7e34;
+}
+
+.btn-activate:hover {
+  background: #1e7e34;
+  color: white;
+}
+
+.btn-suspend {
+  background: #fdecea;
+  color: #e74c3c;
+  border: 1px solid #e74c3c;
+}
+
+.btn-suspend:hover {
+  background: #e74c3c;
+  color: white;
+}
+
+
 /* =========================
    EMPTY STATE
 ========================= */
@@ -156,6 +201,7 @@
   color: #777;
   font-size: 14px;
 }
+
 
 /* =========================
    SKELETON LOADER
@@ -171,65 +217,191 @@
   animation: shimmer 1.4s infinite ease;
   border-radius: 14px;
 }
-/* shop detiilas popup */
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+
+/* =========================
+   CLICKABLE ROW
+========================= */
 .clickable-row {
   cursor: pointer;
 }
 
+
+/* =========================
+   MODAL OVERLAY
+========================= */
 .shop-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.65);
+  background: rgba(0, 26, 227, 0.18);
+  backdrop-filter: blur(8px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+
   z-index: 9999;
+  animation: fadeIn 0.25s ease;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+
+/* =========================
+   MODAL CONTAINER
+========================= */
 .shop-modal-container {
-  background: #fff;
+  background: #ffffff;
   width: 100%;
-  height: 100%;
+  max-width: 760px;
+  max-height: 90vh;
   overflow-y: auto;
+
+  border-radius: 18px;
   padding: 24px;
   position: relative;
+
+  border-top: 6px solid #001ae3;
+
+  box-shadow:
+    0 14px 34px rgba(0, 26, 227, 0.15),
+    0 30px 70px rgba(0, 26, 227, 0.20);
+
+  animation: modalSlide 0.3s ease;
 }
 
+@keyframes modalSlide {
+  from {
+    transform: translateY(30px) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+
+/* =========================
+   CLOSE BUTTON
+========================= */
 .shop-modal-close {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 10000;
-  background: #111;
-  color: #fff;
+  position: absolute;
+  top: 14px;
+  right: 14px;
+
+  background: #eef1ff;
+  color: #001ae3;
   border: none;
-  padding: 10px 14px;
-  border-radius: 8px;
+
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
   cursor: pointer;
+  font-size: 14px;
+
+  transition: all 0.2s ease;
 }
 
+.shop-modal-close:hover {
+  background: #001ae3;
+  color: white;
+  transform: rotate(90deg);
+}
+
+
+/* =========================
+   MODAL SECTIONS
+========================= */
+.modal-section {
+  margin-bottom: 18px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f4f6ff;
+}
+
+.modal-section h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #001ae3;
+}
+
+.modal-section p {
+  font-size: 14px;
+  color: #1e293b;
+  line-height: 1.5;
+}
+
+
+/* =========================
+/* =========================
+   IMAGE GALLERY
+========================= */
 .modal-gallery {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 10px;
+  gap: 12px;
 }
 
 .modal-gallery img {
   width: 100%;
-  border-radius: 8px;
+  height: 95px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid #e0e5ff;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  cursor: default;   /* normal cursor */
+}
+
+.modal-gallery img:hover {
+  transform: scale(1.25);
+  z-index: 10;
+  position: relative;
+  box-shadow: 0 12px 26px rgba(0,26,227,0.30);
 }
 
 
-@keyframes shimmer {
-  0% {
-    background-position: 100% 0;
-  }
-  100% {
-    background-position: -100% 0;
-  }
+
+/* =========================
+   INFO ROWS
+========================= */
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  color: #334155;
 }
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stat-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #475569;
+}
+
 
 /* =========================
    RESPONSIVE
 ========================= */
 @media (max-width: 768px) {
+
   .fund-row {
     grid-template-columns: 1fr;
     gap: 8px;
@@ -242,25 +414,9 @@
   .page-title {
     font-size: 20px;
   }
-}
-.btn-activate {
-  background: #e6f4ea;
-  color: #1e7e34;
-  border: 1px solid #1e7e34;
-}
 
-.btn-activate:hover {
-  background: #1e7e34;
-  color: #ffffff;
-}
-
-.btn-suspend {
-  background: #fdecea;
-  color: #e74c3c;
-  border: 1px solid #e74c3c;
-}
-
-.btn-suspend:hover {
-  background: #e74c3c;
-  color: #ffffff;
+  .shop-modal-container {
+    padding: 18px;
+    border-radius: 14px;
+  }
 }

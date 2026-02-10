@@ -181,7 +181,7 @@ function ExecutiveManagement() {
           className="btn btn-primary"
           onClick={() => {
             setShowAdd(!showAdd);
-            setCredentials(null);
+            setCredentials(null); 
           }}
         >
           {showAdd ? "Close" : "+ Add Executive"}
