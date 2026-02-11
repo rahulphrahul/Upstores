@@ -21,20 +21,23 @@ function ExecutiveServiceManagement({ user }) {
   const [editingService, setEditingService] = useState(null);
   const [categories, setCategories] = useState([]);
   const [locating, setLocating] = useState(false);
+const [showServiceQrPreview, setShowServiceQrPreview] = useState(false);
 
-  const [form, setForm] = useState({
-    name: "",
-    owner_name: "",
-    phone: "",
-    wallet_balance: "",
-    category_id: "",
-    commission: "",
-    address: "",
-    email: "",
-    description: "",
-    latitude: "",
-    longitude: "",
-  });
+ const [form, setForm] = useState({
+  name: "",
+  owner_name: "",
+  phone: "",
+  wallet_balance: "",
+  address: "",
+  email: "",
+  description: "",
+  latitude: "",
+  longitude: "",
+  category_commissions: [
+    { category_id: "", commission: "" }
+  ],
+});
+
 
   const [logo, setLogo] = useState(null);
   const [images, setImages] = useState([]);
@@ -84,25 +87,27 @@ const [serviceLoading, setServiceLoading] = useState(false);
     setImages(files);
   };
 
-  const resetForm = () => {
-    setForm({
-      name: "",
-      owner_name: "",
-      phone: "",
-      wallet_balance: "",
-      category_id: "",
-      commission: "",
-      address: "",
-      email: "",
-      description: "",
-      latitude: "",
-      longitude: "",
-    });
-    setLogo(null);
-    setImages([]);
-    setEditingService(null);
-    setShowForm(false);
-  };
+const resetForm = () => {
+  setForm({
+    name: "",
+    owner_name: "",
+    phone: "",
+    wallet_balance: "",
+    address: "",
+    email: "",
+    description: "",
+    latitude: "",
+    longitude: "",
+    category_commissions: [
+      { category_id: "", commission: "" }
+    ],
+  });
+  setLogo(null);
+  setImages([]);
+  setEditingService(null);
+  setShowForm(false);
+};
+
 const openServiceModal = async (serviceId) => {
   setShowServiceModal(true);
   setServiceLoading(true);
@@ -118,6 +123,35 @@ const openServiceModal = async (serviceId) => {
   } finally {
     setServiceLoading(false);
   }
+};
+// category handle
+const addCategoryRow = () => {
+  setForm((prev) => ({
+    ...prev,
+    category_commissions: [
+      ...prev.category_commissions,
+      { category_id: "", commission: "" }
+    ],
+  }));
+};
+
+const removeCategoryRow = (index) => {
+  setForm((prev) => ({
+    ...prev,
+    category_commissions: prev.category_commissions.filter(
+      (_, i) => i !== index
+    ),
+  }));
+};
+
+const handleCategoryChange = (index, field, value) => {
+  const updated = [...form.category_commissions];
+  updated[index][field] = value;
+
+  setForm({
+    ...form,
+    category_commissions: updated,
+  });
 };
 
   /* =========================
@@ -152,17 +186,27 @@ const openServiceModal = async (serviceId) => {
      CREATE / UPDATE
   ========================= */
   const handleSubmit = async () => {
-    if (!form.name || !form.commission || !form.owner_name) {
-      alert("Owner name, Service name, and commission are required");
-      return;
-    }
+ if (!form.name || !form.owner_name) {
+  alert("Owner name and Service name are required");
+  return;
+}
+
 
     const fd = new FormData();
     fd.append("executive_id", executiveId);
 
-    Object.keys(form).forEach((key) => {
-      if (form[key] !== "") fd.append(key, form[key]);
-    });
+   Object.keys(form).forEach((key) => {
+  if (key !== "category_commissions" && form[key] !== "") {
+    fd.append(key, form[key]);
+  }
+});
+
+// send category commissions as JSON
+fd.append(
+  "category_commissions",
+  JSON.stringify(form.category_commissions)
+);
+
 
     if (logo) fd.append("logo", logo);
     images.forEach((img) => fd.append("images[]", img));
@@ -188,8 +232,10 @@ const openServiceModal = async (serviceId) => {
       owner_name: service.owner_name || "",
       phone: service.phone || "",
       wallet_balance: service.wallet_balance || "",
-      category_id: service.category_id || "",
-      commission: service.commission || "",
+     category_commissions:
+  service.category_commissions?.length
+    ? service.category_commissions
+    : [{ category_id: "", commission: "" }],
       address: service.address || "",
       email: service.email || "",
       description: service.description || "",
@@ -239,21 +285,66 @@ const openServiceModal = async (serviceId) => {
             <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
             <input name="address" placeholder="Address" value={form.address} onChange={handleChange} />
 
-            <textarea
+           
+
+      
+
+
+
+    <button
+      type="button"
+      className="btn btn-success"
+      onClick={addCategoryRow}
+    >
+      + Add Category
+    </button>
+
+ <textarea
               name="description"
               placeholder="Description"
               value={form.description}
               onChange={handleChange}
             />
+  {(form.category_commissions || []).map((row, index) => (
+    <div key={index} className="d-flex gap-2 mt-2">
 
-            <select name="category_id" className="form-control" value={form.category_id} onChange={handleChange}>
-              <option value="">Select Category</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
+      <select
+        className="form-control"
+        value={row.category_id}
+        onChange={(e) =>
+          handleCategoryChange(index, "category_id", e.target.value)
+        }
+      >
+        <option value="">Select Category</option>
+        {categories.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name}
+          </option>
+        ))}
+      </select>
 
-            <input name="commission" placeholder="Commission (%)" value={form.commission} onChange={handleChange} />
+      <input
+        className="form-control"
+        placeholder="Commission %"
+        value={row.commission}
+        onChange={(e) =>
+          handleCategoryChange(index, "commission", e.target.value)
+        }
+      />
+
+      {index > 0 && (
+        <button
+          type="button"
+          className="btn btn-danger"
+          onClick={() => removeCategoryRow(index)}
+        >
+          ✕
+        </button>
+      )}
+    </div>
+  ))}
+
+
 
             <input name="latitude" placeholder="Latitude" value={form.latitude} readOnly />
             <input name="longitude" placeholder="Longitude" value={form.longitude} readOnly />
@@ -405,18 +496,40 @@ const openServiceModal = async (serviceId) => {
             </div>
 
             {/* ================= QR ================= */}
-            {selectedService.scanner_code?.[0]?.scanner_code && (
-              <div className="modal-section center">
-                <h4>📱 service QR</h4>
-                <QRCodeCanvas
-                  value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
-                    selectedService.scanner_code[0].scanner_code
-                  )}&type=service`}
-                  size={160}
-                  level="H"
-                />
-              </div>
-            )}
+           {/* ================= SERVICE QR CARD ================= */}
+{selectedService.scanner_code?.[0]?.scanner_code && (
+  <div className="modal-section">
+    <div className="qr-master-card">
+
+      <div className="qr-header">
+        <h3 className="qr-shop-name">
+          {selectedService.service?.name}
+        </h3>
+        <span className="qr-owner">
+          Owner: {selectedService.service?.owner_name}
+        </span>
+      </div>
+
+      <div
+        className="qr-body zoomable"
+        onClick={() => setShowServiceQrPreview(true)}
+      >
+        <QRCodeCanvas
+          value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+            selectedService.scanner_code[0].scanner_code
+          )}&type=service`}
+          size={160}
+          level="H"
+        />
+      </div>
+
+      <div className="qr-footer">
+        <span>Click or hover to enlarge</span>
+      </div>
+
+    </div>
+  </div>
+)}
 
             {/* ================= GALLERY ================= */}
             <div className="modal-section">
@@ -436,6 +549,55 @@ const openServiceModal = async (serviceId) => {
                 </div>
               )}
             </div>
+{/* ================= SERVICE CATEGORY COMMISSIONS ================= */}
+<div className="modal-section commission-master-section">
+
+  <div className="section-header">
+    <span className="section-sub">
+      Total Categories: {selectedService.category_commissions?.length || 0}
+    </span>
+  </div>
+
+  {selectedService.category_commissions &&
+  selectedService.category_commissions.length > 0 ? (
+
+    <div className="commission-grid">
+      {selectedService.category_commissions.map((item) => (
+        <div key={item.id} className="commission-card">
+
+          <div className="commission-top">
+            <h5>{item.category_name}</h5>
+
+            <span
+              className={`status-dot ${
+                item.status === "active"
+                  ? "status-active"
+                  : "status-inactive"
+              }`}
+            >
+              {item.status}
+            </span>
+          </div>
+
+          <div className="commission-value">
+            {item.commission}%
+          </div>
+
+          <div className="commission-label">
+            Platform Commission
+          </div>
+
+        </div>
+      ))}
+    </div>
+
+  ) : (
+    <div className="empty-commission">
+      <p>No commission configuration found for this service.</p>
+    </div>
+  )}
+
+</div>
 
             {/* ================= MAP ================= */}
             <div className="modal-section">
@@ -474,6 +636,23 @@ const openServiceModal = async (serviceId) => {
           </div>
         );
       })()}
+    </div>
+  </div>
+)}
+{/* qr zoom */}
+{showServiceQrPreview && (
+  <div
+    className="qr-preview-overlay"
+    onClick={() => setShowServiceQrPreview(false)}
+  >
+    <div className="qr-preview-box">
+      <QRCodeCanvas
+        value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+          selectedService.scanner_code[0].scanner_code
+        )}&type=service`}
+        size={300}
+        level="H"
+      />
     </div>
   </div>
 )}

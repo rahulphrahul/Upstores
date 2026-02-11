@@ -28,23 +28,25 @@ function ExecutiveSellerManagement({ user }) {
   const [showSellerModal, setShowSellerModal] = useState(false);
 const [selectedSeller, setSelectedSeller] = useState(null);
 const [sellerLoading, setSellerLoading] = useState(false);
+const [showSellerQrPreview, setShowSellerQrPreview] = useState(false);
+
 
 const shop_type ="seller";
-  const [form, setForm] = useState({
-    category_id: "",
-    owner_name: "",
-    name: "",
-    phone: "",
-    email: "",
-    address: "",
-    description: "",
-    wallet_balance: "",
-    commission: "",
-    latitude: "",
-    longitude: "",
-    logo: null,
-    images: [],
-  });
+const [form, setForm] = useState({
+  name: "",
+  owner_name: "",
+  phone: "",
+  wallet_balance: "",
+  address: "",
+  email: "",
+  description: "",
+  latitude: "",
+  longitude: "",
+  category_commissions: [
+    { category_id: "", commission: "" }
+  ],
+});
+
 
   /* =========================
      LOAD SELLERS
@@ -144,40 +146,77 @@ const openSellerModal = async (sellerId) => {
   /* =========================
      RESET FORM
   ========================= */
-  const resetForm = () => {
-    setForm({
-      category_id: "",
-      owner_name: "",
-      name: "",
-      phone: "",
-      email: "",
-      address: "",
-      description: "",
-      wallet_balance: "",
-      commission: "",
-      latitude: "",
-      longitude: "",
-      logo: null,
-      images: [],
-    });
-    setEditingSeller(null);
-    setShowForm(false);
-  };
+ const resetForm = () => {
+  setForm({
+    name: "",
+    owner_name: "",
+    phone: "",
+    wallet_balance: "",
+    address: "",
+    email: "",
+    description: "",
+    latitude: "",
+    longitude: "",
+    category_commissions: [
+      { category_id: "", commission: "" }
+    ],
+  });
+  // setLogo(null);
+  // setImages([]);
+ setEditingSeller(null);
+  setShowForm(false);
+};
+
+// category handle
+const addCategoryRow = () => {
+  setForm((prev) => ({
+    ...prev,
+    category_commissions: [
+      ...prev.category_commissions,
+      { category_id: "", commission: "" }
+    ],
+  }));
+};
+
+const removeCategoryRow = (index) => {
+  setForm((prev) => ({
+    ...prev,
+    category_commissions: prev.category_commissions.filter(
+      (_, i) => i !== index
+    ),
+  }));
+};
+
+const handleCategoryChange = (index, field, value) => {
+  const updated = [...form.category_commissions];
+  updated[index][field] = value;
+
+  setForm({
+    ...form,
+    category_commissions: updated,
+  });
+};
 
   /* =========================
      CREATE / UPDATE SELLER
   ========================= */
   const handleSubmit = async () => {
-    if (!form.name || !form.phone || !form.owner_name) {
-      alert("Owner name, seller name, and phone are required");
-      return;
-    }
+   if (!form.name || !form.owner_name) {
+  alert("Owner name and Seller name are required");
+  return;
+}
+
 
     const fd = new FormData();
     Object.keys(form).forEach((key) => {
-      if (key !== "logo" && key !== "images" && form[key] !== "")
+      if (key !== "logo" && key !== "images" && key !== "category_commissions" && form[key] !== "")
         fd.append(key, form[key]);
     });
+    // send category commissions as JSON
+fd.append(
+  "category_commissions",
+  JSON.stringify(form.category_commissions)
+);
 
     fd.append("executive_id", executiveId);
 
@@ -201,7 +240,11 @@ const openSellerModal = async (sellerId) => {
   const handleEdit = (seller) => {
     setEditingSeller(seller);
     setForm({
-      category_id: seller.category_id || "",
+   category_commissions:
+  seller.category_commissions?.length
+    ? seller.category_commissions
+    : [{ category_id: "", commission: "" }],
+
       owner_name: seller.owner_name || "",
       name: seller.name || "",
       phone: seller.phone || "",
@@ -209,7 +252,6 @@ const openSellerModal = async (sellerId) => {
       address: seller.address || "",
       description: seller.description || "",
       wallet_balance: seller.wallet_balance || "",
-      commission: seller.commission || "",
       latitude: seller.latitude || "",
       longitude: seller.longitude || "",
       logo: null,
@@ -244,20 +286,66 @@ const openSellerModal = async (sellerId) => {
           <h4>{editingSeller ? "Edit Seller" : "Add New Seller"}</h4>
 
           <div className="form-grid">
-            {/* Category Dropdown */}
-            <select name="category_id" value={form.category_id} onChange={handleChange} className="form-control">
-              <option value="">Select Category</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
-            </select>
-
-            <input name="owner_name" placeholder="Owner Name" value={form.owner_name} onChange={handleChange} />
+             <input name="owner_name" placeholder="Owner Name" value={form.owner_name} onChange={handleChange} />
             <input name="name" placeholder="Seller Name" value={form.name} onChange={handleChange} />
             <input name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} />
             <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
-            <input name="wallet_balance" placeholder="Initial Wallet" value={form.wallet_balance} onChange={handleChange} />
-            <input name="commission" placeholder="Commission %" value={form.commission} onChange={handleChange} />
+            {/* Category Dropdown */}
+         
+
+  
+    <button
+      type="button"
+      className="btn btn-success"
+      onClick={addCategoryRow}
+    >
+      + Add Catgory
+    </button>
+ <input name="wallet_balance" placeholder="Initial Wallet" value={form.wallet_balance} onChange={handleChange} />
+
+  {(form.category_commissions || []).map((row, index) => (
+    <div key={index} className="d-flex gap-2 mt-2">
+
+      <select
+        className="form-control"
+        value={row.category_id}
+        onChange={(e) =>
+          handleCategoryChange(index, "category_id", e.target.value)
+        }
+      >
+        <option value="">Select Category</option>
+        {categories.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name}
+          </option>
+        ))}
+      </select>
+
+      <input
+        className="form-control"
+        placeholder="Commission %"
+        value={row.commission}
+        onChange={(e) =>
+          handleCategoryChange(index, "commission", e.target.value)
+        }
+      />
+
+      {index > 0 && (
+        <button
+          type="button"
+          className="btn btn-danger"
+          onClick={() => removeCategoryRow(index)}
+        >
+          ✕
+        </button>
+      )}
+    </div>
+  ))}
+
+
+
+           
+            
             <input name="address" placeholder="Address" value={form.address} onChange={handleChange} />
             <textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} />
 
@@ -416,19 +504,42 @@ const openSellerModal = async (sellerId) => {
               <div>✉️ {selectedSeller.user?.[0]?.email || "Not set"}</div>
             </div>
 
-            {/* ================= QR ================= */}
-            {selectedSeller.scanner_code?.[0]?.scanner_code && (
-              <div className="modal-section center">
-                <h4>📱 seller QR</h4>
-                <QRCodeCanvas
-                  value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
-                    selectedSeller.scanner_code[0].scanner_code
-                  )}&type=seller`}
-                  size={160}
-                  level="H"
-                />
-              </div>
-            )}
+   {/* ================= SELLER QR CARD ================= */}
+{selectedSeller.scanner_code?.[0]?.scanner_code && (
+  <div className="modal-section">
+    <div className="qr-master-card">
+
+      <div className="qr-header">
+        <h3 className="qr-shop-name">
+          {selectedSeller.seller?.name}
+        </h3>
+        <span className="qr-owner">
+          Owner: {selectedSeller.seller?.owner_name}
+        </span>
+      </div>
+
+      <div
+        className="qr-body zoomable"
+        onClick={() => setShowSellerQrPreview(true)}
+      >
+        <QRCodeCanvas
+          value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+            selectedSeller.scanner_code[0].scanner_code
+          )}&type=seller`}
+          size={160}
+          level="H"
+        />
+      </div>
+
+      <div className="qr-footer">
+        <span>Click or hover to enlarge</span>
+      </div>
+
+    </div>
+  </div>
+)}
+
+
 
             {/* ================= GALLERY ================= */}
             <div className="modal-section">
@@ -448,6 +559,57 @@ const openSellerModal = async (sellerId) => {
                 </div>
               )}
             </div>
+            {/* ================= SELLER CATEGORY COMMISSIONS ================= */}
+<div className="modal-section commission-master-section">
+
+  <div className="section-header">
+    
+    <span className="section-sub">
+      Total Categories: {selectedSeller.category_commissions?.length || 0}
+    </span>
+  </div>
+
+  {selectedSeller.category_commissions &&
+  selectedSeller.category_commissions.length > 0 ? (
+
+    <div className="commission-grid">
+      {selectedSeller.category_commissions.map((item) => (
+        <div key={item.id} className="commission-card">
+
+          <div className="commission-top">
+            <h5>{item.category_name}</h5>
+
+            <span
+              className={`status-dot ${
+                item.status === "active"
+                  ? "status-active"
+                  : "status-inactive"
+              }`}
+            >
+              {item.status}
+            </span>
+          </div>
+
+          <div className="commission-value">
+            {item.commission}%
+          </div>
+
+          <div className="commission-label">
+            Platform Commission
+          </div>
+
+        </div>
+      ))}
+    </div>
+
+  ) : (
+    <div className="empty-commission">
+      <p>No commission configuration found for this seller.</p>
+    </div>
+  )}
+
+</div>
+
 
             {/* ================= MAP ================= */}
             <div className="modal-section">
@@ -486,6 +648,23 @@ const openSellerModal = async (sellerId) => {
           </div>
         );
       })()}
+    </div>
+  </div>
+)}
+{/* qr zoom */}
+{showSellerQrPreview && (
+  <div
+    className="qr-preview-overlay"
+    onClick={() => setShowSellerQrPreview(false)}
+  >
+    <div className="qr-preview-box">
+      <QRCodeCanvas
+        value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+          selectedSeller.scanner_code[0].scanner_code
+        )}&type=seller`}
+        size={300}
+        level="H"
+      />
     </div>
   </div>
 )}

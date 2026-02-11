@@ -25,23 +25,26 @@ function ExecutiveShopManagement({ user }) {
   const [showShopModal, setShowShopModal] = useState(false);
 const [selectedShop, setSelectedShop] = useState(null);
 const [shopLoading, setShopLoading] = useState(false);
+const [showQrPreview, setShowQrPreview] = useState(false);
 
 const shop_type="shop";
-  const [form, setForm] = useState({
-    name: "",
-    owner_name: "",
-    phone: "",
-    email: "",
-    address: "",
-    description: "",
-    category_id: "",
-    commission: "",
-    wallet_balance: "",
-    latitude: "",
-    longitude: "",
-    logo: null,
-    images: [],
-  });
+const [form, setForm] = useState({
+  name: "",
+  owner_name: "",
+  phone: "",
+  email: "",
+  address: "",
+  description: "",
+  wallet_balance: "",
+  latitude: "",
+  longitude: "",
+  logo: null,
+  images: [],
+  category_commissions: [
+    { category_id: "", commission: "" }
+  ]
+});
+
 
   /* =========================
      LOAD SHOPS
@@ -72,6 +75,26 @@ const openShopModal = async (shopId) => {
   } finally {
     setShopLoading(false);
   }
+};
+const handleCategoryChange = (index, field, value) => {
+  const updated = [...form.category_commissions];
+  updated[index][field] = value;
+  setForm({ ...form, category_commissions: updated });
+};
+
+const addCategoryRow = () => {
+  setForm({
+    ...form,
+    category_commissions: [
+      ...form.category_commissions,
+      { category_id: "", commission: "" }
+    ]
+  });
+};
+
+const removeCategoryRow = (index) => {
+  const updated = form.category_commissions.filter((_, i) => i !== index);
+  setForm({ ...form, category_commissions: updated });
 };
 
   /* =========================
@@ -145,32 +168,40 @@ const openShopModal = async (shopId) => {
     const fd = new FormData();
 
     Object.entries(form).forEach(([key, value]) => {
-      if (key === "logo" || key === "images") return;
+      if (key === "logo" || key === "images" || key === "category_commissions") return;
       if (value !== "") fd.append(key, value);
     });
 
+
     fd.append("executive_id", executiveId);
+    // Append category commissions as JSON
+fd.append(
+  "category_commissions",
+  JSON.stringify(form.category_commissions)
+);
 
     if (form.logo) fd.append("logo", form.logo);
     form.images.forEach((img) => fd.append("images[]", img));
 
     await createExecutiveShop(fd);
 
-    setForm({
-      name: "",
-      owner_name: "",
-      phone: "",
-      email: "",
-      address: "",
-      description: "",
-      category_id: "",
-      commission: "",
-      wallet_balance: "",
-      latitude: "",
-      longitude: "",
-      logo: null,
-      images: [],
-    });
+ setForm({
+  name: "",
+  owner_name: "",
+  phone: "",
+  email: "",
+  address: "",
+  description: "",
+  wallet_balance: "",
+  latitude: "",
+  longitude: "",
+  logo: null,
+  images: [],
+  category_commissions: [
+    { category_id: "", commission: "" }
+  ]
+});
+
 
     setShowAdd(false);
     loadShops();
@@ -213,15 +244,56 @@ const openShopModal = async (shopId) => {
             <input name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} />
             <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
 
-            <select name="category_id" className="form-control" value={form.category_id} onChange={handleChange}>
-              <option value="">Select Category</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
+       
+   <button
+    type="button"
+    className="btn btn-success" style={{height:40}}
+    onClick={addCategoryRow}
+  >
+    + Add Category
+  </button>
+  <input name="wallet_balance" placeholder="Initial Wallet Amount" value={form.wallet_balance} onChange={handleChange} />
+{(form.category_commissions || []).map((row, index) => (
 
-            <input name="commission" placeholder="Commission (%)" value={form.commission} onChange={handleChange} />
-            <input name="wallet_balance" placeholder="Initial Wallet Amount" value={form.wallet_balance} onChange={handleChange} />
+    <div key={index}>
+
+      <select
+        value={row.category_id}
+        className="form-control"
+        onChange={(e) =>
+          handleCategoryChange(index, "category_id", e.target.value)
+        }
+      >
+        <option value="">Select Category</option>
+        {(categories || []).map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name}
+          </option>
+        ))}
+      </select>
+
+      <input
+        type="number"
+        placeholder="Commission (%)"
+        value={row.commission}
+        onChange={(e) =>
+          handleCategoryChange(index, "commission", e.target.value)
+        }
+      />
+
+   {index > 0 && (
+  <button
+    type="button"
+    className="btn btn-danger"
+    onClick={() => removeCategoryRow(index)}
+  >
+    ✕
+  </button>
+)}
+
+    </div>
+  ))}
+          
             <input name="address" placeholder="Address" value={form.address} onChange={handleChange} />
             <textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} />
 
@@ -277,7 +349,7 @@ const openShopModal = async (shopId) => {
             </tr>
           </thead>
           <tbody>
-            {shops.map((s) => (
+         {(shops || []).map((s) => (
               <tr  key={s.user_id}
   className="clickable-row"
   onClick={() => openShopModal(s.user_id)}>
@@ -384,18 +456,43 @@ const openShopModal = async (shopId) => {
             </div>
 
             {/* ================= QR ================= */}
-            {selectedShop.scanner_code?.[0]?.scanner_code && (
-              <div className="modal-section center">
-                <h4>📱 Shop QR</h4>
-                <QRCodeCanvas
-                  value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
-                    selectedShop.scanner_code[0].scanner_code
-                  )}&type=shop`}
-                  size={160}
-                  level="H"
-                />
-              </div>
-            )}
+         {/* ================= SHOP QR CARD ================= */}
+{/* ================= SHOP QR CARD ================= */}
+{selectedShop.scanner_code?.[0]?.scanner_code && (
+  <div className="modal-section">
+    <div className="qr-master-card">
+
+      <div className="qr-header">
+        <h3 className="qr-shop-name">
+          {selectedShop.shop?.name}
+        </h3>
+        <span className="qr-owner">
+          Owner: {selectedShop.shop?.owner_name}
+        </span>
+      </div>
+
+      <div
+        className="qr-body zoomable"
+        onClick={() => setShowQrPreview(true)}
+      >
+        <QRCodeCanvas
+          value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+            selectedShop.scanner_code[0].scanner_code
+          )}&type=shop`}
+          size={160}
+          level="H"
+        />
+      </div>
+
+      <div className="qr-footer">
+        <span>Click or hover to enlarge</span>
+      </div>
+
+    </div>
+  </div>
+)}
+
+
 
             {/* ================= GALLERY ================= */}
             <div className="modal-section">
@@ -415,6 +512,52 @@ const openShopModal = async (shopId) => {
                 </div>
               )}
             </div>
+            {/* ================= CATEGORY COMMISSIONS ================= */}
+<div className="modal-section commission-master-section">
+  <div className="section-header">
+    <span className="section-sub">
+      Total Categories: {selectedShop.category_commissions?.length || 0}
+    </span>
+  </div>
+
+  {selectedShop.category_commissions &&
+  selectedShop.category_commissions.length > 0 ? (
+    <div className="commission-grid">
+      {selectedShop.category_commissions.map((item) => (
+        <div key={item.id} className="commission-card">
+
+          <div className="commission-top">
+            <h5>{item.category_name}</h5>
+
+            <span
+              className={`status-dot ${
+                item.status === "active"
+                  ? "status-active"
+                  : "status-inactive"
+              }`}
+            >
+              {item.status}
+            </span>
+          </div>
+
+          <div className="commission-value">
+            {item.commission}%
+          </div>
+
+          <div className="commission-label">
+            Platform Commission
+          </div>
+
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div className="empty-commission">
+      <p>No commission configuration found for this shop.</p>
+    </div>
+  )}
+</div>
+
 
             {/* ================= MAP ================= */}
             <div className="modal-section">
@@ -458,6 +601,23 @@ const openShopModal = async (shopId) => {
 )}
 
 {/* end popup modal */}
+{showQrPreview && (
+  <div
+    className="qr-preview-overlay"
+    onClick={() => setShowQrPreview(false)}
+  >
+    <div className="qr-preview-box">
+      <QRCodeCanvas
+        value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+          selectedShop.scanner_code[0].scanner_code
+        )}&type=shop`}
+        size={300}
+        level="H"
+      />
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

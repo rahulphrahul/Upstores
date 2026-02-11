@@ -8,6 +8,8 @@ import React, {
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import { FaCrown, FaLayerGroup, FaChartLine } from "react-icons/fa";
+
 import { 
   FaStore, 
   FaUserTie, 
@@ -351,6 +353,39 @@ console.log("stauttsus",stats.data);
       </div>
     </div>
   </div>
+{/* ADMIN EARNINGS */}
+<div className="stat-card earnings">
+  <div className="stat-top">
+    <div className="stat-icon-box earnings">
+      <FaCrown />
+    </div>
+
+    <div>
+      <p className="stat-title">Admin Points</p>
+      <h3>
+        {Number(stats?.data?.admin_points?.points || 0).toLocaleString()}
+      </h3>
+    </div>
+  </div>
+
+  <div className="stat-divider"></div>
+
+  <div className="stat-metrics">
+    <div className="metric">
+      <FaLayerGroup />
+      <span>Total PV</span>
+      <strong>
+        {Number(stats?.data?.admin_points?.pv || 0).toLocaleString()}
+      </strong>
+    </div>
+
+    <div className="metric">
+      <FaChartLine />
+      <span>Status</span>
+      <strong className="positive">Active</strong>
+    </div>
+  </div>
+</div>
 
 </div>
 

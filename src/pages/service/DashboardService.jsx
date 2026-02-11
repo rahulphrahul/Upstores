@@ -12,6 +12,7 @@ const DashboardService = () => {
   // 🔐 Get logged-in user
   const user =  JSON.parse(localStorage.getItem("user"));
   const serviceId = user?.service_id || user?.id; 
+const [qrZoom, setQrZoom] = useState(false);
 
   useEffect(() => {
     const fetchService = async () => {
@@ -55,7 +56,7 @@ const images =
 
   if (loading) return <p>Loading service details...</p>;
   if (!service) return <p>No service data available.</p>;
-
+console.log("ssss",service)
   return (
     <div className="shop-page">
       {/* HEADER */}
@@ -85,6 +86,38 @@ const images =
           </div>
         </div>
       </div>
+            {/* STATS */}
+<section className="stats-section">
+  <div className="stats-grid">
+    <div className="stat-card">
+      <span className="stat-title">Total Purchases</span>
+      <span className="stat-value">
+        {service.stats?.total_purchases || 0}
+      </span>
+    </div>
+
+    <div className="stat-card success">
+      <span className="stat-title">Confirmed</span>
+      <span className="stat-value">
+        {service.stats?.confirmed_purchases || 0}
+      </span>
+    </div>
+
+    <div className="stat-card warning">
+      <span className="stat-title">Pending</span>
+      <span className="stat-value">
+        {service.stats?.pending_purchases || 0}
+      </span>
+    </div>
+
+    <div className="stat-card revenue">
+      <span className="stat-title">Total Revenue</span>
+      <span className="stat-value">
+        ₹{service.stats?.total_revenue || 0}
+      </span>
+    </div>
+  </div>
+</section>
 
       {/* CONTENT */}
       <div className="shop-content">
@@ -135,10 +168,10 @@ const images =
           {/* IMAGES */}
             {/* SHOP GALLERY */}
           <section className="gallery-section">
-            <h2 className="section-title">🖼️ Shop Gallery</h2>
+            <h2 className="section-title">🖼️ Service Gallery</h2>
           
             {images.length === 0 ? (
-              <p className="text-muted">No shop images uploaded</p>
+              <p className="text-muted">No service images uploaded</p>
             ) : (
               <div className="shop-gallery">
                 {images.map((img, index) => (
@@ -158,46 +191,136 @@ const images =
         {/* SIDEBAR */}
         <div className="shop-sidebar">
           {/* QR */}
-          <section className="qr-section">
-            <h2 className="section-title">📱 Service QR Code</h2>
-            <div className="qr-card">
-             {service && (
-    <>
-      <QRCodeCanvas
-        id="shop-qr"
-        value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
- service.scanner_code.scanner_code
-)}&type=service`}
+       <section className="qr-section">
+  <div className="qr-master-card">
 
-        size={200}
-        level="H"
-        includeMargin={true}
-      />
+    {/* Header */}
+    <div className="qr-header">
+      <h2 className="qr-title">Service QR</h2>
+      <span className="qr-badge">Instant Access</span>
+    </div>
 
-      <p className="qr-text">
-        Scan to view shop details
-      </p>
+    {/* Service Info */}
+    <div className="qr-owner">
+      <strong>{service.service.name}</strong>
+      <span>Owner: {service.service.owner_name}</span>
+    </div>
 
-      <button
-        className="download-qr-btn"
-        onClick={() => {
-          const canvas = document.getElementById("shop-qr");
-          const pngUrl = canvas
-            .toDataURL("image/png")
-            .replace("image/png", "image/octet-stream");
+    {/* QR Display */}
+    {service.scanner_code[0]?.scanner_code && (
+      <>
+        <div
+          className="qr-wrapper"
+          onClick={() => setQrZoom(true)}
+        >
+          
+          <QRCodeCanvas
+            id="service-qr"
+            value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+              service.scanner_code[0].scanner_code
+            )}&type=service`}
+            size={190}
+            level="H"
+            includeMargin
+          />
+        </div>
 
-          const link = document.createElement("a");
-          link.href = pngUrl;
-          link.download = `${service.service.name}-qr.png`;
-          link.click();
-        }}
-      >
-        Download QR
-      </button>
-    </>
-  )}
-            </div>
-          </section>
+        <p className="qr-caption">
+          Scan to view details
+        </p>
+
+        <div className="qr-actions">
+          <button
+            className="qr-download-btn"
+            onClick={() => {
+              const qrCanvas = document.getElementById("service-qr");
+              if (!qrCanvas) return;
+
+              const size = 420;
+              const canvas = document.createElement("canvas");
+              canvas.width = size;
+              canvas.height = size + 120;
+
+              const ctx = canvas.getContext("2d");
+
+              // Background
+              ctx.fillStyle = "#f8fafc";
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+              // Card
+              ctx.fillStyle = "#ffffff";
+              ctx.shadowColor = "rgba(0,0,0,0.15)";
+              ctx.shadowBlur = 25;
+              ctx.fillRect(20, 20, size - 40, size + 80);
+              ctx.shadowBlur = 0;
+
+              // Service Name
+              ctx.fillStyle = "#111827";
+              ctx.font = "bold 24px Arial";
+              ctx.textAlign = "center";
+              ctx.fillText(
+                service.service.name,
+                size / 2,
+                60
+              );
+
+              // // Owner
+              // ctx.fillStyle = "#6b7280";
+              // ctx.font = "16px Arial";
+              // ctx.fillText(
+              //   `Owner: ${service.service.owner_name}`,
+              //   size / 2,
+              //   90
+              // );
+
+              // QR
+              const qrSize = 240;
+              const qrX = (size - qrSize) / 2;
+              const qrY = 120;
+              ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+
+              // Footer
+              ctx.fillStyle = "#9ca3af";
+              ctx.font = "14px Arial";
+              ctx.fillText(
+                "Scan to view details",
+                size / 2,
+                qrY + qrSize + 40
+              );
+
+              const link = document.createElement("a");
+              link.download = `${service.service.name}-qr-card.png`;
+              link.href = canvas.toDataURL("image/png");
+              link.click();
+            }}
+          >
+            Download QR
+          </button>
+        </div>
+      </>
+    )}
+  </div>
+</section>
+<section className="commission-section">
+  <h2 className="section-title">💸 Categories</h2>
+
+  <div className="commission-card">
+    {service.categories?.length > 0 ? (
+      service.categories.map((cat) => (
+        <div key={cat.id} className="commission-row">
+          <span className="commission-category">
+            {cat.name}
+          </span>
+          <span className="commission-value">
+            {cat.commission}%
+          </span>
+        </div>
+      ))
+    ) : (
+      <p className="text-muted">No Categories Found</p>
+    )}
+  </div>
+</section>
 
           {/* CONTACT */}
           <section className="contact-section">
@@ -238,6 +361,25 @@ const images =
                     </section>
         </div>
       </div>
+      {qrZoom && (
+  <div
+    className="qr-zoom-overlay"
+    onClick={() => setQrZoom(false)}
+  >
+    <div className="qr-zoom-box">
+      <QRCodeCanvas
+        value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+          service.scanner_code[0]?.scanner_code || ""
+        )}&type=service`}
+        size={320}
+        level="H"
+        includeMargin
+      />
+      <p className="qr-zoom-text">Tap anywhere to close</p>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

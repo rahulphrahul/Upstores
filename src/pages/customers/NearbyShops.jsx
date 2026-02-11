@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { BASE_IMAGE_URL } from "../../config/config";
+import { QRCodeCanvas } from "qrcode.react";
 import {
   getExecutiveNearbyShops,
   getExecutiveNearbySellers,
@@ -31,6 +32,30 @@ function NearbyShops({ user }) {
 const [showModal, setShowModal] = useState(false);
 const [selectedItem, setSelectedItem] = useState(null);
 const [modalLoading, setModalLoading] = useState(false);
+const [showQrPreview, setShowQrPreview] = useState(false);
+
+const entity =
+  selectedItem?.shop ||
+  selectedItem?.seller ||
+  selectedItem?.service ||
+  null;
+
+const entityType =
+  selectedItem?.shop ? "shop" :
+  selectedItem?.seller ? "seller" :
+  selectedItem?.service ? "service" :
+  null;
+
+
+const logo =
+  selectedItem?.media?.find(m => m.logo)?.logo || null;
+
+const images =
+  selectedItem?.media
+    ?.filter(m => m.images)
+    .map(m => m.images) || [];
+
+
 
   const fetchData = (lat, lng, type) => {
     setLoading(true);
@@ -262,13 +287,13 @@ console.log("selectedItem",selectedItem);
               />
 
               <div>
-                <h2>{selectedItem.shop?.name ||
-   selectedItem.seller?.name ||
-   selectedItem.service?.name}</h2>
+                <h2>{entity?.name ||
+   entity?.name ||
+   entity?.name}</h2>
                 <p>
-                  Owner: {selectedItem.shop?.owner_name ||
-   selectedItem.seller?.owner_name ||
-   selectedItem.service?.owner_name}
+                  Owner: {entity?.owner_name ||
+   entity?.owner_name ||
+   entity?.owner_name}
                 </p>
               </div>
             </div>
@@ -278,17 +303,17 @@ console.log("selectedItem",selectedItem);
               <div className="stat-card">
                 <span>💰 Wallet</span>
                 <strong>
-                  ₹ {selectedItem.shop?.wallet_balance ||
-   selectedItem.seller?.wallet_balance ||
-   selectedItem.service?.wallet_balance}
+                  ₹ {entity?.wallet_balance ||
+   entity?.wallet_balance ||
+   entity?.wallet_balance}
                 </strong>
               </div>
               <div className="stat-card">
                 <span>📦 Orders</span>
                 <strong>
-                  {selectedItem.shop?.total_orders ||
-   selectedItem.seller?.total_orders ||
-   selectedItem.service?.total_orders}
+                  {entity?.total_orders ||
+   entity?.total_orders ||
+   entity?.total_orders}
                 </strong>
               </div>
             </div>
@@ -297,9 +322,9 @@ console.log("selectedItem",selectedItem);
             <div className="modal-section">
               <h4>📞 Contact</h4>
               <div>
-                📍                   {selectedItem.shop?.address ||
-   selectedItem.seller?.address ||
-   selectedItem.service?.address || "Not set"}
+                📍                   {entity?.address ||
+   entity?.address ||
+   entity?.address || "Not set"}
               </div>
               <div>
                 📞 {selectedItem.user?.[0]?.phone || "Not set"}
@@ -308,6 +333,40 @@ console.log("selectedItem",selectedItem);
                 ✉️ {selectedItem.user?.[0]?.email || "Not set"}
               </div>
             </div>
+{/* ================= QR MASTER CARD ================= */}
+{selectedItem.scanner_code?.[0]?.scanner_code && (
+  <div className="modal-section">
+    <div className="qr-master-card">
+
+      <div className="qr-header">
+        <h3 className="qr-shop-name">
+          {entity?.name}
+        </h3>
+        <span className="qr-owner">
+          Owner: {entity?.owner_name}
+        </span>
+      </div>
+
+      <div
+        className="qr-body zoomable"
+        onClick={() => setShowQrPreview(true)}
+      >
+        <QRCodeCanvas
+          value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+            selectedItem.scanner_code[0].scanner_code
+          )}&type=${entityType}`}
+          size={160}
+          level="H"
+        />
+      </div>
+
+      <div className="qr-footer">
+        <span>Click or hover to enlarge</span>
+      </div>
+
+    </div>
+  </div>
+)}
 
             {/* GALLERY */}
             <div className="modal-section">
@@ -327,25 +386,75 @@ console.log("selectedItem",selectedItem);
                 </div>
               )}
             </div>
+{/* ================= CATEGORY COMMISSIONS ================= */}
+<div className="modal-section commission-master-section">
+
+  <div className="section-header">
+   
+    <span className="section-sub">
+      Total Categories: {selectedItem.category_commissions?.length || 0}
+    </span>
+  </div>
+
+  {selectedItem.category_commissions &&
+  selectedItem.category_commissions.length > 0 ? (
+
+    <div className="commission-grid">
+      {selectedItem.category_commissions.map((item) => (
+        <div key={item.id} className="commission-card">
+
+          <div className="commission-top">
+            <h5>{item.category_name}</h5>
+
+            <span
+              className={`status-dot ${
+                item.status === "active"
+                  ? "status-active"
+                  : "status-inactive"
+              }`}
+            >
+              {item.status}
+            </span>
+          </div>
+
+          <div className="commission-value">
+            {item.commission}%
+          </div>
+
+          <div className="commission-label">
+            Platform Commission
+          </div>
+
+        </div>
+      ))}
+    </div>
+
+  ) : (
+    <div className="empty-commission">
+      <p>No commission configuration found.</p>
+    </div>
+  )}
+
+</div>
 
             {/* MAP */}
             <div className="modal-section">
               <h4>📍 Location</h4>
 
-              {selectedItem.shop?.latitude ||
-   selectedItem.seller?.latitude ||
-   selectedItem.service?.latitude &&
-              selectedItem.shop?.longitude ||
-   selectedItem.seller?.longitude ||
-   selectedItem.service?.longitude ? (
+              {entity?.latitude ||
+   entity?.latitude ||
+   entity?.latitude &&
+              entity?.longitude ||
+   entity?.longitude ||
+   entity?.longitude ? (
                 <MapContainer
                   center={[
-                    selectedItem.shop?.latitude ||
-   selectedItem.seller?.latitude ||
-   selectedItem.service?.latitude,
-                    selectedItem.shop?.longitude ||
-   selectedItem.seller?.longitude ||
-   selectedItem.service?.longitude
+                    entity?.latitude ||
+   entity?.latitude ||
+   entity?.latitude,
+                    entity?.longitude ||
+   entity?.longitude ||
+   entity?.longitude
                   ]}
                   zoom={16}
                   style={{
@@ -356,19 +465,19 @@ console.log("selectedItem",selectedItem);
                   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                   <Marker
                     position={[
-                     selectedItem.shop?.latitude ||
-   selectedItem.seller?.latitude ||
-   selectedItem.service?.latitude,
-                    selectedItem.shop?.longitude ||
-   selectedItem.seller?.longitude ||
-   selectedItem.service?.longitude
+                     entity?.latitude ||
+   entity?.latitude ||
+   entity?.latitude,
+                    entity?.longitude ||
+   entity?.longitude ||
+   entity?.longitude
                     ]}
                   >
                     <Popup>
                       <strong>
-                       {selectedItem.shop?.name ||
-   selectedItem.seller?.name ||
-   selectedItem.service?.name}
+                       {entity?.name ||
+   entity?.name ||
+   entity?.name}
                       </strong>
                     </Popup>
                   </Marker>
@@ -384,6 +493,25 @@ console.log("selectedItem",selectedItem);
     </div>
   </div>
 )}
+{/* qu zoom */}
+{showQrPreview &&
+ selectedItem?.scanner_code?.[0]?.scanner_code && (
+  <div
+    className="qr-preview-overlay"
+    onClick={() => setShowQrPreview(false)}
+  >
+    <div className="qr-preview-box">
+      <QRCodeCanvas
+        value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+          selectedItem.scanner_code[0].scanner_code
+        )}&type=${entityType}`}
+        size={300}
+        level="H"
+      />
+    </div>
+  </div>
+)}
+
 
     </div>
   );

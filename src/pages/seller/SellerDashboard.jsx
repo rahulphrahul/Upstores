@@ -9,6 +9,7 @@ import { shopIcon } from "../../utils/leafletIcon";
 const SellerDashboard = () => {
   const [seller, setSeller] = useState(null);
   const [loading, setLoading] = useState(true);
+const [qrZoom, setQrZoom] = useState(false);
 
   // 🔐 Get logged-in user (SAME AS SERVICE)
   const user = JSON.parse(localStorage.getItem("user"));
@@ -84,7 +85,38 @@ console.log("tetet",seller);
           </div>
         </div>
       </div>
+ {/* STATS */}
+<section className="stats-section">
+  <div className="stats-grid">
+    <div className="stat-card">
+      <span className="stat-title">Total Purchases</span>
+      <span className="stat-value">
+        {seller.stats?.total_purchases || 0}
+      </span>
+    </div>
 
+    <div className="stat-card success">
+      <span className="stat-title">Confirmed</span>
+      <span className="stat-value">
+        {seller.stats?.confirmed_purchases || 0}
+      </span>
+    </div>
+
+    <div className="stat-card warning">
+      <span className="stat-title">Pending</span>
+      <span className="stat-value">
+        {seller.stats?.pending_purchases || 0}
+      </span>
+    </div>
+
+    <div className="stat-card revenue">
+      <span className="stat-title">Total Revenue</span>
+      <span className="stat-value">
+        ₹{seller.stats?.total_revenue || 0}
+      </span>
+    </div>
+  </div>
+</section>
       {/* CONTENT */}
       <div className="seller-content">
         <div className="seller-main">
@@ -195,38 +227,126 @@ console.log("tetet",seller);
         {/* SIDEBAR */}
         <div className="seller-sidebar">
           {/* QR */}
-          <section className="seller-qr-section">
-            <h2 className="section-title">📱 Seller QR Code</h2>
+        <section className="seller-qr-section">
+  <div className="qr-master-card">
 
-            <div className="seller-qr-card">
-              <QRCodeCanvas
-                id="seller-qr"
-                value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
-                 seller?.scanner_code?.[0]?.scanner_code
-                )}&type=seller`}
-                size={200}
-                level="H"
-                includeMargin
-              />
+    {/* Header */}
+    <div className="qr-header">
+      <h2 className="qr-title">Seller QR</h2>
+      <span className="qr-badge">Instant Access</span>
+    </div>
 
-              <button
-                className="download-qr-btn"
-                onClick={() => {
-                  const canvas = document.getElementById("seller-qr");
-                  const pngUrl = canvas
-                    .toDataURL("image/png")
-                    .replace("image/png", "image/octet-stream");
+    {/* Seller Info */}
+    <div className="qr-owner">
+      <strong>{seller.seller?.name}</strong>
+      <span>Owner: {seller.seller?.owner_name || "-"}</span>
+    </div>
 
-                  const link = document.createElement("a");
-                  link.href = pngUrl;
-                  link.download = `${seller.seller?.name}-qr.png`;
-                  link.click();
-                }}
-              >
-                Download QR
-              </button>
-            </div>
-          </section>
+    {/* QR */}
+    {seller?.scanner_code?.[0]?.scanner_code && (
+      <>
+      <div
+  className="qr-wrapper"
+  onClick={() => setQrZoom(true)}
+>
+          <QRCodeCanvas
+            id="seller-qr"
+            value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+              seller.scanner_code[0].scanner_code
+            )}&type=seller`}
+            size={190}
+            level="H"
+            includeMargin
+          />
+        </div>
+
+        <p className="qr-caption">
+          Scan to view details
+        </p>
+
+        <div className="qr-actions">
+          <button
+            className="qr-download-btn"
+            onClick={() => {
+              const qrCanvas = document.getElementById("seller-qr");
+              if (!qrCanvas) return;
+
+              const size = 420;
+              const canvas = document.createElement("canvas");
+              canvas.width = size;
+              canvas.height = size + 120;
+
+              const ctx = canvas.getContext("2d");
+
+              // Background
+              ctx.fillStyle = "#f8fafc";
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+              // Card
+              ctx.fillStyle = "#ffffff";
+              ctx.shadowColor = "rgba(0,0,0,0.15)";
+              ctx.shadowBlur = 25;
+              ctx.fillRect(20, 20, size - 40, size + 80);
+              ctx.shadowBlur = 0;
+
+              // Seller Name
+              ctx.fillStyle = "#111827";
+              ctx.font = "bold 24px Arial";
+              ctx.textAlign = "center";
+              ctx.fillText(
+                seller.seller?.name || "Seller",
+                size / 2,
+                60
+              );
+
+              // QR
+              const qrSize = 240;
+              const qrX = (size - qrSize) / 2;
+              const qrY = 100;
+              ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+
+              // Footer
+              ctx.fillStyle = "#9ca3af";
+              ctx.font = "14px Arial";
+              ctx.fillText(
+                "Scan to view details",
+                size / 2,
+                qrY + qrSize + 40
+              );
+
+              const link = document.createElement("a");
+              link.download = `${seller.seller?.name}-qr-card.png`;
+              link.href = canvas.toDataURL("image/png");
+              link.click();
+            }}
+          >
+            Download QR
+          </button>
+        </div>
+      </>
+    )}
+  </div>
+</section>
+<section className="commission-section">
+  <h2 className="section-title">💸 Categories</h2>
+
+  <div className="commission-card">
+    {seller.categories?.length > 0 ? (
+      seller.categories.map((cat) => (
+        <div key={cat.id} className="commission-row">
+          <span className="commission-category">
+            {cat.name}
+          </span>
+          <span className="commission-value">
+            {cat.commission}%
+          </span>
+        </div>
+      ))
+    ) : (
+      <p className="text-muted">No Categories Found</p>
+    )}
+  </div>
+</section>
 
           {/* CONTACT */}
           <section className="seller-contact-section">
@@ -274,6 +394,25 @@ console.log("tetet",seller);
           </section>
         </div>
       </div>
+      {qrZoom && (
+  <div
+    className="qr-zoom-overlay"
+    onClick={() => setQrZoom(false)}
+  >
+    <div className="qr-zoom-box">
+      <QRCodeCanvas
+        value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+          seller?.scanner_code?.[0]?.scanner_code || ""
+        )}&type=seller`}
+        size={320}
+        level="H"
+        includeMargin
+      />
+      <p className="qr-zoom-text">Tap anywhere to close</p>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
