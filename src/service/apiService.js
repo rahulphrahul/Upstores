@@ -341,6 +341,35 @@ export const getExecutiveNearbyShops = async (executiveId, latitude, longitude) 
   const res = await fetch(`${BASE_URL}/shops/get_executive_nearby_shops.php?executive_id=${executiveId}&latitude=${latitude}&longitude=${longitude}`);
   return res.json();
 };
+export const getExecutiveNearbyServices = async (executiveId, latitude, longitude) => {
+  const res = await fetch(`${BASE_URL}/services/get_executive_nearby_services.php?executive_id=${executiveId}&latitude=${latitude}&longitude=${longitude}`);
+  return res.json();
+};
+export const getExecutiveNearbySellers = async (executiveId, latitude, longitude) => {
+  const res = await fetch(`${BASE_URL}/sellers/get_executive_nearby_sellers.php?executive_id=${executiveId}&latitude=${latitude}&longitude=${longitude}`);
+  return res.json();
+};
+
+export const getNearbyItemDetails = async (id, type) => {
+  let endpoint = "";
+   let type_id = "";
+
+  if (type === "sellers") {
+    endpoint = "sellers/get_login_seller.php";
+    type_id="seller_id";
+  } else if (type === "shops") {
+    endpoint = "shops/shop_login_details.php";
+    type_id="shop_id";
+  } else if (type === "services") {
+    endpoint = "services/get_login_services.php";
+    type_id="service_id";
+  }
+
+  const res = await fetch(`${BASE_URL}/${endpoint}?${type_id}=${id}`);
+  return res.json();
+};
+
+
 
 /* ================= purchase history ================= */
 export const getPurchaseHistory = async (executiveId) => {

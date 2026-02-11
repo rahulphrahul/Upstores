@@ -63,7 +63,7 @@ const menus = {
     { name: "Shops", path: "/dashboard/executive/shops", icon: <Store {...iconStyle} /> },
     { name: "Sellers", path: "/dashboard/executive/sellers", icon: <UserCircle {...iconStyle} /> },
     { name: "Services", path: "/dashboard/executive/services", icon: <Wrench {...iconStyle} /> },
-    { name: "NearBy Shops", path: "/dashboard/executive/nearby", icon: <MapPin {...iconStyle} /> },
+    { name: "NearBy Merchants", path: "/dashboard/executive/nearby", icon: <MapPin {...iconStyle} /> },
   ],
 
   shop: [
