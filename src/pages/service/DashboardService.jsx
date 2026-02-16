@@ -39,7 +39,7 @@ if (!service) return <p>No seller data available.</p>;
 
 const images =
   service.media?.filter(m => m.images).map(m => m.images) || [];
-  // Download QR codelogo
+  // Download QR code
   const downloadQr = (url) => {
     fetch(url)
       .then((res) => res.blob())

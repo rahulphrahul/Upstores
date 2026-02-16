@@ -173,10 +173,10 @@ console.log("tetet",seller);
 
           {/* STORE IMAGES */}
 <section className="gallery-section">
-  <h2 className="section-title">🖼️ Shop Gallery</h2>
+  <h2 className="section-title">🖼️ Seller Gallery</h2>
 
   {images.length === 0 ? (
-    <p className="text-muted">No shop images uploaded</p>
+    <p className="text-muted">No Seller images uploaded</p>
   ) : (
     <div className="shop-gallery">
       {images.map((img, index) => (

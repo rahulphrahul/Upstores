@@ -31,14 +31,15 @@ body {
 ========================= */
 .sidebar {
   width: 260px;
-  background: #ffffff;
-  border-right: 1px solid #e5e7eb;
+  background: #ffffff; /* same as topbar */
+  border-right: 1px solid #e6e9ff; /* match header border tone */
   height: 100vh;
   display: flex;
   flex-direction: column;
   padding: 16px 12px;
-  flex-shrink: 0; /* prevents layout shifting */
+  flex-shrink: 0;
 }
+
 
 /* LOGO */
 .sidebar-logo {
@@ -373,4 +374,21 @@ body {
   right: 0;
   bottom: 0;
   z-index: 998;
+}
+
+/* badge */
+.pending-badge {
+  background: #dc2626; /* red */
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  line-height: 1;
 }

@@ -8,6 +8,14 @@ import React, {
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import { 
+  FaStore, 
+  FaUserTie, 
+  FaTools, 
+  FaWallet, 
+  FaExchangeAlt, 
+  FaClock 
+} from "react-icons/fa";
 
 import {
   getDashboardStats,
@@ -240,7 +248,7 @@ const shop_type="all";
   if (loading) {
     return <MasterDashboardSkeleton />;
   }
-
+console.log("stauttsus",stats.data);
   /* =========================
      MAIN UI
   ========================= */
@@ -249,20 +257,103 @@ const shop_type="all";
       <h2 className="page-title">Master Dashboard</h2>
 
       {/* COUNTS */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <p>Total Customers</p>
-          <h3>{stats.customers}</h3>
-        </div>
-        <div className="stat-card">
-          <p>Total Shops</p>
-          <h3>{stats.shops}</h3>
-        </div>
-        <div className="stat-card">
-          <p>Total Points</p>
-          <h3>{stats.points}</h3>
-        </div>
+    <div className="stats-grid">
+
+  {/* SHOPS */}
+  <div className="stat-card shops">
+    <div className="stat-top">
+      <div className="stat-icon-box shops">
+        <FaStore />
       </div>
+      <div>
+        <p className="stat-title">Shops</p>
+        <h3>{stats?.data.shops?.total || 0}</h3>
+      </div>
+    </div>
+
+    <div className="stat-metrics">
+      <div className="metric">
+        <FaWallet />
+        <span>Wallet</span>
+        <strong>₹ {stats?.data.shops?.wallet || 0}</strong>
+      </div>
+      <div className="metric">
+        <FaExchangeAlt />
+        <span>Transactions</span>
+        <strong>₹ {stats?.data.shops?.transactions || 0}</strong>
+      </div>
+      <div className="metric">
+        <FaClock />
+        <span>Pending</span>
+        <strong>{stats?.data.shops?.pending || 0}</strong>
+      </div>
+    </div>
+  </div>
+
+  {/* SELLERS */}
+  <div className="stat-card sellers">
+    <div className="stat-top">
+      <div className="stat-icon-box sellers">
+        <FaUserTie />
+      </div>
+      <div>
+        <p className="stat-title">Sellers</p>
+        <h3>{stats?.data.sellers?.total || 0}</h3>
+      </div>
+    </div>
+
+    <div className="stat-metrics">
+      <div className="metric">
+        <FaWallet />
+        <span>Wallet</span>
+        <strong>₹ {stats?.data.sellers?.wallet || 0}</strong>
+      </div>
+      <div className="metric">
+        <FaExchangeAlt />
+        <span>Transactions</span>
+        <strong>₹ {stats?.data.sellers?.transactions || 0}</strong>
+      </div>
+      <div className="metric">
+        <FaClock />
+        <span>Pending</span>
+        <strong>{stats?.data.sellers?.pending || 0}</strong>
+      </div>
+    </div>
+  </div>
+
+  {/* SERVICES */}
+  <div className="stat-card services">
+    <div className="stat-top">
+      <div className="stat-icon-box services">
+        <FaTools />
+      </div>
+      <div>
+        <p className="stat-title">Services</p>
+        <h3>{stats?.data.services?.total || 0}</h3>
+      </div>
+    </div>
+
+    <div className="stat-metrics">
+      <div className="metric">
+        <FaWallet />
+        <span>Wallet</span>
+        <strong>₹ {stats?.data.services?.wallet || 0}</strong>
+      </div>
+      <div className="metric">
+        <FaExchangeAlt />
+        <span>Transactions</span>
+        <strong>₹ {stats?.data.services?.transactions || 0}</strong>
+      </div>
+      <div className="metric">
+        <FaClock />
+        <span>Pending</span>
+        <strong>{stats?.data.services?.pending || 0}</strong>
+      </div>
+    </div>
+  </div>
+
+</div>
+
 
       {/* CHARTS */}
       <div className="grid-2">

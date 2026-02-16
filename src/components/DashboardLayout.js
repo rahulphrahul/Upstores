@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { getPurchasePendingCount } from "../service/apiService";
 import { Button } from "react-bootstrap";
 import { FiMenu, FiX } from "react-icons/fi";
 import "./DashboardLayout.css";
@@ -42,6 +43,7 @@ function DashboardLayout({ user, setUser }) {
   };
 
  const iconStyle = { color: "#9CA3AF", size: 18 }; // Tailwind gray-400
+const [pendingCount, setPendingCount] = useState(0);
 
 const menus = {
   admin: [
@@ -61,7 +63,7 @@ const menus = {
     { name: "Shops", path: "/dashboard/executive/shops", icon: <Store {...iconStyle} /> },
     { name: "Sellers", path: "/dashboard/executive/sellers", icon: <UserCircle {...iconStyle} /> },
     { name: "Services", path: "/dashboard/executive/services", icon: <Wrench {...iconStyle} /> },
-    { name: "NearBy Shops", path: "/dashboard/executive/nearby", icon: <MapPin {...iconStyle} /> },
+    { name: "NearBy Merchants", path: "/dashboard/executive/nearby", icon: <MapPin {...iconStyle} /> },
   ],
 
   shop: [
@@ -69,6 +71,7 @@ const menus = {
     { name: "Customer QR", path: "/dashboard/shop/customer_qr", icon: <QrCode {...iconStyle} /> },
     { name: "Purchase", path: "/dashboard/shop/purchase_history", icon: <ShoppingCart {...iconStyle} /> },
     { name: "Wallet Management", path: "/dashboard/shop/wallet_management", icon: <Wallet {...iconStyle} /> },
+    { name: "Customer Purchase", path: "/dashboard/shop/customer_purchase", icon: <Wallet {...iconStyle} /> },
   ],
 
   seller: [
@@ -76,6 +79,7 @@ const menus = {
     { name: "Customer QR", path: "/dashboard/sellers/customer_qr", icon: <QrCode {...iconStyle} /> },
     { name: "Purchase", path: "/dashboard/sellers/purchase_history", icon: <ShoppingCart {...iconStyle} /> },
     { name: "Wallet Management", path: "/dashboard/sellers/wallet_management", icon: <Wallet {...iconStyle} /> },
+    { name: "Customer Purchase", path: "/dashboard/sellers/customer_purchase", icon: <Wallet {...iconStyle} /> },
   ],
 
   service: [
@@ -83,8 +87,20 @@ const menus = {
     { name: "Customer QR", path: "/dashboard/service/customer_qr", icon: <QrCode {...iconStyle} /> },
     { name: "Purchase", path: "/dashboard/service/purchase_history", icon: <ShoppingCart {...iconStyle} /> },
     { name: "Wallet Management", path: "/dashboard/service/wallet_management", icon: <Wallet {...iconStyle} /> },
+    { name: "Customer Purchase", path: "/dashboard/service/customer_purchase", icon: <Wallet {...iconStyle} /> },
   ],
 };
+useEffect(() => {
+  if (!user) return;
+  getPurchasePendingCount(user.id)
+    .then(res => {
+      // console.log("ress",res.data[0]['total_count']);
+      if (res.status === "success") {
+        setPendingCount(res.data[0]['total_count']);
+      }
+    })
+    .catch(() => {});
+}, [user]);
 
 
   const menuItems = menus[user?.role] || [];
@@ -119,7 +135,13 @@ const menus = {
       onClick={closeSidebarOnMobile}
     >
       <span className="menu-icon">{item.icon}</span>
-      <span className="menu-text">{item.name}</span>
+      <span className="menu-text">{item.name}
+         {item.name === "Customer Purchase" && pendingCount > 0 && (
+          <span className="pending-badge">
+            {pendingCount}
+          </span>
+        )}
+      </span>
     </NavLink>
   ))}
 </nav>

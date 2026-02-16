@@ -262,61 +262,145 @@ const openShopModal = async (shopId) => {
         </div>
       )}
 
-      <div className="card">
+           <div className="card">
+
+        {/* ===== DESKTOP TABLE ===== */}
         <table className="data-table">
           <thead>
           <tr>
               <th>Shop</th>
               <th>Owner</th>
               <th>Phone</th>
-               <th>Email</th>
+              <th>Email</th>
               <th>Wallet</th>
               <th>Status</th>
               <th>Location</th>
               <th>Action</th>
             </tr>
           </thead>
+
           <tbody>
             {shops.map((s) => (
-              <tr  key={s.user_id}
-  className="clickable-row"
-  onClick={() => openShopModal(s.user_id)}>
-                <td>{s.shop_name}</td>
-                <td>{s.owner_name}</td>
-                <td>{s.phone}</td>
-                 <td>{s.email}</td>
-                <td>₹ {s.wallet_balance}</td>
-                 <td><span className={`status ${s.status}`}>{s.status}</span></td>
-              <td>
-  {s.latitude ? (
-    <a
-      href={`https://www.google.com/maps?q=${s.latitude},${s.longitude}`}
-      target="_blank"
-      rel="noreferrer"
-    >
-      View on Map
-    </a>
-  ) : "—"}
-</td>
-
-                <td>
-                  <button className="btn" onClick={(e) => {
-    e.stopPropagation();
-    toggleStatus(s);
-  }}>
+              <tr
+                key={s.user_id}
+                className="clickable-row"
+                onClick={() => openShopModal(s.user_id)}
+              >
+                <td data-label="Shop">{s.shop_name}</td>
+                <td data-label="Owner">{s.owner_name}</td>
+                <td data-label="Phone">{s.phone}</td>
+                <td data-label="Email">{s.email}</td>
+                <td data-label="Wallet">₹ {s.wallet_balance}</td>
+                <td data-label="Status">
+                  <span className={`status ${s.status}`}>
+                    {s.status}
+                  </span>
+                </td>
+                <td data-label="Location">
+                  {s.latitude ? (
+                    <a
+                      href={`https://www.google.com/maps?q=${s.latitude},${s.longitude}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      View on Map
+                    </a>
+                  ) : "—"}
+                </td>
+                <td
+                  data-label="Action"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    className="btn"
+                    onClick={() => toggleStatus(s)}
+                  >
                     {s.status === "active" ? "Suspend" : "Activate"}
                   </button>
                 </td>
               </tr>
             ))}
+
             {shops.length === 0 && (
               <tr>
-                <td colSpan="7">No shops found</td>
+                <td colSpan="8" className="empty">
+                  No shops found
+                </td>
               </tr>
             )}
           </tbody>
         </table>
+
+       {/* ===== MOBILE CARD VIEW ===== */}
+<div className="mobile-shop-list">
+  {shops.map((s) => (
+    <div
+      key={s.user_id}
+      className="shop-mobile-card"
+      onClick={() => openShopModal(s.user_id)}
+    >
+      {/* Header Row */}
+      <div className="shop-mobile-header">
+        <div className="shop-mobile-title">
+          {s.shop_name}
+        </div>
+
+        <span className={`status ${s.status}`}>
+          {s.status}
+        </span>
       </div>
+
+      {/* Details */}
+      <div className="shop-mobile-sub">
+        Owner: {s.owner_name}
+      </div>
+
+      <div className="shop-mobile-sub">
+        📞 {s.phone}
+      </div>
+
+      <div className="shop-mobile-sub">
+        ✉️ {s.email}
+      </div>
+
+      <div className="shop-mobile-sub">
+        💰 Wallet: ₹ {s.wallet_balance}
+      </div>
+
+      {/* Location */}
+      {s.latitude && (
+        <div className="shop-mobile-meta">
+          <a
+            href={`https://www.google.com/maps?q=${s.latitude},${s.longitude}`}
+            target="_blank"
+            rel="noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            📍 View Location
+          </a>
+        </div>
+      )}
+
+      {/* Action Button */}
+      <div style={{ marginTop: "10px" }}>
+        <button
+          className="btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleStatus(s);
+          }}
+        >
+          {s.status === "active" ? "Suspend" : "Activate"}
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
+
+
+      </div>
+
      {/* SHOP DETAILS MODAL */}
 {showShopModal && (
   <div className="shop-modal-overlay">

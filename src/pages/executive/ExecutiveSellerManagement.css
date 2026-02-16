@@ -1,62 +1,79 @@
-/* =========================
+/* =====================================
    PAGE WRAPPER
-========================= */
-.exec-page {
+===================================== */
+.exec-shop-page {
   width: 100%;
+  padding-top: 75px;
 }
 
-/* =========================
+/* =====================================
    HEADER
-========================= */
+===================================== */
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
+  gap: 10px;
 }
 
 .page-title {
   font-size: 24px;
   font-weight: 600;
   color: #001ae3;
+  letter-spacing: 0.3px;
 }
 
-/* =========================
+/* =====================================
    CARD
-========================= */
+===================================== */
 .card {
   background: #ffffff;
-  border-radius: 14px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 8px 24px rgba(0, 26, 227, 0.12);
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 22px;
+  box-shadow: 0 8px 24px rgba(0, 26, 227, 0.08);
+  transition: all 0.3s ease;
 }
 
-/* =========================
+/* =====================================
    FORM
-========================= */
+===================================== */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin-bottom: 16px;
+  gap: 16px;
+  margin-bottom: 18px;
 }
 
-.form-grid input {
+.form-grid input,
+.form-grid textarea,
+.form-grid select {
   padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #dcdcdc;
+  border-radius: 10px;
+  border: 1px solid #e2e6ff;
   font-size: 14px;
+  background: #fafbff;
+  transition: all 0.25s ease;
 }
 
-.form-grid input:focus {
+.form-grid textarea {
+  resize: none;
+  min-height: 80px;
+}
+
+.form-grid input:focus,
+.form-grid textarea:focus,
+.form-grid select:focus {
   outline: none;
   border-color: #001ae3;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0, 26, 227, 0.1);
 }
 
-/* =========================
+/* =====================================
    TABLE
-========================= */
+===================================== */
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -77,27 +94,33 @@
 
 .data-table td {
   padding: 14px 12px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #f0f0f0;
   color: #333;
 }
 
-.data-table tbody tr:hover {
-  background: #fafbff;
+.data-table tbody tr {
+  transition: background 0.2s ease;
+  cursor: pointer;
 }
 
-/* =========================
-   STATUS
-========================= */
+.data-table tbody tr:hover {
+  background: #f9faff;
+}
+
+/* =====================================
+   STATUS BADGES
+===================================== */
 .status {
-  padding: 4px 12px;
-  border-radius: 14px;
+  padding: 5px 14px;
+  border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
   text-transform: capitalize;
+  display: inline-block;
 }
 
 .status.active {
-  background: #e8ebff;
+  background: #e6ebff;
   color: #001ae3;
 }
 
@@ -106,13 +129,13 @@
   color: #e74c3c;
 }
 
-/* =========================
+/* =====================================
    BUTTONS
-========================= */
+===================================== */
 .btn {
   border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
+  padding: 9px 16px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -126,121 +149,155 @@
 
 .btn-primary:hover {
   background: #0013b8;
-}
-.form-control {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  background-color: #fff;
-  outline: none;
-  transition: border 0.2s, box-shadow 0.2s;
+  transform: translateY(-1px);
 }
 
-.form-control:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+.btn-outline {
+  background: transparent;
+  border: 1px solid #001ae3;
+  color: #001ae3;
 }
 
-/* Remove default select arrow differences */
-.form-control select {
-  appearance: none;
+.btn-outline:hover {
+  background: #001ae3;
+  color: #ffffff;
 }
 
-/* Fix select height */
-select.form-control {
-  height: 40px;
-  cursor: pointer;
+/* =====================================
+   MOBILE CARD VIEW
+===================================== */
+.mobile-shop-list {
+  display: none;
 }
 
-
-/* =========================
-   RESPONSIVE
-========================= */
-@media (max-width: 900px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .page-title {
-    font-size: 20px;
-  }
+.shop-mobile-card {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 6px 18px rgba(0, 26, 227, 0.06);
+  transition: all 0.25s ease;
 }
-/* modaL */
+
+.shop-mobile-card:hover {
+  transform: translateY(-2px);
+}
+
+.shop-mobile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.shop-mobile-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: #001ae3;
+}
+
+.shop-mobile-sub {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.shop-mobile-meta {
+  font-size: 13px;
+  color: #001ae3;
+  margin-top: 6px;
+}
+
+/* =====================================
+   MODAL
+===================================== */
 .shop-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.55);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 999;
+  padding: 20px;
 }
 
 .shop-modal-container {
-  background: #fff;
-  width: 92%;
-  max-width: 900px;
+  background: #ffffff;
+  width: 100%;
+  max-width: 950px;
   max-height: 90vh;
   overflow-y: auto;
-  border-radius: 16px;
-  padding: 20px;
+  border-radius: 18px;
+  padding: 24px;
   position: relative;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .shop-modal-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 14px;
+  right: 14px;
   border: none;
-  background: #eee;
+  background: #f0f2ff;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.shop-modal-close:hover {
+  background: #e0e5ff;
 }
 
 .modal-header {
   display: flex;
-  gap: 16px;
+  gap: 18px;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .modal-shop-logo {
-  width: 70px;
-  height: 70px;
-  border-radius: 12px;
+  width: 75px;
+  height: 75px;
+  border-radius: 14px;
   object-fit: cover;
-  border: 1px solid #ddd;
+  border: 1px solid #e0e5ff;
 }
 
 .modal-stats {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 14px;
+  margin-bottom: 18px;
 }
 
 .stat-card {
-  background: #f9fafb;
-  padding: 12px;
-  border-radius: 12px;
+  background: #f6f8ff;
+  padding: 14px;
+  border-radius: 14px;
   text-align: center;
+  font-size: 14px;
 }
 
 .modal-section {
-  background: #f9fafb;
-  padding: 14px;
-  border-radius: 12px;
-  margin-bottom: 14px;
+  background: #f6f8ff;
+  padding: 16px;
+  border-radius: 14px;
+  margin-bottom: 16px;
 }
 
 .modal-section.center {
@@ -250,12 +307,50 @@ select.form-control {
 .modal-gallery {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 10px;
+  gap: 12px;
 }
 
 .modal-gallery img {
   width: 100%;
-  height: 90px;
+  height: 95px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 10px;
+  transition: transform 0.2s ease;
+}
+
+.modal-gallery img:hover {
+  transform: scale(1.05);
+}
+
+/* =====================================
+   RESPONSIVE
+===================================== */
+@media (max-width: 1024px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .card {
+  overflow-x: auto;
+}
+
+.data-table {
+  min-width: 900px;
+}
+
+
+  .modal-stats {
+    grid-template-columns: 1fr;
+  }
 }
