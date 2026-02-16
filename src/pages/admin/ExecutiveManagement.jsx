@@ -255,8 +255,10 @@ function ExecutiveManagement() {
       </div>
 
       {/* TABLE */}
-      <div className="card">
-        <table className="data-table">
+     <div className="card">
+  <div className="table-wrapper">
+    <table className="data-table">
+
           <thead>
             <tr>
               <th>Name</th>
@@ -313,9 +315,10 @@ function ExecutiveManagement() {
               </tr>
             )}
           </tbody>
-        </table>
-      </div>
-    </div>
+           </table>
+  </div>
+</div>
+</div>
   );
 }
 

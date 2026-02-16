@@ -147,7 +147,9 @@ function ServiceManagement() {
 
       {/* Services Table */}
       <div className="card">
-        <table className="data-table">
+  <div className="table-scroll">
+    <table className="data-table">
+
           <thead>
             <tr>
               <th>Service</th>
@@ -194,7 +196,7 @@ function ServiceManagement() {
           </tbody>
         </table>
       </div>
-
+</div>
       {/* SERVICE MODAL */}
       {showServiceModal && (
         <div className="shop-modal-overlay">

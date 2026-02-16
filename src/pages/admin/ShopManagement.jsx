@@ -145,8 +145,10 @@ function ShopManagement() {
             </div>
 
             {/* Shops Table */}
-            <div className="card">
-                <table className="data-table">
+           <div className="card">
+  <div className="table-scroll">
+    <table className="data-table">
+
                     <thead>
                         <tr>
                             <th>Shop</th>
@@ -200,7 +202,7 @@ function ShopManagement() {
                     </tbody>
                 </table>
             </div>
-
+</div>
             {/* SHOP DETAILS MODAL */}
             {showShopModal && (
                 <div className="shop-modal-overlay">

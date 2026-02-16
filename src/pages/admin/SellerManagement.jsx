@@ -146,8 +146,10 @@ function SellerManagement() {
       </div>
 
       {/* Sellers Table */}
-      <div className="card">
-        <table className="data-table">
+     <div className="card">
+  <div className="table-scroll">
+    <table className="data-table">
+
           <thead>
             <tr>
               <th>Seller</th>
@@ -192,7 +194,7 @@ function SellerManagement() {
           </tbody>
         </table>
       </div>
-
+</div>
       {/* Seller Modal */}
       {showSellerModal && (
         <div className="shop-modal-overlay">

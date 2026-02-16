@@ -42,7 +42,9 @@ function CustomerManagement() {
       <h2 className="page-title">Customer Management</h2>
 
       <div className="card">
-        <table className="data-table">
+  <div className="table-scroll">
+    <table className="data-table">
+
           <thead>
             <tr>
               <th>Name</th>
@@ -112,7 +114,7 @@ function CustomerManagement() {
           </tbody>
         </table>
       </div>
-
+</div>
       {/* WALLET MODAL */}
       {showWalletModal && (
         <div className="modal-overlay">

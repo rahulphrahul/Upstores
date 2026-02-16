@@ -420,3 +420,105 @@
     border-radius: 14px;
   }
 }
+/* =========================
+   MOBILE IMPROVEMENTS
+========================= */
+@media (max-width: 768px) {
+
+  /* Make tables scrollable */
+  .data-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* Prevent table from shrinking */
+  .data-table table,
+  .data-table thead,
+  .data-table tbody,
+  .data-table th,
+  .data-table td,
+  .data-table tr {
+    white-space: nowrap;
+  }
+
+  /* Fund rows stack cleanly */
+  .fund-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  /* Modal responsive spacing */
+  .shop-modal-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  /* Modal gallery tighter grid */
+  .modal-gallery {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  }
+
+  /* Prevent buttons from breaking layout */
+  .btn {
+    width: auto;
+    white-space: nowrap;
+  }
+
+  /* Smaller title */
+  .page-title {
+    font-size: 20px;
+  }
+}
+/* ===============================
+   TABLE STABLE STRUCTURE FIX
+================================= */
+
+.card {
+  width: 100%;
+  overflow: hidden;
+}
+
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Important */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;   /* DO NOT use fixed */
+}
+
+/* Prevent text collapsing */
+.data-table th,
+.data-table td {
+  padding: 14px 16px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Keep header clean */
+.data-table thead {
+  background: #f8fafc;
+}
+
+/* Prevent row breaking */
+.data-table tbody tr {
+  border-bottom: 1px solid #eee;
+}
+
+/* ===============================
+   MOBILE FIX ONLY
+================================= */
+@media (max-width: 992px) {
+
+  .data-table {
+    min-width: 750px; /* This is the key */
+  }
+
+}
