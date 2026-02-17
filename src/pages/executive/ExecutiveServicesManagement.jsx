@@ -282,62 +282,122 @@ const openServiceModal = async (serviceId) => {
         </div>
       )}
 
-      <div className="card">
-        <table className="data-table">
-          <thead>
-            <tr>
-               <th>Service</th>
-              <th>Owner</th>             
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Wallet</th>
-              <th>Status</th>
-              <th>Location</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {services.map((s) => (
-             <tr
-  key={s.user_id}
-  className="clickable-row"
-  onClick={() => openServiceModal(s.user_id)}
->
+    <div className="card">
 
-                <td>{s.name}</td>
-                <td>{s.owner_name}</td>
-                 <td>{s.phone || "—"}</td>
-                <td>{s.email}</td>
-                <td>{s.wallet_balance}</td>
-                <td><span className={`status ${s.status}`}>{s.status}</span></td>
-                 <td>
-  {s.latitude ? (
-    <a
-      href={`https://www.google.com/maps?q=${s.latitude},${s.longitude}`}
-      target="_blank"
-      rel="noreferrer"
-    >
-      View on Map
-    </a>
-  ) : "—"}
-</td>
-                <td>
-                 {/*} <button className="btn btn-danger" onClick={() => handleEdit(s)}>Edit</button>*/}
-                  <button className="btn btn-warning m-1" onClick={(e) => {
-    e.stopPropagation();
-    toggleStatus(s);
-  }}>
-                    {s.status === "active" ? "Disable" : "Enable"}
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {services.length === 0 && (
-              <tr><td colSpan="6" className="empty">No services found</td></tr>
-            )}
-          </tbody>
-        </table>
+  {/* ===== DESKTOP TABLE ===== */}
+  <table className="data-table">
+    <thead>
+      <tr>
+        <th>Service</th>
+        <th>Owner</th>
+        <th>Phone</th>
+        <th>Email</th>
+        <th>Wallet</th>
+        <th>Status</th>
+        <th>Location</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {services.map((s) => (
+        <tr
+          key={s.user_id}
+          className="clickable-row"
+          onClick={() => openServiceModal(s.user_id)}
+        >
+          <td data-label="Service">{s.name}</td>
+          <td data-label="Owner">{s.owner_name}</td>
+          <td data-label="Phone">{s.phone || "—"}</td>
+          <td data-label="Email">{s.email || "—"}</td>
+          <td data-label="Wallet">₹ {s.wallet_balance || 0}</td>
+          <td data-label="Status">
+            <span className={`status ${s.status}`}>{s.status}</span>
+          </td>
+          <td data-label="Location">
+            {s.latitude ? (
+              <a
+                href={`https://www.google.com/maps?q=${s.latitude},${s.longitude}`}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                View on Map
+              </a>
+            ) : "—"}
+          </td>
+          <td data-label="Action" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="btn"
+              onClick={() => toggleStatus(s)}
+            >
+              {s.status === "active" ? "Suspend" : "Activate"}
+            </button>
+          </td>
+        </tr>
+      ))}
+
+      {services.length === 0 && (
+        <tr>
+          <td colSpan="8" className="empty">
+            No services found
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+
+  {/* ===== MOBILE CARD VIEW ===== */}
+  <div className="mobile-service-list">
+    {services.map((s) => (
+      <div
+        key={s.user_id}
+        className="service-mobile-card"
+        onClick={() => openServiceModal(s.user_id)}
+      >
+        {/* Header */}
+        <div className="service-mobile-header">
+          <div className="service-mobile-title">{s.name}</div>
+          <span className={`status ${s.status}`}>{s.status}</span>
+        </div>
+
+        {/* Details */}
+        <div className="service-mobile-sub">Owner: {s.owner_name}</div>
+        <div className="service-mobile-sub">📞 {s.phone || "—"}</div>
+        <div className="service-mobile-sub">✉️ {s.email || "—"}</div>
+        <div className="service-mobile-sub">💰 Wallet: ₹ {s.wallet_balance || 0}</div>
+
+        {/* Location */}
+        {s.latitude && (
+          <div className="service-mobile-meta">
+            <a
+              href={`https://www.google.com/maps?q=${s.latitude},${s.longitude}`}
+              target="_blank"
+              rel="noreferrer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              📍 View Location
+            </a>
+          </div>
+        )}
+
+        {/* Action Button */}
+        <div style={{ marginTop: "10px" }}>
+          <button
+            className="btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleStatus(s);
+            }}
+          >
+            {s.status === "active" ? "Suspend" : "Activate"}
+          </button>
+        </div>
       </div>
+    ))}
+  </div>
+</div>
+
       {/* SERVICE DETAILS MODAL */}
 {showServiceModal && (
   <div className="shop-modal-overlay">

@@ -1,9 +1,11 @@
-/* =========================
+ound/* =========================
    PAGE WRAPPER
 ========================= */
 .exec-page {
   width: 100%;
+  padding-top: 190px; /* adjust to your header height */
 }
+
 
 /* =========================
    PAGE TITLE
@@ -295,4 +297,43 @@ select.form-control {
   height: 90px;
   object-fit: cover;
   border-radius: 8px;
+}
+/* Mobile card only visible on small screens */
+.mobile-service-list {
+  display: none;
+  gap: 12px;
+  flex-direction: column;
+}
+
+.service-mobile-card {
+  border: 1px solid #ddd;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.service-mobile-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.service-mobile-sub {
+  margin: 2px 0;
+}
+
+.service-mobile-meta a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+/* Responsive rules */
+@media screen and (max-width: 768px) {
+  .data-table {
+    display: none; /* hide desktop table */
+  }
+  .mobile-service-list {
+    display: flex;
+  }
 }
