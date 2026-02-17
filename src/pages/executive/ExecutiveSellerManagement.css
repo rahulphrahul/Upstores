@@ -3,7 +3,7 @@
 ===================================== */
 .exec-shop-page {
   width: 100%;
-  padding-top: 75px;
+  padding-top: 75px; /* increase to match header height */
 }
 
 /* =====================================
@@ -15,6 +15,7 @@
   align-items: center;
   margin-bottom: 22px;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .page-title {
@@ -124,7 +125,7 @@
   color: #001ae3;
 }
 
-.status.inactive {
+.status.suspended {
   background: #fdecea;
   color: #e74c3c;
 }
@@ -161,6 +162,41 @@
 .btn-outline:hover {
   background: #001ae3;
   color: #ffffff;
+}
+
+/* ===== Activate / Suspend Buttons (match shop) ===== */
+/* ===== Activate / Suspend Buttons ===== */
+/* ===== Activate / Suspend Buttons ===== */
+.btn-activate {
+  background: #16a34a !important;   /* same as Add Seller button */
+  color: #ffffff !important;
+  border: 1px solid #16a34a !important;
+}
+
+.btn-activate:hover {
+  background: #15803d !important;  /* darker green on hover */
+  color: #ffffff !important;
+}
+
+.btn-suspend {
+  background: #16a34a !important;   /* same green as Add Seller */
+  color: #ffffff !important;
+  border: 1px solid #16a34a !important;
+}
+
+.btn-suspend:hover {
+  background: #15803d !important;  /* darker green hover */
+  color: #ffffff !important;
+}
+
+/* =====================================
+   EMPTY STATE
+===================================== */
+.empty {
+  text-align: center;
+  padding: 20px;
+  color: #777;
+  font-size: 14px;
 }
 
 /* =====================================
@@ -322,6 +358,10 @@
   transform: scale(1.05);
 }
 
+.clickable-row {
+  cursor: pointer;
+}
+
 /* =====================================
    RESPONSIVE
 ===================================== */
@@ -341,14 +381,13 @@
     align-items: flex-start;
   }
 
-  .card {
-  overflow-x: auto;
-}
+  .data-table {
+    display: none;
+  }
 
-.data-table {
-  min-width: 900px;
-}
-
+  .mobile-shop-list {
+    display: block;
+  }
 
   .modal-stats {
     grid-template-columns: 1fr;

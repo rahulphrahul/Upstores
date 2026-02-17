@@ -19,17 +19,17 @@ const MAX_IMAGE_SIZE = MAX_IMAGE_MB * 1024 * 1024;
 function ExecutiveSellerManagement({ user }) {
   const executiveId = user.id;
 
-
   const [sellers, setSellers] = useState([]);
   const [categories, setCategories] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingSeller, setEditingSeller] = useState(null);
   const [locating, setLocating] = useState(false);
   const [showSellerModal, setShowSellerModal] = useState(false);
-const [selectedSeller, setSelectedSeller] = useState(null);
-const [sellerLoading, setSellerLoading] = useState(false);
+  const [selectedSeller, setSelectedSeller] = useState(null);
+  const [sellerLoading, setSellerLoading] = useState(false);
 
-const shop_type ="seller";
+  const shop_type = "seller";
+
   const [form, setForm] = useState({
     category_id: "",
     owner_name: "",
@@ -49,15 +49,15 @@ const shop_type ="seller";
   /* =========================
      LOAD SELLERS
   ========================= */
-const loadSellers = async () => {
-  try {
-    const res = await getExecutiveSellers(executiveId);
-    setSellers(res.data || []);
-  } catch (err) {
-    console.error(err);
-    setSellers([]);
-  }
-};
+  const loadSellers = async () => {
+    try {
+      const res = await getExecutiveSellers(executiveId);
+      setSellers(res.data || []);
+    } catch (err) {
+      console.error(err);
+      setSellers([]);
+    }
+  };
 
   const loadCategories = async () => {
     const res = await getCategories(shop_type);
@@ -69,22 +69,22 @@ const loadSellers = async () => {
     loadCategories();
   }, []);
 
-const openSellerModal = async (sellerId) => {
-  setShowSellerModal(true);
-  setSellerLoading(true);
-  setSelectedSeller(null);
+  const openSellerModal = async (sellerId) => {
+    setShowSellerModal(true);
+    setSellerLoading(true);
+    setSelectedSeller(null);
 
-  try {
-    const res = await getSellerLoginDetails(sellerId);
-    if (res.status === "success") {
-      setSelectedSeller(res.data);
+    try {
+      const res = await getSellerLoginDetails(sellerId);
+      if (res.status === "success") {
+        setSelectedSeller(res.data);
+      }
+    } catch (e) {
+      console.error("Failed to load seller details", e);
+    } finally {
+      setSellerLoading(false);
     }
-  } catch (e) {
-    console.error("Failed to load seller details", e);
-  } finally {
-    setSellerLoading(false);
-  }
-};
+  };
 
   /* =========================
      FORM HANDLERS
@@ -234,7 +234,10 @@ const openSellerModal = async (sellerId) => {
     <div className="exec-seller-page">
       <div className="page-header">
         <h2 className="page-title">My Sellers</h2>
-        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+        <button
+          className="btn btn-primary"
+          onClick={() => setShowForm(!showForm)}
+        >
           {showForm ? "Close" : "+ Add Seller"}
         </button>
       </div>
@@ -244,45 +247,98 @@ const openSellerModal = async (sellerId) => {
           <h4>{editingSeller ? "Edit Seller" : "Add New Seller"}</h4>
 
           <div className="form-grid">
-            {/* Category Dropdown */}
-            <select name="category_id" value={form.category_id} onChange={handleChange} className="form-control">
+            <select
+              name="category_id"
+              value={form.category_id}
+              onChange={handleChange}
+              className="form-control"
+            >
               <option value="">Select Category</option>
               {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
               ))}
             </select>
 
-            <input name="owner_name" placeholder="Owner Name" value={form.owner_name} onChange={handleChange} />
-            <input name="name" placeholder="Seller Name" value={form.name} onChange={handleChange} />
-            <input name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} />
-            <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
-            <input name="wallet_balance" placeholder="Initial Wallet" value={form.wallet_balance} onChange={handleChange} />
-            <input name="commission" placeholder="Commission %" value={form.commission} onChange={handleChange} />
-            <input name="address" placeholder="Address" value={form.address} onChange={handleChange} />
-            <textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} />
+            <input
+              name="owner_name"
+              placeholder="Owner Name"
+              value={form.owner_name}
+              onChange={handleChange}
+            />
+            <input
+              name="name"
+              placeholder="Seller Name"
+              value={form.name}
+              onChange={handleChange}
+            />
+            <input
+              name="phone"
+              placeholder="Phone"
+              value={form.phone}
+              onChange={handleChange}
+            />
+            <input
+              name="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={handleChange}
+            />
+            <input
+              name="wallet_balance"
+              placeholder="Initial Wallet"
+              value={form.wallet_balance}
+              onChange={handleChange}
+            />
+            <input
+              name="commission"
+              placeholder="Commission %"
+              value={form.commission}
+              onChange={handleChange}
+            />
+            <input
+              name="address"
+              placeholder="Address"
+              value={form.address}
+              onChange={handleChange}
+            />
+            <textarea
+              name="description"
+              placeholder="Description"
+              value={form.description}
+              onChange={handleChange}
+            />
 
-            {/* Latitude / Longitude */}
             <input name="latitude" placeholder="Latitude" value={form.latitude} readOnly />
             <input name="longitude" placeholder="Longitude" value={form.longitude} readOnly />
-            <button className="btn btn-outline" onClick={getCurrentLocation} disabled={locating}>
+            <button
+              className="btn btn-outline"
+              onClick={getCurrentLocation}
+              disabled={locating}
+            >
               {locating ? "Fetching..." : "📍 Use Current Location"}
             </button>
 
-            {/* Logo */}
             <div className="upload-group">
-              <label className="upload-label">🖼️ Seller Logo <span className="upload-hint">(max 2MB)</span></label>
+              <label className="upload-label">
+                🖼️ Seller Logo <span className="upload-hint">(max 2MB)</span>
+              </label>
               <input type="file" accept="image/*" onChange={handleLogoChange} />
             </div>
 
-            {/* Images */}
             <div className="upload-group">
-              <label className="upload-label">📸 Seller Images <span className="upload-hint">(multiple • max 2MB each)</span></label>
+              <label className="upload-label">
+                📸 Seller Images <span className="upload-hint">(multiple • max 2MB each)</span>
+              </label>
               <input type="file" accept="image/*" multiple onChange={handleImagesChange} />
             </div>
           </div>
 
           <div className="form-actions">
-            <button className="btn btn-outline" onClick={resetForm}>Cancel</button>
+            <button className="btn btn-outline" onClick={resetForm}>
+              Cancel
+            </button>
             <button className="btn btn-primary" onClick={handleSubmit}>
               {editingSeller ? "Update Seller" : "Create Seller"}
             </button>
@@ -290,13 +346,16 @@ const openSellerModal = async (sellerId) => {
         </div>
       )}
 
-      {/* Seller List */}
+      {/* =========================
+           SELLER LIST (TABLE + MOBILE)
+      ========================= */}
       <div className="card">
+        {/* ===== DESKTOP TABLE ===== */}
         <table className="data-table">
           <thead>
             <tr>
-               <th>Seller</th>
-              <th>Owner</th>             
+              <th>Seller</th>
+              <th>Owner</th>
               <th>Phone</th>
               <th>Email</th>
               <th>Wallet</th>
@@ -305,38 +364,39 @@ const openSellerModal = async (sellerId) => {
               <th>Action</th>
             </tr>
           </thead>
+
           <tbody>
             {sellers.map((s) => (
-             <tr
-  key={s.user_id}
-  className="clickable-row"
-  onClick={() => openSellerModal(s.user_id)}
->
-
-                <td>{s.name}</td>
-                <td>{s.owner_name}</td>
-                <td>{s.phone}</td>
-                <td>{s.email || "—"}</td>
-                <td>₹ {s.wallet_balance}</td>
-                  <td><span className={`status ${s.status}`}>{s.status}</span></td>
-              <td>
-  {s.latitude ? (
-    <a
-      href={`https://www.google.com/maps?q=${s.latitude},${s.longitude}`}
-      target="_blank"
-      rel="noreferrer"
-    >
-      View on Map
-    </a>
-  ) : "—"}
-</td>
-                <td className="actions">
-                {/* <button className="btn btn-danger" onClick={() => handleEdit(s)}>Edit</button>*/}
-                  <button className={`btn ${s.status === "active" ? "btn-warning" : "btn-success"}`} onClick={(e) => {
-    e.stopPropagation();
-    toggleStatus(s);
-  }}
->
+              <tr
+                key={s.user_id}
+                className="clickable-row"
+                onClick={() => openSellerModal(s.user_id)}
+              >
+                <td data-label="Seller">{s.name}</td>
+                <td data-label="Owner">{s.owner_name}</td>
+                <td data-label="Phone">{s.phone}</td>
+                <td data-label="Email">{s.email || "—"}</td>
+                <td data-label="Wallet">₹ {s.wallet_balance}</td>
+                <td data-label="Status">
+                  <span className={`status ${s.status}`}>{s.status}</span>
+                </td>
+                <td data-label="Location">
+                  {s.latitude ? (
+                    <a
+                      href={`https://www.google.com/maps?q=${s.latitude},${s.longitude}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      View on Map
+                    </a>
+                  ) : "—"}
+                </td>
+                <td data-label="Action" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    className={`btn ${s.status === "active" ? "btn-suspend" : "btn-activate"}`}
+                    onClick={() => toggleStatus(s)}
+                  >
                     {s.status === "active" ? "Suspend" : "Activate"}
                   </button>
                 </td>
@@ -344,152 +404,169 @@ const openSellerModal = async (sellerId) => {
             ))}
             {sellers.length === 0 && (
               <tr>
-                <td colSpan="8" className="empty">No sellers found</td>
+                <td colSpan="8" className="empty">
+                  No sellers found
+                </td>
               </tr>
             )}
           </tbody>
         </table>
-      </div>
-      {/* SHOP DETAILS MODAL */}
-{showSellerModal && (
-  <div className="shop-modal-overlay">
-    <div className="shop-modal-container">
 
-      {/* CLOSE */}
-      <button
-        className="shop-modal-close"
-        onClick={() => setShowSellerModal(false)}
-      >
-        ✕
-      </button>
-
-      {sellerLoading && (
-        <p className="modal-loading">Loading seller details...</p>
-      )}
-
-      {!sellerLoading && selectedSeller && (() => {
-
-        const logo =
-          selectedSeller.media?.find(m => m.logo && m.logo !== "")?.logo;
-
-        const images =
-          selectedSeller.media?.filter(m => m.images).map(m => m.images) || [];
-
-        return (
-          <div className="shop-modal-content">
-
-            {/* ================= HEADER ================= */}
-            <div className="modal-header">
-              <img
-                src={
-                  logo
-                    ? `${BASE_IMAGE_URL}/${logo}`
-                    : "/shop-placeholder.png"
-                }
-                className="modal-shop-logo"
-                alt="seller Logo"
-              />
-
-              <div>
-                <h2>{selectedSeller.seller.name}</h2>
-                <p>Owner: {selectedSeller.seller.owner_name}</p>
+        {/* ===== MOBILE CARD VIEW ===== */}
+        <div className="mobile-shop-list">
+          {sellers.map((s) => (
+            <div
+              key={s.user_id}
+              className="shop-mobile-card"
+              onClick={() => openSellerModal(s.user_id)}
+            >
+              <div className="shop-mobile-header">
+                <div className="shop-mobile-title">{s.name}</div>
+                <span className={`status ${s.status}`}>{s.status}</span>
               </div>
-            </div>
 
-            {/* ================= STATS ================= */}
-            <div className="modal-stats">
-              <div className="stat-card">
-                <span>💰 Wallet</span>
-                <strong>₹ {selectedSeller.seller.wallet_balance}</strong>
-              </div>
-              <div className="stat-card">
-                <span>📦 Orders</span>
-                <strong>{selectedSeller.seller.total_orders}</strong>
-              </div>
-            </div>
+              <div className="shop-mobile-sub">Owner: {s.owner_name}</div>
+              <div className="shop-mobile-sub">📞 {s.phone}</div>
+              <div className="shop-mobile-sub">✉️ {s.email || "—"}</div>
+              <div className="shop-mobile-sub">💰 Wallet: ₹ {s.wallet_balance}</div>
 
-            {/* ================= CONTACT ================= */}
-            <div className="modal-section">
-              <h4>📞 Contact Details</h4>
-              <div>📍 {selectedSeller.seller.address || "Not set"}</div>
-              <div>📞 {selectedSeller.user?.[0]?.phone || "Not set"}</div>
-              <div>✉️ {selectedSeller.user?.[0]?.email || "Not set"}</div>
-            </div>
-
-            {/* ================= QR ================= */}
-            {selectedSeller.scanner_code?.[0]?.scanner_code && (
-              <div className="modal-section center">
-                <h4>📱 seller QR</h4>
-                <QRCodeCanvas
-                  value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
-                    selectedSeller.scanner_code[0].scanner_code
-                  )}&type=seller`}
-                  size={160}
-                  level="H"
-                />
-              </div>
-            )}
-
-            {/* ================= GALLERY ================= */}
-            <div className="modal-section">
-              <h4>🖼️ seller Gallery</h4>
-
-              {images.length === 0 ? (
-                <p>No images uploaded</p>
-              ) : (
-                <div className="modal-gallery">
-                  {images.map((img, i) => (
-                    <img
-                      key={i}
-                      src={`${BASE_IMAGE_URL}/${img}`}
-                      alt="seller"
-                    />
-                  ))}
+              {s.latitude && (
+                <div className="shop-mobile-meta">
+                  <a
+                    href={`https://www.google.com/maps?q=${s.latitude},${s.longitude}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    📍 View Location
+                  </a>
                 </div>
               )}
-            </div>
 
-            {/* ================= MAP ================= */}
-            <div className="modal-section">
-              <h4>📍 seller Location</h4>
-
-              {selectedSeller.seller.latitude && selectedSeller.seller.longitude ? (
-                <MapContainer
-                  center={[
-                    selectedSeller.seller.latitude,
-                    selectedSeller.seller.longitude
-                  ]}
-                  zoom={16}
-                  style={{
-                    height: "220px",
-                    borderRadius: "12px"
+              <div style={{ marginTop: "10px" }}>
+                <button
+                  className={`btn ${s.status === "active" ? "btn-suspend" : "btn-activate"}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleStatus(s);
                   }}
                 >
-                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                  <Marker
-                    position={[
-                      selectedSeller.seller.latitude,
-                      selectedSeller.seller.longitude
-                    ]}
-                    icon={shopIcon}
-                  >
-                    <Popup>
-                      <strong>{selectedSeller.seller.name}</strong>
-                    </Popup>
-                  </Marker>
-                </MapContainer>
-              ) : (
-                <p>Location not available</p>
-              )}
+                  {s.status === "active" ? "Suspend" : "Activate"}
+                </button>
+              </div>
             </div>
+          ))}
+        </div>
+      </div>
 
+      {/* =========================
+           SELLER DETAILS MODAL
+      ========================= */}
+      {showSellerModal && (
+        <div className="shop-modal-overlay">
+          <div className="shop-modal-container">
+            <button
+              className="shop-modal-close"
+              onClick={() => setShowSellerModal(false)}
+            >
+              ✕
+            </button>
+
+            {sellerLoading && <p className="modal-loading">Loading seller details...</p>}
+
+            {!sellerLoading && selectedSeller && (() => {
+              const logo =
+                selectedSeller.media?.find((m) => m.logo && m.logo !== "")?.logo;
+
+              const images =
+                selectedSeller.media?.filter((m) => m.images).map((m) => m.images) || [];
+
+              return (
+                <div className="shop-modal-content">
+                  <div className="modal-header">
+                    <img
+                      src={logo ? `${BASE_IMAGE_URL}/${logo}` : "/shop-placeholder.png"}
+                      className="modal-shop-logo"
+                      alt="seller Logo"
+                    />
+                    <div>
+                      <h2>{selectedSeller.seller.name}</h2>
+                      <p>Owner: {selectedSeller.seller.owner_name}</p>
+                    </div>
+                  </div>
+
+                  <div className="modal-stats">
+                    <div className="stat-card">
+                      <span>💰 Wallet</span>
+                      <strong>₹ {selectedSeller.seller.wallet_balance}</strong>
+                    </div>
+                    <div className="stat-card">
+                      <span>📦 Orders</span>
+                      <strong>{selectedSeller.seller.total_orders}</strong>
+                    </div>
+                  </div>
+
+                  <div className="modal-section">
+                    <h4>📞 Contact Details</h4>
+                    <div>📍 {selectedSeller.seller.address || "Not set"}</div>
+                    <div>📞 {selectedSeller.user?.[0]?.phone || "Not set"}</div>
+                    <div>✉️ {selectedSeller.user?.[0]?.email || "Not set"}</div>
+                  </div>
+
+                  {selectedSeller.scanner_code?.[0]?.scanner_code && (
+                    <div className="modal-section center">
+                      <h4>📱 seller QR</h4>
+                      <QRCodeCanvas
+                        value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+                          selectedSeller.scanner_code[0].scanner_code
+                        )}&type=seller`}
+                        size={160}
+                        level="H"
+                      />
+                    </div>
+                  )}
+
+                  <div className="modal-section">
+                    <h4>🖼️ seller Gallery</h4>
+                    {images.length === 0 ? (
+                      <p>No images uploaded</p>
+                    ) : (
+                      <div className="modal-gallery">
+                        {images.map((img, i) => (
+                          <img key={i} src={`${BASE_IMAGE_URL}/${img}`} alt="seller" />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="modal-section">
+                    <h4>📍 seller Location</h4>
+                    {selectedSeller.seller.latitude && selectedSeller.seller.longitude ? (
+                      <MapContainer
+                        center={[selectedSeller.seller.latitude, selectedSeller.seller.longitude]}
+                        zoom={16}
+                        style={{ height: "220px", borderRadius: "12px" }}
+                      >
+                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                        <Marker
+                          position={[selectedSeller.seller.latitude, selectedSeller.seller.longitude]}
+                          icon={shopIcon}
+                        >
+                          <Popup>
+                            <strong>{selectedSeller.seller.name}</strong>
+                          </Popup>
+                        </Marker>
+                      </MapContainer>
+                    ) : (
+                      <p>Location not available</p>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
-        );
-      })()}
-    </div>
-  </div>
-)}
-
+        </div>
+      )}
     </div>
   );
 }
