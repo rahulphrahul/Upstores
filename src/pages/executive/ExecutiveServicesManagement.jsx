@@ -18,6 +18,9 @@ function ExecutiveServiceManagement({ user }) {
 
   const [services, setServices] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+const itemsPerPage = 5;   // change if needed
+
   const [editingService, setEditingService] = useState(null);
   const [categories, setCategories] = useState([]);
   const [locating, setLocating] = useState(false);
@@ -35,6 +38,12 @@ function ExecutiveServiceManagement({ user }) {
     latitude: "",
     longitude: "",
   });
+const totalPages = Math.ceil(services.length / itemsPerPage);
+
+const paginatedServices = services.slice(
+  (currentPage - 1) * itemsPerPage,
+  currentPage * itemsPerPage
+);
 
   const [logo, setLogo] = useState(null);
   const [images, setImages] = useState([]);
@@ -47,9 +56,13 @@ const [serviceLoading, setServiceLoading] = useState(false);
      LOAD SERVICES
   ========================= */
   const loadServices = async () => {
-    const res = await getExecutiveServices(executiveId);
-    if (res?.status === "success") setServices(res.data || []);
-  };
+  const res = await getExecutiveServices(executiveId);
+  if (res?.status === "success") {
+    setServices(res.data || []);
+    setCurrentPage(1);
+  }
+};
+
 
   useEffect(() => {
     loadServices();
@@ -300,7 +313,8 @@ const openServiceModal = async (serviceId) => {
     </thead>
 
     <tbody>
-      {services.map((s) => (
+      {paginatedServices.map((s) => (
+
         <tr
           key={s.user_id}
           className="clickable-row"
@@ -349,7 +363,8 @@ const openServiceModal = async (serviceId) => {
 
   {/* ===== MOBILE CARD VIEW ===== */}
   <div className="mobile-service-list">
-    {services.map((s) => (
+    {paginatedServices.map((s) => (
+
       <div
         key={s.user_id}
         className="service-mobile-card"
@@ -396,6 +411,27 @@ const openServiceModal = async (serviceId) => {
       </div>
     ))}
   </div>
+</div>
+<div className="pagination">
+  <button
+    className="page-btn"
+    disabled={currentPage === 1}
+    onClick={() => setCurrentPage((p) => p - 1)}
+  >
+    ←
+  </button>
+
+  <span className="page-info">
+    Page {currentPage} of {totalPages || 1}
+  </span>
+
+  <button
+    className="page-btn"
+    disabled={currentPage === totalPages}
+    onClick={() => setCurrentPage((p) => p + 1)}
+  >
+    →
+  </button>
 </div>
 
       {/* SERVICE DETAILS MODAL */}

@@ -20,6 +20,9 @@ function ExecutiveShopManagement({ user }) {
 
   const [shops, setShops] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+const itemsPerPage = 5;
+
   const [locating, setLocating] = useState(false);
   const [categories, setCategories] = useState([]);
   const [showShopModal, setShowShopModal] = useState(false);
@@ -42,14 +45,22 @@ const shop_type="shop";
     logo: null,
     images: [],
   });
+const totalPages = Math.ceil(shops.length / itemsPerPage);
+
+const paginatedShops = shops.slice(
+  (currentPage - 1) * itemsPerPage,
+  currentPage * itemsPerPage
+);
 
   /* =========================
      LOAD SHOPS
   ========================= */
-  const loadShops = async () => {
-    const res = await getExecutiveShops(executiveId);
-    setShops(res.data || []);
-  };
+ const loadShops = async () => {
+  const res = await getExecutiveShops(executiveId);
+  setShops(res.data || []);
+  setCurrentPage(1); // reset to first page
+};
+
 
   useEffect(() => {
     loadShops();
@@ -280,7 +291,8 @@ const openShopModal = async (shopId) => {
           </thead>
 
           <tbody>
-            {shops.map((s) => (
+            {paginatedShops.map((s) => (
+
               <tr
                 key={s.user_id}
                 className="clickable-row"
@@ -334,7 +346,8 @@ const openShopModal = async (shopId) => {
 
        {/* ===== MOBILE CARD VIEW ===== */}
 <div className="mobile-shop-list">
-  {shops.map((s) => (
+ {paginatedShops.map((s) => (
+
     <div
       key={s.user_id}
       className="shop-mobile-card"
@@ -400,6 +413,28 @@ const openShopModal = async (shopId) => {
 
 
       </div>
+     <div className="pagination">
+  <button
+    className="page-btn"
+    disabled={currentPage === 1}
+    onClick={() => setCurrentPage((p) => p - 1)}
+  >
+    ←
+  </button>
+
+  <span className="page-info">
+    Page {currentPage} of {totalPages || 1}
+  </span>
+
+  <button
+    className="page-btn"
+    disabled={currentPage === totalPages}
+    onClick={() => setCurrentPage((p) => p + 1)}
+  >
+    →
+  </button>
+</div>
+
 
      {/* SHOP DETAILS MODAL */}
 {showShopModal && (

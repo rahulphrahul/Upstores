@@ -377,3 +377,38 @@
     display: block;
   }
 }
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.page-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: #001ae3;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #0013b8;
+  transform: scale(1.05);
+}
+
+.page-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-weight: 500;
+  color: #333;
+}

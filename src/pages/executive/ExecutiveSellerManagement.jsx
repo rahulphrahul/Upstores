@@ -21,6 +21,9 @@ function ExecutiveSellerManagement({ user }) {
 
   const [sellers, setSellers] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+const itemsPerPage = 5;
+
   const [showForm, setShowForm] = useState(false);
   const [editingSeller, setEditingSeller] = useState(null);
   const [locating, setLocating] = useState(false);
@@ -45,6 +48,14 @@ function ExecutiveSellerManagement({ user }) {
     logo: null,
     images: [],
   });
+const totalPages = Math.ceil(sellers.length / itemsPerPage);
+
+const paginatedSellers = sellers.slice(
+  (currentPage - 1) * itemsPerPage,
+  currentPage * itemsPerPage
+);
+
+// const pageNumbers = [...Array(totalPages).keys()].map(n => n + 1);
 
   /* =========================
      LOAD SELLERS
@@ -52,7 +63,9 @@ function ExecutiveSellerManagement({ user }) {
   const loadSellers = async () => {
     try {
       const res = await getExecutiveSellers(executiveId);
-      setSellers(res.data || []);
+     setSellers(res.data || []);
+setCurrentPage(1);
+
     } catch (err) {
       console.error(err);
       setSellers([]);
@@ -366,7 +379,8 @@ function ExecutiveSellerManagement({ user }) {
           </thead>
 
           <tbody>
-            {sellers.map((s) => (
+          {paginatedSellers.map((s) => (
+
               <tr
                 key={s.user_id}
                 className="clickable-row"
@@ -414,7 +428,8 @@ function ExecutiveSellerManagement({ user }) {
 
         {/* ===== MOBILE CARD VIEW ===== */}
         <div className="mobile-shop-list">
-          {sellers.map((s) => (
+         {paginatedSellers.map((s) => (
+
             <div
               key={s.user_id}
               className="shop-mobile-card"
@@ -458,6 +473,28 @@ function ExecutiveSellerManagement({ user }) {
           ))}
         </div>
       </div>
+ <div className="pagination">
+  <button
+    className="page-btn"
+    disabled={currentPage === 1}
+    onClick={() => setCurrentPage((p) => p - 1)}
+  >
+    ←
+  </button>
+
+  <span className="page-info">
+    Page {currentPage} of {totalPages || 1}
+  </span>
+
+  <button
+    className="page-btn"
+    disabled={currentPage === totalPages}
+    onClick={() => setCurrentPage((p) => p + 1)}
+  >
+    →
+  </button>
+</div>
+
 
       {/* =========================
            SELLER DETAILS MODAL
