@@ -23,6 +23,7 @@ const ShopDashboard = () => {
   const [shop, setShop] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+const [qrZoom, setQrZoom] = useState(false);
 
   // 🔐 Get logged-in user
   const user =  JSON.parse(localStorage.getItem("user"));
@@ -95,6 +96,39 @@ const images =
       <div className="shop-content">
         {/* MAIN */}
         <div className="shop-main">
+          {/* STATS */}
+<section className="stats-section">
+  <div className="stats-grid">
+    <div className="stat-card">
+      <span className="stat-title">Total Purchases</span>
+      <span className="stat-value">
+        {shop.stats?.total_purchases || 0}
+      </span>
+    </div>
+
+    <div className="stat-card success">
+      <span className="stat-title">Confirmed</span>
+      <span className="stat-value">
+        {shop.stats?.confirmed_purchases || 0}
+      </span>
+    </div>
+
+    <div className="stat-card warning">
+      <span className="stat-title">Pending</span>
+      <span className="stat-value">
+        {shop.stats?.pending_purchases || 0}
+      </span>
+    </div>
+
+    <div className="stat-card revenue">
+      <span className="stat-title">Total Revenue</span>
+      <span className="stat-value">
+        ₹{shop.stats?.total_revenue || 0}
+      </span>
+    </div>
+  </div>
+</section>
+
           {/* WALLET */}
           <section className="wallet-section">
             <h2 className="section-title">💰 Wallet Balance</h2>
@@ -156,48 +190,136 @@ const images =
         {/* SIDEBAR */}
         <div className="shop-sidebar">
           {/* QR */}
-          <section className="qr-section">
-            <h2 className="section-title">📱 Shop QR</h2>
-          <div className="qr-card">
-  {shop.shop?.shop_id && (
-    <>
+     <section className="qr-section">
+  <div className="qr-master-card">
+
+    {/* Header */}
+    <div className="qr-header">
+      <h2 className="qr-title">Shop QR</h2>
+      <span className="qr-badge">Scan & Pay</span>
+    </div>
+
+    {/* Owner info */}
+    <div className="qr-owner">
+      <strong>{shop.shop.name}</strong>
+      <span>Owner: {shop.shop.owner_name}</span>
+    </div>
+
+    {/* QR Display */}
+    <div
+      className="qr-wrapper"
+      onClick={() => setQrZoom(true)}
+    >
       <QRCodeCanvas
         id="shop-qr"
         value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
- shop.scanner_code[0].scanner_code
-)}&type=shop`}
-
-        size={200}
+          shop.scanner_code?.[0]?.scanner_code || ""
+        )}&type=shop`}
+        size={190}
         level="H"
         includeMargin={true}
       />
+    </div>
 
-      <p className="qr-text">
-        Scan to view shop details
-      </p>
+    <p className="qr-caption">
+      Tap or hover to scan
+    </p>
 
+    {/* Actions */}
+    <div className="qr-actions">
       <button
-        className="download-qr-btn"
-        onClick={() => {
-          const canvas = document.getElementById("shop-qr");
-          const pngUrl = canvas
-            .toDataURL("image/png")
-            .replace("image/png", "image/octet-stream");
+        className="qr-download-btn"
+       onClick={() => {
+  const qrCanvas = document.getElementById("shop-qr");
 
-          const link = document.createElement("a");
-          link.href = pngUrl;
-          link.download = `${shop.shop.name}-qr.png`;
-          link.click();
-        }}
+  if (!qrCanvas) return;
+
+  const size = 420;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size + 120;
+
+  const ctx = canvas.getContext("2d");
+
+  // Background
+  ctx.fillStyle = "#f8fafc";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Card background
+  ctx.fillStyle = "#ffffff";
+  ctx.shadowColor = "rgba(0,0,0,0.12)";
+  ctx.shadowBlur = 20;
+  ctx.fillRect(20, 20, size - 40, size + 80);
+
+  ctx.shadowBlur = 0;
+
+  // Shop name
+  ctx.fillStyle = "#111827";
+  ctx.font = "bold 24px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(shop.shop.name, size / 2, 60);
+
+  // // Owner
+  // ctx.fillStyle = "#6b7280";
+  // ctx.font = "16px Arial";
+  // ctx.fillText(
+  //   `Owner: ${shop.shop.owner_name}`,
+  //   size / 2,
+  //   90
+  // );
+
+  // Draw QR
+  const qrSize = 240;
+  const qrX = (size - qrSize) / 2;
+  const qrY = 120;
+
+  ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+
+  // Footer text
+  ctx.fillStyle = "#9ca3af";
+  ctx.font = "14px Arial";
+  ctx.fillText(
+    "One scan away",
+    size / 2,
+    qrY + qrSize + 40
+  );
+
+  // Download
+  const link = document.createElement("a");
+  link.download = `${shop.shop.name}-qr-card.png`;
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+}}
+
       >
         Download QR
       </button>
-    </>
-  )}
-</div>
+    </div>
+  </div>
+</section>
+
+<section className="commission-section">
+  <h2 className="section-title">💸 Categories</h2>
+
+  <div className="commission-card">
+    {shop.categories?.length > 0 ? (
+      shop.categories.map((cat) => (
+        <div key={cat.id} className="commission-row">
+          <span className="commission-category">
+            {cat.name}
+          </span>
+          <span className="commission-value">
+            {cat.commission}%
+          </span>
+        </div>
+      ))
+    ) : (
+      <p className="text-muted">No Categories Found</p>
+    )}
+  </div>
+</section>
 
 
-          </section>
 
           {/* CONTACT */}
           <section className="contact-section">
@@ -239,6 +361,22 @@ const images =
 
         </div>
       </div>
+      {qrZoom && (
+  <div className="qr-zoom-overlay" onClick={() => setQrZoom(false)}>
+    <div className="qr-zoom-box">
+      <QRCodeCanvas
+        value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+          shop.scanner_code?.[0]?.scanner_code || ""
+        )}&type=shop`}
+        size={320}
+        level="H"
+        includeMargin={true}
+      />
+      <p className="qr-zoom-text">Tap anywhere to close</p>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

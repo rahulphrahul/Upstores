@@ -131,3 +131,36 @@
   border-radius: 6px;
   cursor: pointer;
 }
+/* =========================
+   ADMIN EARNINGS CARD
+========================= */
+
+.stat-card.earnings {
+  /* background: linear-gradient(135deg, #0f172a, #1e293b); */
+  color: #fff;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.stat-card.earnings:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+}
+
+.stat-icon-box.earnings {
+  background: #38a169;
+  color: #fff;
+}
+
+.stat-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 16px 0;
+}
+
+.stat-card .positive {
+  color: green;
+  font-weight: 600;
+}
