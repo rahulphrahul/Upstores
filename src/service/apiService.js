@@ -170,6 +170,17 @@ export const getCategories = async (main_type) => {
   return res.json();
 };
 
+export const addPurchase = async (formData) => {
+  const res = await fetch(
+    `${BASE_URL}/customer/add_purchase.php`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+
+  return res.json();
+};
 
 /* ============================
    ADD EXECUTIVE SELLER

@@ -157,7 +157,7 @@ body {
   .content {
     margin-left: 0;
     width: 100%;
-    padding-top: 1.5rem;
+    padding-top: 7rem;
   }
 }
 
@@ -346,8 +346,6 @@ body {
 .search-input::placeholder {
   color: #999;
 }
-
-/* notification styles unchanged */
 /* =========================
    NOTIFICATION PANEL
 ========================= */
@@ -385,26 +383,28 @@ body {
   align-items: center;
 }
 
-.notification-close {
+.close-notification {
   background: none;
   border: none;
-  font-size: 18px;
   cursor: pointer;
+  padding: 4px;
 }
 
 /* =========================
    BODY (SCROLL AREA)
 ========================= */
-.notification-body {
+.notification-list {
   flex: 1;
   overflow-y: auto;
-  padding: 10px;
+  padding: 12px;
 }
 
 /* =========================
    NOTIFICATION ITEM
 ========================= */
 .notification-item {
+  display: flex;
+  gap: 12px;
   padding: 12px;
   border-radius: 10px;
   border: 1px solid #f0f0f0;
@@ -414,46 +414,46 @@ body {
   cursor: pointer;
 }
 
-.notification-item:hover {
+.notification-item.unread {
   background: #f4f6ff;
   border-color: #e0e5ff;
 }
 
-.notification-title {
+.notification-item:hover {
+  background: #eef1ff;
+}
+
+.notification-icon {
+  flex-shrink: 0;
+}
+
+.notification-content h4 {
   font-size: 14px;
   font-weight: 600;
   color: #111827;
-  margin-bottom: 4px;
+  margin: 0 0 4px;
 }
 
-.notification-message {
+.notification-content p {
   font-size: 13px;
   color: #555;
+  margin: 0;
 }
 
 .notification-time {
+  display: block;
   font-size: 11px;
   color: #999;
   margin-top: 6px;
 }
 
 /* =========================
-   EMPTY STATE
-========================= */
-.notification-empty {
-  text-align: center;
-  padding: 40px 10px;
-  color: #888;
-  font-size: 14px;
-}
-
-/* =========================
-   OVERLAY
+   OVERLAY (optional)
 ========================= */
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  /* background: rgba(0,0,0,0.4); */
   z-index: 998;
 }
 
