@@ -5,7 +5,7 @@ import { loginUser } from "../service/apiService";
 import logo from "../assets/logo.png";
 import ChangePasswordModal from "./ChangePasswordModal";
 import { checkEmailExists } from "../service/apiService";
-
+import { FALLBACK_IMAGE } from "../config/config";
 
 function LoginPage({ setUser }) {
   const [username, setUsername] = useState("");
@@ -63,7 +63,7 @@ const handleEmailBlur = async () => {
                 {/* Logo */}
                 <div className="text-center mb-4">
                   <img
-                    src={logo}
+                    src={logo || FALLBACK_IMAGE}
                     alt="Company Logo"
                     height="55"
                     className="mb-3"

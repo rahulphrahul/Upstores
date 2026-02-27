@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import NotificationPanel from './NotificationPanel';
 import Drawer from "./Drawer";
 import React, { useState } from 'react';
+import { FALLBACK_IMAGE } from "../config/config";
 function Header({ toggleSidebar, isSidebarOpen, user, logo }) {
   const location = useLocation();
 
@@ -49,7 +50,7 @@ function Header({ toggleSidebar, isSidebarOpen, user, logo }) {
             </button>
           )}
           <img
-            src={logo}
+            src={logo || FALLBACK_IMAGE}
             alt="Company Logo"
             className={`topbar-logo ${isCustomerDashboard ? "logo-large" : ""
               }`}

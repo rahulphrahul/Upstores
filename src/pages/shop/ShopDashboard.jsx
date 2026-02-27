@@ -4,7 +4,7 @@ import { getShopLoginDetails } from "../../service/apiService";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { shopIcon } from "../../utils/leafletIcon";
 import { QRCodeCanvas } from "qrcode.react";
-import { BASE_IMAGE_URL } from "../../config/config";
+import { BASE_IMAGE_URL, FALLBACK_IMAGE } from "../../config/config";
 
 
 // Download QR helper
@@ -25,10 +25,10 @@ const ShopDashboard = () => {
   const [error, setError] = useState("");
 const [qrZoom, setQrZoom] = useState(false);
 
-  // 🔐 Get logged-in user
+  //  Get logged-in user
   const user =  JSON.parse(localStorage.getItem("user"));
   const shopId = user?.shop_id || user?.id; 
-  // 👆 depending on how you store login data
+  // depending on how you store login data
 // alert(shopId);
   useEffect(() => {
     if (!shopId) {
@@ -64,6 +64,12 @@ const logo =
 const images =
   shop.media?.filter(m => m.images).map(m => m.images) || [];
 
+// console.log("img",images);
+const imageArray = images
+  ? images[0].split(",").filter((img) => img.trim() !== "")
+  : [];
+  console.log("imgara",imageArray);
+
   // console.log("shop",shop.media);
 // console.log("ffff",shop.scanner_code[0].scanner_code)
   return (
@@ -76,7 +82,7 @@ const images =
       src={
         logo
           ? `${BASE_IMAGE_URL}/${logo}`
-          : "/shop-placeholder.png"
+          : {FALLBACK_IMAGE}
       }
       alt={shop.shop.name}
       className="shop-logo"
@@ -87,7 +93,7 @@ const images =
               Owner: {shop.shop.owner_name}
             </p>
             <div className="shop-meta">
-              <span>📦 Orders: {shop.shop.total_orders}</span>
+              <span> Orders: {shop.shop.total_orders||0}</span>
             </div>
           </div>
         </div>
@@ -131,7 +137,7 @@ const images =
 
           {/* WALLET */}
           <section className="wallet-section">
-            <h2 className="section-title">💰 Wallet Balance</h2>
+            <h2 className="section-title"> Wallet Balance</h2>
             <div className="wallet-card">
               <div className="wallet-balance">
                 <span className="currency">₹</span>
@@ -144,7 +150,7 @@ const images =
 
           {/* TRANSACTIONS */}
           <section className="transactions-section">
-            <h2 className="section-title">📊 Transactions</h2>
+            <h2 className="section-title"> Transactions</h2>
             <div className="transactions-list">
               {shop.transactions.length === 0 && (
                 <p>No transactions</p>
@@ -166,22 +172,38 @@ const images =
           </section>
           {/* SHOP GALLERY */}
 <section className="gallery-section">
-  <h2 className="section-title">🖼️ Shop Gallery</h2>
+  <h2 className="section-title"> Shop Gallery</h2>
 
   {images.length === 0 ? (
     <p className="text-muted">No shop images uploaded</p>
   ) : (
-    <div className="shop-gallery">
-      {images.map((img, index) => (
-        <div key={index} className="gallery-item">
-          <img
-            src={`${BASE_IMAGE_URL}/${img}`}
-            alt={`Shop image ${index + 1}`}
-            loading="lazy"
-          />
-        </div>
-      ))}
+<div className="shop-gallery">
+
+  {imageArray.length > 0 ? (
+    imageArray.map((img, index) => (
+      <div key={index} className="gallery-item">
+        <img
+          src={`${BASE_IMAGE_URL}/${img.trim()}` || FALLBACK_IMAGE}
+          alt={`shop image ${index + 1}`}
+          loading="lazy"
+          onError={(e) => {
+            e.target.onerror = null; // prevent infinite loop
+            e.target.src = FALLBACK_IMAGE;
+          }}
+        />
+      </div>
+    ))
+  ) : (
+    <div className="gallery-item">
+      <img
+        src={FALLBACK_IMAGE}
+        alt="no image available"
+        loading="lazy"
+      />
     </div>
+  )}
+
+</div>
   )}
 </section>
 
@@ -299,7 +321,7 @@ const images =
 </section>
 
 <section className="commission-section">
-  <h2 className="section-title">💸 Categories</h2>
+  <h2 className="section-title"> Categories</h2>
 
   <div className="commission-card">
     {shop.categories?.length > 0 ? (
@@ -323,7 +345,7 @@ const images =
 
           {/* CONTACT */}
           <section className="contact-section">
-            <h2 className="section-title">📞 Contact</h2>
+            <h2 className="section-title"> Contact</h2>
             <div className="contact-card">
               <div>📍 {shop.shop.address || "Not set"}</div>
               <div>📞 {shop.user[0].phone || "Not set"}</div>
@@ -332,7 +354,7 @@ const images =
           </section>
           {/* location map */}
           <section className="map-section">
-  <h2 className="section-title">📍 Shop Location</h2>
+  <h2 className="section-title"> Shop Location</h2>
 
   {shop.shop.latitude && shop.shop.longitude ? (
     <MapContainer

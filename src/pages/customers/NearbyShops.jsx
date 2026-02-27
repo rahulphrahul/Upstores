@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import { BASE_IMAGE_URL } from "../../config/config";
+import { BASE_IMAGE_URL , FALLBACK_IMAGE} from "../../config/config";
 import { QRCodeCanvas } from "qrcode.react";
 import {
   getExecutiveNearbyShops,
@@ -280,7 +280,7 @@ console.log("selectedItem",selectedItem);
                 src={
                   logo
                     ? `${BASE_IMAGE_URL}/${logo}`
-                    : "/shop-placeholder.png"
+                    : {FALLBACK_IMAGE}
                 }
                 className="modal-shop-logo"
                 alt="logo"
@@ -379,7 +379,7 @@ console.log("selectedItem",selectedItem);
                   {images.map((img, i) => (
                     <img
                       key={i}
-                      src={`${BASE_IMAGE_URL}/${img}`}
+                      src={`${BASE_IMAGE_URL}/${img}` || FALLBACK_IMAGE}
                       alt="item"
                     />
                   ))}

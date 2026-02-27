@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import {
   getExecutiveSellers,
   addExecutiveSeller,
@@ -7,7 +8,7 @@ import {
   getSellerLoginDetails,
   getCategories,
 } from "../../service/apiService";
-import { BASE_IMAGE_URL } from "../../config/config";
+import { BASE_IMAGE_URL , FALLBACK_IMAGE} from "../../config/config";
 import { QRCodeCanvas } from "qrcode.react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { shopIcon } from "../../utils/leafletIcon";
@@ -213,39 +214,64 @@ const handleCategoryChange = (index, field, value) => {
   /* =========================
      CREATE / UPDATE SELLER
   ========================= */
-  const handleSubmit = async () => {
-   if (!form.name || !form.owner_name) {
-  alert("Owner name and Seller name are required");
-  return;
-}
+const handleSubmit = async () => {
 
+  if (!form.name || !form.owner_name) {
+    toast.error("Owner name and Seller name are required");
+    return;
+  }
 
-    const fd = new FormData();
-    Object.keys(form).forEach((key) => {
-      if (key !== "logo" && key !== "images" && key !== "category_commissions" && form[key] !== "")
-        fd.append(key, form[key]);
-    });
-    // send category commissions as JSON
-fd.append(
-  "category_commissions",
-  JSON.stringify(form.category_commissions)
-);
+  const fd = new FormData();
 
-    fd.append("executive_id", executiveId);
+  Object.keys(form).forEach((key) => {
+    if (
+      key !== "logo" &&
+      key !== "images" &&
+      key !== "category_commissions" &&
+      form[key] !== ""
+    ) {
+      fd.append(key, form[key]);
+    }
+  });
 
-    if (form.logo) fd.append("logo", form.logo);
-    form.images.forEach((img) => fd.append("images[]", img));
+  // Send category commissions
+  fd.append(
+    "category_commissions",
+    JSON.stringify(form.category_commissions)
+  );
+
+  fd.append("executive_id", executiveId);
+
+  if (form.logo) fd.append("logo", form.logo);
+  form.images.forEach((img) => fd.append("images[]", img));
+
+  try {
+    let res;
 
     if (editingSeller) {
       fd.append("seller_id", editingSeller.id);
-      await updateExecutiveSeller(fd);
+      res = await updateExecutiveSeller(fd);
     } else {
-      await addExecutiveSeller(fd);
+      res = await addExecutiveSeller(fd);
     }
 
-    resetForm();
-    loadSellers();
-  };
+    if (res.status === "success") {
+      toast.success(
+        editingSeller
+          ? "Seller updated successfully"
+          : "Seller added successfully"
+      );
+
+      resetForm();
+      loadSellers();
+    } else {
+      toast.error(res.message || "Something went wrong");
+    }
+
+  } catch (error) {
+    toast.error("Server error. Please try again.");
+  }
+};
 
   /* =========================
      EDIT SELLER
@@ -565,7 +591,7 @@ fd.append(
                 <div className="shop-modal-content">
                   <div className="modal-header">
                     <img
-                      src={logo ? `${BASE_IMAGE_URL}/${logo}` : "/shop-placeholder.png"}
+                      src={logo ? `${BASE_IMAGE_URL}/${logo}` : {FALLBACK_IMAGE}}
                       className="modal-shop-logo"
                       alt="seller Logo"
                     />
@@ -641,7 +667,7 @@ fd.append(
                   {images.map((img, i) => (
                     <img
                       key={i}
-                      src={`${BASE_IMAGE_URL}/${img}`}
+                      src={`${BASE_IMAGE_URL}/${img}` || FALLBACK_IMAGE}
                       alt="seller"
                     />
                   ))}

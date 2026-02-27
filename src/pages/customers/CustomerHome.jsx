@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Drawer from '../../components/Drawer';
 import NotificationPanel from '../../components/NotificationPanel';
 import './CustomerHome.css';
+import { FALLBACK_IMAGE } from '../../config/config';
 
 const CustomerHome = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -91,7 +92,7 @@ const CustomerHome = () => {
                 <button className="start-btn">{banner.buttonText}</button>
               </div>
               <div className="banner-image">
-                <img src={banner.image} alt={banner.title} />
+                <img src={banner.image || FALLBACK_IMAGE} alt={banner.title} />
               </div>
             </div>
           ))}

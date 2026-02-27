@@ -7,7 +7,7 @@ import {
   getServiceLoginDetails
 } from "../../service/apiService";
 import "./ServiceManagement.css";
-import { BASE_IMAGE_URL } from "../../config/config";
+import { BASE_IMAGE_URL,FALLBACK_IMAGE } from "../../config/config";
 import { QRCodeCanvas } from "qrcode.react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { shopIcon } from "../../utils/leafletIcon";
@@ -228,7 +228,7 @@ function ServiceManagement() {
                   {/* HEADER */}
                   <div className="modal-header">
                     <img
-                      src={logo ? `${BASE_IMAGE_URL}/${logo}` : "/shop-placeholder.png"}
+                      src={logo ? `${BASE_IMAGE_URL}/${logo}` : {FALLBACK_IMAGE}}
                       className="modal-shop-logo"
                       alt="Service Logo"
                     />
@@ -312,7 +312,7 @@ function ServiceManagement() {
                         {images.map((img, i) => (
                           <img
                             key={i}
-                            src={`${BASE_IMAGE_URL}/${img}`}
+                            src={`${BASE_IMAGE_URL}/${img}` || FALLBACK_IMAGE}
                             alt="Service"
                           />
                         ))}

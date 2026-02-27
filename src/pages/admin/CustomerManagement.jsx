@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./CustomerManagement.css";
 import { getCustomers,updateWallet } from "../../service/apiService";
 
-import { BASE_CUSTM_IMG_URL } from "../../config/config";
+import { BASE_CUSTM_IMG_URL,FALLBACK_IMAGE } from "../../config/config";
 
 function CustomerManagement() {
   const [customers, setCustomers] = useState([]);
@@ -154,7 +154,7 @@ function CustomerManagement() {
 
             {selectedCustomer.qr_image ? (
               <img
-                src={BASE_CUSTM_IMG_URL + selectedCustomer.qr_image}
+                src={BASE_CUSTM_IMG_URL + selectedCustomer.qr_image || FALLBACK_IMAGE}
                 alt="QR"
                 className="qr-img"
               />

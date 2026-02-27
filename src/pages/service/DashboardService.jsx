@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import "./DashboardService.css";
 import { getServiceLoginDetails } from "../../service/apiService"; // your API service
 import { QRCodeCanvas } from "qrcode.react";
-import { BASE_IMAGE_URL } from "../../config/config";
+import { BASE_IMAGE_URL,FALLBACK_IMAGE } from "../../config/config";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { shopIcon } from "../../utils/leafletIcon";
 
 const DashboardService = () => {
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
-  // 🔐 Get logged-in user
+  // Get logged-in user
   const user =  JSON.parse(localStorage.getItem("user"));
   const serviceId = user?.service_id || user?.id; 
 const [qrZoom, setQrZoom] = useState(false);
@@ -53,7 +53,12 @@ const images =
         document.body.removeChild(link);
       });
   };
+        
 
+const imageArray = images
+  ? images[0].split(",").filter((img) => img.trim() !== "")
+  : [];
+  console.log("imgara",imageArray);
   if (loading) return <p>Loading service details...</p>;
   if (!service) return <p>No service data available.</p>;
 console.log("ssss",service)
@@ -65,13 +70,13 @@ console.log("ssss",service)
           <img  src={
                   logo
                     ? `${BASE_IMAGE_URL}/${logo}`
-                    : "/shop-placeholder.png"
+                    : {FALLBACK_IMAGE}
                 } alt={service.service.name} className="shop-logo" />
            <img
                 src={
                   logo
                     ? `${BASE_IMAGE_URL}/${logo}`
-                    : "/shop-placeholder.png"
+                    : {FALLBACK_IMAGE}
                 }
                 alt={service.service.name}
                 className="shop-logo"
@@ -80,8 +85,8 @@ console.log("ssss",service)
             <h1 className="shop-name">{service.service.name}</h1>
             <p className="shop-description">{service.service.description}</p>
             <div className="shop-meta">
-              {/* <span className="shop-rating">⭐ {service.service.rating} Rating</span> */}
-              <span className="shop-orders">🛠️ {service.customers_count || 0} customers</span>
+              {/* <span className="shop-rating"> {service.service.rating} Rating</span> */}
+              <span className="shop-orders"> {service.customers_count || 0} customers</span>
             </div>
           </div>
         </div>
@@ -124,7 +129,7 @@ console.log("ssss",service)
         <div className="shop-main">
           {/* WALLET */}
           <section className="wallet-section">
-            <h2 className="section-title">💰 Wallet Balance</h2>
+            <h2 className="section-title"> Wallet Balance</h2>
             <div className="wallet-card">
               <div className="wallet-balance">
                 <span className="currency">₹</span>
@@ -145,7 +150,7 @@ console.log("ssss",service)
 
           {/* TRANSACTIONS */}
           <section className="transactions-section">
-            <h2 className="section-title">📊 Service Transactions</h2>
+            <h2 className="section-title"> Service Transactions</h2>
             <div className="transactions-list">
               {service.transactions?.map((tx) => (
                 <div key={tx.id} className="transaction-item">
@@ -168,22 +173,40 @@ console.log("ssss",service)
           {/* IMAGES */}
             {/* SHOP GALLERY */}
           <section className="gallery-section">
-            <h2 className="section-title">🖼️ Service Gallery</h2>
+            <h2 className="section-title"> Service Gallery</h2>
           
             {images.length === 0 ? (
               <p className="text-muted">No service images uploaded</p>
             ) : (
-              <div className="shop-gallery">
-                {images.map((img, index) => (
-                  <div key={index} className="gallery-item">
-                    <img
-                      src={`${BASE_IMAGE_URL}/${img}`}
-                      alt={`service image ${index + 1}`}
-                      loading="lazy"
-                    />
-                  </div>
-                ))}
-              </div>
+   
+
+<div className="shop-gallery">
+
+  {imageArray.length > 0 ? (
+    imageArray.map((img, index) => (
+      <div key={index} className="gallery-item">
+        <img
+          src={`${BASE_IMAGE_URL}/${img.trim()}` || FALLBACK_IMAGE}
+          alt={`service image ${index + 1}`}
+          loading="lazy"
+          onError={(e) => {
+            e.target.onerror = null; // prevent infinite loop
+            e.target.src = FALLBACK_IMAGE;
+          }}
+        />
+      </div>
+    ))
+  ) : (
+    <div className="gallery-item">
+      <img
+        src={FALLBACK_IMAGE}
+        alt="no image available"
+        loading="lazy"
+      />
+    </div>
+  )}
+
+</div>
             )}
           </section>
         </div>
@@ -324,7 +347,7 @@ console.log("ssss",service)
 
           {/* CONTACT */}
           <section className="contact-section">
-            <h2 className="section-title">📞 Contact Information</h2>
+            <h2 className="section-title"> Contact Information</h2>
             <div className="contact-card">
               <div className="contact-item">📍 {service.user[0]['address'] || "-"}</div>
               <div className="contact-item">📞 {service.user[0]['phone'] || "-"}</div>
@@ -333,7 +356,7 @@ console.log("ssss",service)
           </section>
            {/* location map */}
                               <section className="map-section">
-                      <h2 className="section-title">📍 Service Location</h2>
+                      <h2 className="section-title"> Service Location</h2>
                     
                       {service.service.latitude && service.service.longitude ? (
                         <MapContainer

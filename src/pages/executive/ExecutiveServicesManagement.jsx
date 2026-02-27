@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import {
   getExecutiveServices,
   addExecutiveService,
@@ -7,7 +8,7 @@ import {
   getServiceLoginDetails,
   getCategories,
 } from "../../service/apiService";
-import { BASE_IMAGE_URL } from "../../config/config";
+import { BASE_IMAGE_URL,FALLBACK_IMAGE } from "../../config/config";
 import { QRCodeCanvas } from "qrcode.react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { shopIcon } from "../../utils/leafletIcon";
@@ -202,42 +203,59 @@ const handleCategoryChange = (index, field, value) => {
   /* =========================
      CREATE / UPDATE
   ========================= */
-  const handleSubmit = async () => {
- if (!form.name || !form.owner_name) {
-  alert("Owner name and Service name are required");
-  return;
-}
+const handleSubmit = async () => {
 
-
-    const fd = new FormData();
-    fd.append("executive_id", executiveId);
-
-   Object.keys(form).forEach((key) => {
-  if (key !== "category_commissions" && form[key] !== "") {
-    fd.append(key, form[key]);
+  if (!form.name || !form.owner_name) {
+    toast.error("Owner name and Service name are required");
+    return;
   }
-});
 
-// send category commissions as JSON
-fd.append(
-  "category_commissions",
-  JSON.stringify(form.category_commissions)
-);
+  const fd = new FormData();
+  fd.append("executive_id", executiveId);
 
+  Object.keys(form).forEach((key) => {
+    if (key !== "category_commissions" && form[key] !== "") {
+      fd.append(key, form[key]);
+    }
+  });
 
-    if (logo) fd.append("logo", logo);
-    images.forEach((img) => fd.append("images[]", img));
+  // Send category commissions as JSON
+  fd.append(
+    "category_commissions",
+    JSON.stringify(form.category_commissions)
+  );
+
+  if (logo) fd.append("logo", logo);
+  images.forEach((img) => fd.append("images[]", img));
+
+  try {
+    let res;
 
     if (editingService) {
       fd.append("service_id", editingService.id);
-      await updateExecutiveService(fd);
+      res = await updateExecutiveService(fd);
     } else {
-      await addExecutiveService(fd);
+      res = await addExecutiveService(fd);
     }
 
-    resetForm();
-    loadServices();
-  };
+    if (res.status === "success") {
+      toast.success(
+        editingService
+          ? "Service updated successfully"
+          : "Service added successfully"
+      );
+
+      resetForm();
+      loadServices();
+
+    } else {
+      toast.error(res.message || "Something went wrong");
+    }
+
+  } catch (error) {
+    toast.error("Server error. Please try again.");
+  }
+};
 
   /* =========================
      EDIT
@@ -563,7 +581,7 @@ fd.append(
                 src={
                   logo
                     ? `${BASE_IMAGE_URL}/${logo}`
-                    : "/shop-placeholder.png"
+                    : {FALLBACK_IMAGE}
                 }
                 className="modal-shop-logo"
                 alt="service Logo"
@@ -642,7 +660,7 @@ fd.append(
                   {images.map((img, i) => (
                     <img
                       key={i}
-                      src={`${BASE_IMAGE_URL}/${img}`}
+                      src={`${BASE_IMAGE_URL}/${img}` || FALLBACK_IMAGE}
                       alt="service"
                     />
                   ))}

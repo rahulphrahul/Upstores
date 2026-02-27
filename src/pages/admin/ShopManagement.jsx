@@ -7,7 +7,7 @@ import {
     getShopLoginDetails,
     toggleShopStatus,
 } from "../../service/apiService";
-import { BASE_IMAGE_URL } from "../../config/config";
+import { BASE_IMAGE_URL,FALLBACK_IMAGE } from "../../config/config";
 import { QRCodeCanvas } from "qrcode.react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { shopIcon } from "../../utils/leafletIcon";
@@ -236,7 +236,7 @@ function ShopManagement() {
                                             src={
                                                 logo
                                                     ? `${BASE_IMAGE_URL}/${logo}`
-                                                    : "/shop-placeholder.png"
+                                                    : {FALLBACK_IMAGE}
                                             }
                                             className="modal-shop-logo"
                                             alt="Shop Logo"
@@ -320,7 +320,7 @@ function ShopManagement() {
                                                 {images.map((img, i) => (
                                                     <img
                                                         key={i}
-                                                        src={`${BASE_IMAGE_URL}/${img}`}
+                                                        src={`${BASE_IMAGE_URL}/${img}` || FALLBACK_IMAGE}
                                                         alt="Shop"
                                                     />
                                                 ))}

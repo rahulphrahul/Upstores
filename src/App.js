@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './components/LoginPage';
 import DashboardLayout from './components/DashboardLayout';
 import RoleProtectedRoute from './components/RoleProtectedRoute';
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 // === Admin Pages ===
 
 // === Student Pages ===
@@ -77,6 +78,8 @@ function App() {
   };
 
   return (
+    <>
+       <ToastContainer position="top-right" autoClose={3000} />
     <Router>
       <Routes>
         {/* === LOGIN === */}
@@ -480,6 +483,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
+    </>
   );
 }
 

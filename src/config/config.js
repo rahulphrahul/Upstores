@@ -13,3 +13,5 @@ export const BASE_IMAGE_URL =
 
    export const BASE_URL =
   "https://semicoloninnovations.in/upstores/api"
+
+  export const  FALLBACK_IMAGE = "https://semicoloninnovations.in/upstores/api/images/no-img.png";

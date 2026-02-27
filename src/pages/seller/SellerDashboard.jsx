@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./SellerDashboard.css";
 import { getSellerLoginDetails } from "../../service/apiService";
 import { QRCodeCanvas } from "qrcode.react";
-import { BASE_IMAGE_URL } from "../../config/config";
+import { BASE_IMAGE_URL,FALLBACK_IMAGE } from "../../config/config";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { shopIcon } from "../../utils/leafletIcon";
 
@@ -11,7 +11,7 @@ const SellerDashboard = () => {
   const [loading, setLoading] = useState(true);
 const [qrZoom, setQrZoom] = useState(false);
 
-  // 🔐 Get logged-in user (SAME AS SERVICE)
+  //  Get logged-in user (SAME AS SERVICE)
   const user = JSON.parse(localStorage.getItem("user"));
   const sellerId = user?.seller_id || user?.id;
   
@@ -51,6 +51,11 @@ const images =
 
 
 
+const imageArray = images
+  ? images[0].split(",").filter((img) => img.trim() !== "")
+  : [];
+  console.log("imgara",imageArray);
+
 console.log("tetet",seller);
   return (
     <div className="seller-page">
@@ -61,7 +66,7 @@ console.log("tetet",seller);
             src={
                    logo
                      ? `${BASE_IMAGE_URL}/${logo}`
-                     : "/shop-placeholder.png"
+                     : {FALLBACK_IMAGE}
                  }
             alt={seller.seller?.name}
             className="seller-avatar"
@@ -73,10 +78,10 @@ console.log("tetet",seller);
 
             <div className="seller-meta">
               {/* <span className="seller-rating">
-                ⭐ {seller.rating || 0} ({seller.review_count || 0} reviews)
+                 {seller.rating || 0} ({seller.review_count || 0} reviews)
               </span> */}
               <span className="seller-joined">
-                🗓️ Joined{" "}
+                Joined{" "}
                 {seller.seller?.created_at
                   ? new Date(seller.seller.created_at).toLocaleDateString()
                   : "-"}
@@ -122,7 +127,7 @@ console.log("tetet",seller);
         <div className="seller-main">
           {/* WALLET */}
           <section className="seller-wallet-section">
-            <h2 className="section-title">💳 Seller Wallet</h2>
+            <h2 className="section-title"> Seller Wallet</h2>
 
             <div className="seller-wallet-card">
               <div className="seller-wallet-balance">
@@ -155,7 +160,7 @@ console.log("tetet",seller);
           </section>
           {/* TRANSACTIONS */}
           <section className="transactions-section">
-            <h2 className="section-title">📊 Transactions</h2>
+            <h2 className="section-title">Transactions</h2>
             <div className="transactions-list">
               {seller.transactions.length === 0 && (
                 <p>No transactions</p>
@@ -178,7 +183,7 @@ console.log("tetet",seller);
 
           {/* PRODUCTS */}
           {/* <section className="products-section">
-            <h2 className="section-title">📦 Products</h2>
+            <h2 className="section-title"> Products</h2>
 
             <div className="products-grid">
               {seller.products?.map((product) => (
@@ -205,22 +210,38 @@ console.log("tetet",seller);
 
           {/* STORE IMAGES */}
 <section className="gallery-section">
-  <h2 className="section-title">🖼️ Seller Gallery</h2>
+  <h2 className="section-title"> Seller Gallery</h2>
 
   {images.length === 0 ? (
     <p className="text-muted">No Seller images uploaded</p>
   ) : (
-    <div className="shop-gallery">
-      {images.map((img, index) => (
-        <div key={index} className="gallery-item">
-          <img
-            src={`${BASE_IMAGE_URL}/${img}`}
-            alt={`seller image ${index + 1}`}
-            loading="lazy"
-          />
-        </div>
-      ))}
-    </div>
+   <div className="shop-gallery">
+   
+     {imageArray.length > 0 ? (
+       imageArray.map((img, index) => (
+         <div key={index} className="gallery-item">
+           <img
+             src={`${BASE_IMAGE_URL}/${img.trim()}` || FALLBACK_IMAGE}
+             alt={`shop image ${index + 1}`}
+             loading="lazy"
+             onError={(e) => {
+               e.target.onerror = null; // prevent infinite loop
+               e.target.src = FALLBACK_IMAGE;
+             }}
+           />
+         </div>
+       ))
+     ) : (
+       <div className="gallery-item">
+         <img
+           src={FALLBACK_IMAGE}
+           alt="no image available"
+           loading="lazy"
+         />
+       </div>
+     )}
+   
+   </div>
   )}
 </section>        </div>
 
@@ -328,7 +349,7 @@ console.log("tetet",seller);
   </div>
 </section>
 <section className="commission-section">
-  <h2 className="section-title">💸 Categories</h2>
+  <h2 className="section-title"> Categories</h2>
 
   <div className="commission-card">
     {seller.categories?.length > 0 ? (
@@ -350,7 +371,7 @@ console.log("tetet",seller);
 
           {/* CONTACT */}
           <section className="seller-contact-section">
-            <h2 className="section-title">👤 Seller Information</h2>
+            <h2 className="section-title"> Seller Information</h2>
 
             <div className="seller-contact-card">
               <div className="contact-item">
@@ -366,7 +387,7 @@ console.log("tetet",seller);
           </section>
             {/* location map */}
                     <section className="map-section">
-            <h2 className="section-title">📍 Seller Location</h2>
+            <h2 className="section-title"> Seller Location</h2>
           
             {seller.seller.latitude && seller.seller.longitude ? (
               <MapContainer

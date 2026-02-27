@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import {
   getExecutiveShops,
   createExecutiveShop,
@@ -6,7 +7,7 @@ import {
   getCategories,
   getShopLoginDetails
 } from "../../service/apiService";
-import { BASE_IMAGE_URL } from "../../config/config";
+import { BASE_IMAGE_URL, FALLBACK_IMAGE } from "../../config/config";
 import { QRCodeCanvas } from "qrcode.react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { shopIcon } from "../../utils/leafletIcon";
@@ -173,54 +174,58 @@ const removeCategoryRow = (index) => {
   /* =========================
      CREATE SHOP
   ========================= */
-  const handleCreate = async () => {
-    if (!form.name || !form.owner_name || !form.phone) {
-      alert("Shop name, owner name & phone are required");
-      return;
+ const handleCreate = async () => {
+  if (!form.name || !form.owner_name || !form.phone) {
+    toast.error("Shop name, owner name & phone are required");
+    return;
+  }
+
+  const fd = new FormData();
+
+  Object.entries(form).forEach(([key, value]) => {
+    if (key === "logo" || key === "images" || key === "category_commissions") return;
+    if (value !== "") fd.append(key, value);
+  });
+
+  fd.append("executive_id", executiveId);
+  fd.append("category_commissions", JSON.stringify(form.category_commissions));
+
+  if (form.logo) fd.append("logo", form.logo);
+  form.images.forEach((img) => fd.append("images[]", img));
+
+  try {
+    const res = await createExecutiveShop(fd);
+
+    if (res.status === "success") {
+      toast.success("Shop created successfully");
+
+      setForm({
+        name: "",
+        owner_name: "",
+        phone: "",
+        email: "",
+        address: "",
+        description: "",
+        wallet_balance: "",
+        latitude: "",
+        longitude: "",
+        logo: null,
+        images: [],
+        category_commissions: [
+          { category_id: "", commission: "" }
+        ]
+      });
+
+      setShowAdd(false);
+      loadShops();
+    } else {
+      toast.error(res.message || "Something went wrong");
     }
 
-    const fd = new FormData();
-
-    Object.entries(form).forEach(([key, value]) => {
-      if (key === "logo" || key === "images" || key === "category_commissions") return;
-      if (value !== "") fd.append(key, value);
-    });
-
-
-    fd.append("executive_id", executiveId);
-    // Append category commissions as JSON
-fd.append(
-  "category_commissions",
-  JSON.stringify(form.category_commissions)
-);
-
-    if (form.logo) fd.append("logo", form.logo);
-    form.images.forEach((img) => fd.append("images[]", img));
-
-    await createExecutiveShop(fd);
-
- setForm({
-  name: "",
-  owner_name: "",
-  phone: "",
-  email: "",
-  address: "",
-  description: "",
-  wallet_balance: "",
-  latitude: "",
-  longitude: "",
-  logo: null,
-  images: [],
-  category_commissions: [
-    { category_id: "", commission: "" }
-  ]
-});
-
-
-    setShowAdd(false);
-    loadShops();
-  };
-
+  } catch (error) {
+    toast.error("Server error. Please try again.");
+  }
+};
   /* =========================
      TOGGLE STATUS
   ========================= */
@@ -535,7 +540,7 @@ fd.append(
                 src={
                   logo
                     ? `${BASE_IMAGE_URL}/${logo}`
-                    : "/shop-placeholder.png"
+                    : {FALLBACK_IMAGE}
                 }
                 className="modal-shop-logo"
                 alt="Shop Logo"
@@ -617,7 +622,7 @@ fd.append(
                   {images.map((img, i) => (
                     <img
                       key={i}
-                      src={`${BASE_IMAGE_URL}/${img}`}
+                      src={`${BASE_IMAGE_URL}/${img}` || FALLBACK_IMAGE}
                       alt="Shop"
                     />
                   ))}

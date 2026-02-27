@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import logo from "../assets/logo.png";
 import "./CustomerRegister.css";
 import { registerCustomer } from "../service/apiService";
-
+import { FALLBACK_IMAGE } from "../config/config";
 function CustomerRegister() {
   const [form, setForm] = useState({
     name: "",
@@ -96,7 +96,7 @@ function CustomerRegister() {
         <div className="login-box">
           {/* LOGO */}
           <div className="logo-container">
-            <img src={logo} alt="Company Logo" />
+            <img src={logo || FALLBACK_IMAGE} alt="Company Logo" />
           </div>
 
           <h2>Customer Registration</h2>

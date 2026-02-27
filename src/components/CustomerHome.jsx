@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Drawer from '../../components/Drawer';
 import NotificationPanel from '../../components/NotificationPanel';
+import { FALLBACK_IMAGE } from '../config/config';
 import './CustomerHome.css';
 
 const CustomerHome = () => {
@@ -117,7 +118,7 @@ const CustomerHome = () => {
                 <button className="start-btn">{banner.buttonText}</button>
               </div>
               <div className="banner-image">
-                <img src={banner.image} alt={banner.title} />
+                <img src={banner.image || FALLBACK_IMAGE} alt={banner.title} />
               </div>
             </div>
           ))}

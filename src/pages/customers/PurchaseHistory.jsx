@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./PurchaseHistory.css";
 import { getPurchaseHistorys } from "../../service/apiService"; // Your API service
+import { FALLBACK_IMAGE } from "../../config/config";
 
 function PurchaseHistory() {
   const [purchases, setPurchases] = useState([]);
@@ -84,7 +85,7 @@ function PurchaseHistory() {
         <div className="bill-overlay" onClick={() => setSelectedBill(null)}>
           <div className="bill-sheet" onClick={(e) => e.stopPropagation()}>
             <div className="sheet-handle" />
-            <img src={selectedBill} alt="Bill" />
+            <img src={selectedBill || FALLBACK_IMAGE} alt="Bill" />
             <button
               className="close-btn"
               onClick={() => setSelectedBill(null)}

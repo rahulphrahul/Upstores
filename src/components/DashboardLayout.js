@@ -6,6 +6,7 @@ import { FiMenu, FiX } from "react-icons/fi";
 import "./DashboardLayout.css";
 import logo from "../assets/logo.png";
 import Header from "./Header";
+import { FALLBACK_IMAGE } from "../config/config";
 import {
   LayoutDashboard,
   Users,
@@ -118,7 +119,7 @@ useEffect(() => {
       {/* SIDEBAR */}
       <aside className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
         <div className="text-center mb-4">
-          <img src={logo} alt="Company Logo" className="sidebar-logo" />
+          <img src={logo || FALLBACK_IMAGE} alt="Company Logo" className="sidebar-logo" />
           <h6 className="mt-2 text-black">
             {user?.name?.toUpperCase()}
           </h6>
