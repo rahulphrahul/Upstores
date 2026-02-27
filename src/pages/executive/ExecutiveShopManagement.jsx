@@ -29,7 +29,16 @@ const itemsPerPage = 5;
 const [selectedShop, setSelectedShop] = useState(null);
 const [shopLoading, setShopLoading] = useState(false);
 const [showQrPreview, setShowQrPreview] = useState(false);
+/* =========================
+   PAGINATION LOGIC
+========================= */
 
+const totalPages = Math.ceil(shops.length / itemsPerPage);
+
+const paginatedShops = shops.slice(
+  (currentPage - 1) * itemsPerPage,
+  currentPage * itemsPerPage
+);
 const shop_type="shop";
 const [form, setForm] = useState({
   name: "",

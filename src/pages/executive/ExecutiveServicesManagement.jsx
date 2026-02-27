@@ -49,6 +49,16 @@ const [selectedService, setSelectedService] = useState(null);
 const [serviceLoading, setServiceLoading] = useState(false);
 
  const shop_type ="service";
+ /* =========================
+   PAGINATION LOGIC
+========================= */
+
+const totalPages = Math.ceil(services.length / itemsPerPage);
+
+const paginatedServices = services.slice(
+  (currentPage - 1) * itemsPerPage,
+  currentPage * itemsPerPage
+);
   /* =========================
      LOAD SERVICES
   ========================= */

@@ -134,12 +134,29 @@ const shop_type="all";
       })
     );
 
-    const dailyXAxis = dailyChart.xAxes.push(
-      am5xy.CategoryAxis.new(dailyRoot, {
-        categoryField: "day",
-        renderer: am5xy.AxisRendererX.new(dailyRoot, {}),
-      })
-    );
+   const dailyXAxis = dailyChart.xAxes.push(
+  am5xy.CategoryAxis.new(dailyRoot, {
+    categoryField: "day",
+    renderer: am5xy.AxisRendererX.new(dailyRoot, {
+      minGridDistance: 30,
+    }),
+  })
+);
+dailyChart.set("paddingRight", 10);
+dailyChart.set("paddingLeft", 10);
+dailyChart.set("paddingTop", 10);
+dailyChart.set("paddingBottom", 20);
+dailyChart.set("panX", true);
+dailyChart.set("wheelX", "panX");
+
+// rotate labels on mobile
+if (window.innerWidth < 768) {
+  dailyXAxis.get("renderer").labels.template.setAll({
+    rotation: -45,
+    centerY: am5.p50,
+    centerX: am5.p100,
+  });
+}
 
     const dailyYAxis = dailyChart.yAxes.push(
       am5xy.ValueAxis.new(dailyRoot, {
@@ -168,6 +185,7 @@ const shop_type="all";
 
     dailySeries.appear(1000);
     dailyChart.appear(1000, 100);
+    
 
     /* =========================
        MONTHLY BAR CHART
@@ -183,12 +201,22 @@ const shop_type="all";
       })
     );
 
-    const monthlyXAxis = monthlyChart.xAxes.push(
-      am5xy.CategoryAxis.new(monthlyRoot, {
-        categoryField: "month",
-        renderer: am5xy.AxisRendererX.new(monthlyRoot, {}),
-      })
-    );
+ const monthlyXAxis = monthlyChart.xAxes.push(
+  am5xy.CategoryAxis.new(monthlyRoot, {
+    categoryField: "month",
+    renderer: am5xy.AxisRendererX.new(monthlyRoot, {
+      minGridDistance: 30,
+    }),
+  })
+);
+
+if (window.innerWidth < 768) {
+  monthlyXAxis.get("renderer").labels.template.setAll({
+    rotation: -45,
+    centerY: am5.p50,
+    centerX: am5.p100,
+  });
+}
 
     const monthlyYAxis = monthlyChart.yAxes.push(
       am5xy.ValueAxis.new(monthlyRoot, {
@@ -206,12 +234,23 @@ const shop_type="all";
         categoryXField: "month",
       })
     );
+    monthlyChart.set("paddingRight", 10);
+monthlyChart.set("paddingLeft", 10);
+monthlyChart.set("paddingTop", 10);
+monthlyChart.set("paddingBottom", 20);
+monthlyChart.set("panX", true);
+monthlyChart.set("wheelX", "panX");
 
     monthlySeries.columns.template.setAll({
       width: am5.percent(60),
       fill: am5.color(0x001ae3),
       strokeOpacity: 0,
     });
+    if (window.innerWidth < 768) {
+  monthlySeries.columns.template.setAll({
+    width: am5.percent(40),
+  });
+}
 
     monthlyXAxis.data.setAll(parsedMonthlyData);
     monthlySeries.data.setAll(parsedMonthlyData);
@@ -338,17 +377,17 @@ console.log("stauttsus",stats.data);
     <div className="stat-metrics">
       <div className="metric">
         <FaWallet />
-        <span>Wallet</span>
+        <span className="card-span-text">Wallet</span>
         <strong>₹ {stats?.data.services?.wallet || 0}</strong>
       </div>
       <div className="metric">
         <FaExchangeAlt />
-        <span>Transactions</span>
+        <span className="card-span-text">Transactions</span>
         <strong>₹ {stats?.data.services?.transactions || 0}</strong>
       </div>
       <div className="metric">
         <FaClock />
-        <span>Pending</span>
+        <span className="card-span-text">Pending</span>
         <strong>{stats?.data.services?.pending || 0}</strong>
       </div>
     </div>
@@ -373,7 +412,7 @@ console.log("stauttsus",stats.data);
   <div className="stat-metrics">
     <div className="metric">
       <FaLayerGroup />
-      <span>Total PV</span>
+      <span className="card-span-text">Total PV</span>
       <strong>
         {Number(stats?.data?.admin_points?.pv || 0).toLocaleString()}
       </strong>
@@ -381,7 +420,7 @@ console.log("stauttsus",stats.data);
 
     <div className="metric">
       <FaChartLine />
-      <span>Status</span>
+      <span className="card-span-text">Status</span>
       <strong className="positive">Active</strong>
     </div>
   </div>
@@ -394,7 +433,9 @@ console.log("stauttsus",stats.data);
       <div className="grid-2">
         <div className="card">
           <h4>Daily Transactions</h4>
-          <div ref={dailyChartDiv} className="chart-box" />
+         <div className="chart-scroll">
+  <div ref={dailyChartDiv} className="chart-box" />
+</div>
         </div>
 
         <div className="card">
@@ -407,7 +448,8 @@ console.log("stauttsus",stats.data);
       <div className="card">
         <h4>Pending Fund Approvals</h4>
 
-        <table className="data-table">
+       <div className="table-responsive">
+  <table className="data-table">
           <thead>
             <tr>
               <th>Shop</th>
@@ -444,6 +486,7 @@ console.log("stauttsus",stats.data);
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

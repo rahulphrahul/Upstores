@@ -13,8 +13,8 @@
 /* STATS */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.2rem;
   margin-bottom: 2rem;
 }
 
@@ -153,14 +153,159 @@
   background: #38a169;
   color: #fff;
 }
-
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
 .stat-divider {
   height: 1px;
   background: rgba(255, 255, 255, 0.15);
   margin: 16px 0;
 }
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
 
 .stat-card .positive {
   color: green;
   font-weight: 600;
+}
+.stat-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.stat-metrics {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.metric {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.metric span {
+  flex: 1;
+  text-align: left;
+  margin-left: 8px;
+}
+
+.metric strong {
+  text-align: right;
+}
+/* Scroll wrapper */
+.chart-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+
+/* Tablets */
+@media (max-width: 992px) {
+  .stats-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .stats-grid {
+   grid-template-columns: repeat(1, 1fr);
+  }
+ .chart-box {
+    min-width: 400px;   /* force wide chart */
+    height: 260px;
+  }
+  .card-span-text{
+    text-align: center;
+    justify-content: center;
+  }
+  .stat-card {
+    padding: 1.2rem;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+}
+
+
+/* Mobile */
+@media (max-width: 768px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+ .chart-box {
+    min-width: 400px;   /* force wide chart */
+    height: 220px;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .data-table th,
+  .data-table td {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .approve-btn,
+  .reject-btn {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+}
+@media (max-width: 480px) {
+  .stat-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+ .chart-box {
+    min-width: 400px;   /* force wide chart */
+    height: 260px;
+  }
+
+  .stat-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .metric {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+    .stat-card {
+    text-align: left;
+  }
+
+  .metric {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .metric span {
+    text-align: left;
+  }
+
+  .metric strong {
+    text-align: right;
+    min-width: 80px;
+  }
 }

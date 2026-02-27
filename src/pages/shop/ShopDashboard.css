@@ -513,8 +513,9 @@
 /* responsive */
 @media (max-width: 900px) {
   .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(1, 1fr);
   }
+
 }
 .qr-download-btn {
   background: linear-gradient(135deg, #4f46e5, #3b82f6);

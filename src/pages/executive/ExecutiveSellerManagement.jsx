@@ -32,7 +32,16 @@ const [selectedSeller, setSelectedSeller] = useState(null);
 const [sellerLoading, setSellerLoading] = useState(false);
 const [showSellerQrPreview, setShowSellerQrPreview] = useState(false);
 
+/* =========================
+   PAGINATION LOGIC
+========================= */
 
+const totalPages = Math.ceil(sellers.length / itemsPerPage);
+
+const paginatedSellers = sellers.slice(
+  (currentPage - 1) * itemsPerPage,
+  currentPage * itemsPerPage
+);
 const shop_type ="seller";
 const [form, setForm] = useState({
   name: "",
