@@ -6,7 +6,7 @@ import logo from "../assets/logo.png";
 import ChangePasswordModal from "./ChangePasswordModal";
 import { checkEmailExists } from "../service/apiService";
 import { FALLBACK_IMAGE } from "../config/config";
-
+import { Link } from "react-router-dom";
 function LoginPage({ setUser }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -110,13 +110,12 @@ const handleEmailBlur = async () => {
                       onChange={(e) => setRememberMe(e.target.checked)}
                     />
 
-                    <Button
-                      variant="link"
-                      className="p-0 text-decoration-none"
-                      onClick={() => navigate("/forgot-password")}
-                    >
-                      Forgot password?
-                    </Button>
+                   <Link
+  to="/forgot-password"
+  className="p-0 text-decoration-none"
+>
+  Forgot password?
+</Link>
                   </div>
 
                   <Button
