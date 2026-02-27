@@ -219,8 +219,11 @@ function ServiceManagement() {
               const user = selectedService.user?.[0];
               const media = selectedService.media || [];
 
-              const logo = media.find(m => m.logo)?.logo;
+              const logo = selectedService?.media?.length > 0? media.find(m => m.logo)?.logo:null;
               const images = media.filter(m => m.images).map(m => m.images);
+              const imageArray = images && images.length >0
+  ? images[0].split(",").filter((img) => img.trim() !== "")
+  : [];
 
               return (
                 <div className="shop-modal-content">
@@ -228,7 +231,7 @@ function ServiceManagement() {
                   {/* HEADER */}
                   <div className="modal-header">
                     <img
-                      src={logo ? `${BASE_IMAGE_URL}/${logo}` : {FALLBACK_IMAGE}}
+                      src={logo!=null ? `${BASE_IMAGE_URL}/${logo}` : FALLBACK_IMAGE}
                       className="modal-shop-logo"
                       alt="Service Logo"
                     />
@@ -309,13 +312,30 @@ function ServiceManagement() {
                       <p>No images uploaded</p>
                     ) : (
                       <div className="modal-gallery">
-                        {images.map((img, i) => (
-                          <img
-                            key={i}
-                            src={`${BASE_IMAGE_URL}/${img}` || FALLBACK_IMAGE}
-                            alt="Service"
-                          />
-                        ))}
+                     {imageArray.length > 0 ? (
+    imageArray.map((img, index) => (
+      <div key={index} className="gallery-item">
+        <img
+          src={`${BASE_IMAGE_URL}/${img.trim()}` || FALLBACK_IMAGE}
+          alt={`shop image ${index + 1}`}
+          loading="lazy"
+          onError={(e) => {
+            e.target.onerror = null; // prevent infinite loop
+            e.target.src = FALLBACK_IMAGE;
+          }}
+        />
+      </div>
+    ))
+  ) : (
+    <div className="gallery-item">
+      <img
+        src={FALLBACK_IMAGE}
+        alt="no image available"
+        loading="lazy"
+      />
+    </div>
+  )}
+
                       </div>
                     )}
                   </div>

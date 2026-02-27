@@ -216,16 +216,19 @@ function SellerManagement() {
               const user = selectedSeller.user?.[0];
               const media = selectedSeller.media || [];
 
-              const logo = media.find(m => m.logo)?.logo;
+              const logo =  selectedSeller?.media?.length > 0? media.find(m => m.logo)?.logo:null;
               const images = media.filter(m => m.images).map(m => m.images);
-
+           console.log("imggs",images.length);   
+const imageArray = images && images.length >0
+  ? images[0].split(",").filter((img) => img.trim() !== "")
+  : [];
               return (
                 <div className="shop-modal-content">
 
                   {/* HEADER */}
                   <div className="modal-header">
                     <img
-                      src={logo ? `${BASE_IMAGE_URL}/${logo}` : {FALLBACK_IMAGE}}
+                      src={logo !=null ? `${BASE_IMAGE_URL}/${logo}` : FALLBACK_IMAGE}
                       className="modal-shop-logo"
                       alt="Seller Logo"
                     />
@@ -305,9 +308,30 @@ function SellerManagement() {
                       <p>No images uploaded</p>
                     ) : (
                       <div className="modal-gallery">
-                        {images.map((img, i) => (
-                          <img key={i} src={`${BASE_IMAGE_URL}/${img}`|| FALLBACK_IMAGE} alt="Seller" />
-                        ))}
+                       {imageArray.length > 0 ? (
+    imageArray.map((img, index) => (
+      <div key={index} className="gallery-item">
+        <img
+          src={`${BASE_IMAGE_URL}/${img.trim()}` || FALLBACK_IMAGE}
+          alt={`shop image ${index + 1}`}
+          loading="lazy"
+          onError={(e) => {
+            e.target.onerror = null; // prevent infinite loop
+            e.target.src = FALLBACK_IMAGE;
+          }}
+        />
+      </div>
+    ))
+  ) : (
+    <div className="gallery-item">
+      <img
+        src={FALLBACK_IMAGE}
+        alt="no image available"
+        loading="lazy"
+      />
+    </div>
+  )}
+
                       </div>
                     )}
                   </div>

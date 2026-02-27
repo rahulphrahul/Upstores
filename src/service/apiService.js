@@ -745,7 +745,36 @@ export const rejectWalletRequest = async (requestId, reason) => {
 
   return res.json();
 };
+// reser wallet
+/* RESET */
+export const resetWallets = async (type, reason) => {
+  const user = JSON.parse(localStorage.getItem("user"));
 
+  const res = await fetch(`${BASE_URL}/admin/reset_wallets.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      adminId: user?.id,
+      adminName: user?.name,
+      type,
+      reason
+    })
+  });
+
+  return res.json();
+};
+
+/* HISTORY */
+export const getResetHistory = async (from="",to="",role="") => {
+  const params = new URLSearchParams({from,to,role});
+  const res = await fetch(`${BASE_URL}/admin/get_reset_history.php?${params}`);
+  return res.json();
+};
+
+/* EXPORT */
+export const exportHistory = () => {
+  window.open(`${BASE_URL}/admin/export_reset_history.php`,"_blank");
+};
 /* =========================
    GET WALLET REQUESTS (ADMIN)
 ========================= */

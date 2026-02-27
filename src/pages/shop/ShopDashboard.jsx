@@ -59,13 +59,13 @@ const [qrZoom, setQrZoom] = useState(false);
   if (error) return <div className="error">{error}</div>;
   if (!shop) return null;
 const logo =
-  shop.media?.find(m => m.logo && m.logo !== "")?.logo;
+  shop.media?.length>0 ? shop.media?.find(m => m.logo && m.logo !== "")?.logo:null;
 
 const images =
   shop.media?.filter(m => m.images).map(m => m.images) || [];
 
 // console.log("img",images);
-const imageArray = images
+const imageArray = images && images.length >0
   ? images[0].split(",").filter((img) => img.trim() !== "")
   : [];
   console.log("imgara",imageArray);
@@ -80,9 +80,9 @@ const imageArray = images
          {/* Logo */}
     <img
       src={
-        logo
+        logo!=null
           ? `${BASE_IMAGE_URL}/${logo}`
-          : {FALLBACK_IMAGE}
+          : FALLBACK_IMAGE
       }
       alt={shop.shop.name}
       className="shop-logo"

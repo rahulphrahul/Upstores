@@ -36,7 +36,7 @@ const [qrZoom, setQrZoom] = useState(false);
   if (loading) return <p>Loading seller details...</p>;
 if (!service) return <p>No seller data available.</p>;
   const logo =
-  service.media?.find(m => m.logo && m.logo !== "")?.logo;
+  service.media?.length >0? service.media?.find(m => m.logo && m.logo !== "")?.logo:null;
 
 const images =
   service.media?.filter(m => m.images).map(m => m.images) || [];
@@ -55,7 +55,7 @@ const images =
   };
         
 
-const imageArray = images
+const imageArray = images && images.length >0
   ? images[0].split(",").filter((img) => img.trim() !== "")
   : [];
   console.log("imgara",imageArray);
@@ -68,15 +68,15 @@ console.log("ssss",service)
       <div className="shop-header">
         <div className="shop-header-content">
           <img  src={
-                  logo
+                  logo!=null
                     ? `${BASE_IMAGE_URL}/${logo}`
-                    : {FALLBACK_IMAGE}
+                    : FALLBACK_IMAGE
                 } alt={service.service.name} className="shop-logo" />
            <img
                 src={
-                  logo
+                  logo!=null
                     ? `${BASE_IMAGE_URL}/${logo}`
-                    : {FALLBACK_IMAGE}
+                    : FALLBACK_IMAGE
                 }
                 alt={service.service.name}
                 className="shop-logo"

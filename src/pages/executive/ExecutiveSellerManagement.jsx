@@ -404,7 +404,7 @@ const handleSubmit = async () => {
 
             <div className="upload-group">
               <label className="upload-label">
-                🖼️ Seller Logo <span className="upload-hint">(max 2MB)</span>
+                 Seller Logo <span className="upload-hint">(max 2MB)</span>
               </label>
               <input type="file" accept="image/*" onChange={handleLogoChange} />
             </div>
@@ -510,9 +510,9 @@ const handleSubmit = async () => {
               </div>
 
               <div className="shop-mobile-sub">Owner: {s.owner_name}</div>
-              <div className="shop-mobile-sub">📞 {s.phone}</div>
-              <div className="shop-mobile-sub">✉️ {s.email || "—"}</div>
-              <div className="shop-mobile-sub">💰 Wallet: ₹ {s.wallet_balance}</div>
+              <div className="shop-mobile-sub"> {s.phone}</div>
+              <div className="shop-mobile-sub"> {s.email || "—"}</div>
+              <div className="shop-mobile-sub"> Wallet: ₹ {s.wallet_balance}</div>
 
               {s.latitude && (
                 <div className="shop-mobile-meta">
@@ -582,16 +582,18 @@ const handleSubmit = async () => {
 
             {!sellerLoading && selectedSeller && (() => {
               const logo =
-                selectedSeller.media?.find((m) => m.logo && m.logo !== "")?.logo;
+                selectedSeller.media?.length>0 ? selectedSeller.media?.find((m) => m.logo && m.logo !== "")?.logo:null;
 
               const images =
                 selectedSeller.media?.filter((m) => m.images).map((m) => m.images) || [];
-
+const imageArray = images && images.length >0
+  ? images[0].split(",").filter((img) => img.trim() !== "")
+  : [];
               return (
                 <div className="shop-modal-content">
                   <div className="modal-header">
                     <img
-                      src={logo ? `${BASE_IMAGE_URL}/${logo}` : {FALLBACK_IMAGE}}
+                      src={logo!=null ? `${BASE_IMAGE_URL}/${logo}` : FALLBACK_IMAGE}
                       className="modal-shop-logo"
                       alt="seller Logo"
                     />
@@ -603,17 +605,17 @@ const handleSubmit = async () => {
 
                   <div className="modal-stats">
                     <div className="stat-card">
-                      <span>💰 Wallet</span>
-                      <strong>₹ {selectedSeller.seller.wallet_balance}</strong>
+                      <span> Wallet</span>
+                      <strong>₹ {selectedSeller.seller.wallet_balance || 0}</strong>
                     </div>
                     <div className="stat-card">
-                      <span>📦 Orders</span>
-                      <strong>{selectedSeller.seller.total_orders}</strong>
+                      <span> Orders</span>
+                      <strong>{selectedSeller.seller.total_orders || 0}</strong>
                     </div>
                   </div>
 
                   <div className="modal-section">
-                    <h4>📞 Contact Details</h4>
+                    <h4> Contact Details</h4>
                     <div>📍 {selectedSeller.seller.address || "Not set"}</div>
                     <div>📞 {selectedSeller.user?.[0]?.phone || "Not set"}</div>
                     <div>✉️ {selectedSeller.user?.[0]?.email || "Not set"}</div>
@@ -658,19 +660,36 @@ const handleSubmit = async () => {
 
             {/* ================= GALLERY ================= */}
             <div className="modal-section">
-              <h4>🖼️ seller Gallery</h4>
+              <h4> seller Gallery</h4>
 
               {images.length === 0 ? (
                 <p>No images uploaded</p>
               ) : (
                 <div className="modal-gallery">
-                  {images.map((img, i) => (
-                    <img
-                      key={i}
-                      src={`${BASE_IMAGE_URL}/${img}` || FALLBACK_IMAGE}
-                      alt="seller"
-                    />
-                  ))}
+                  {imageArray.length > 0 ? (
+    imageArray.map((img, index) => (
+      <div key={index} className="gallery-item">
+        <img
+          src={`${BASE_IMAGE_URL}/${img.trim()}` || FALLBACK_IMAGE}
+          alt={`shop image ${index + 1}`}
+          loading="lazy"
+          onError={(e) => {
+            e.target.onerror = null; // prevent infinite loop
+            e.target.src = FALLBACK_IMAGE;
+          }}
+        />
+      </div>
+    ))
+  ) : (
+    <div className="gallery-item">
+      <img
+        src={FALLBACK_IMAGE}
+        alt="no image available"
+        loading="lazy"
+      />
+    </div>
+  )}
+
                 </div>
               )}
             </div>
@@ -728,7 +747,7 @@ const handleSubmit = async () => {
 
             {/* ================= MAP ================= */}
             <div className="modal-section">
-              <h4>📍 seller Location</h4>
+              <h4> seller Location</h4>
 
               {selectedSeller.seller.latitude && selectedSeller.seller.longitude ? (
                 <MapContainer

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./CustomerManagement.css";
 import { getCustomers,updateWallet } from "../../service/apiService";
-
+import { toast } from "react-toastify";
 import { BASE_CUSTM_IMG_URL,FALLBACK_IMAGE } from "../../config/config";
 
 function CustomerManagement() {
@@ -31,11 +31,19 @@ function CustomerManagement() {
     setShowWalletModal(true);
   };
 
-  const saveWalletAdjustment = async () => {
+const saveWalletAdjustment = async () => {
+  try {
     await updateWallet(selectedCustomer.user_id, Number(amount));
+
+    toast.success("Wallet updated successfully ");
+
     setShowWalletModal(false);
     loadCustomers(); // refresh from DB
-  };
+  } catch (error) {
+    toast.error("Failed to update wallet ❌");
+    console.error(error);
+  }
+};
 
   return (
     <div className="customer-page">

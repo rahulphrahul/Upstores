@@ -48,7 +48,7 @@ const entityType =
 
 
 const logo =
-  selectedItem?.media?.find(m => m.logo)?.logo || null;
+   selectedItem?.media?.lenght > 0 ? selectedItem?.media?.find(m => m.logo)?.logo :null;
 
 const images =
   selectedItem?.media
@@ -127,6 +127,9 @@ const images =
   }
 };
 console.log("selectedItem",selectedItem);
+const imageArray = images && images.length >0
+  ? images[0].split(",").filter((img) => img.trim() !== "")
+  : [];
 
   return (
     <div className="nearby-container">
@@ -264,7 +267,7 @@ console.log("selectedItem",selectedItem);
       {!modalLoading && selectedItem && (() => {
 
         const logo =
-          selectedItem.media?.find(m => m.logo)?.logo;
+          selectedItem.media?.length > 0 ? selectedItem.media?.find(m => m.logo)?.logo:null;
 
         const images =
           selectedItem.media
@@ -278,9 +281,9 @@ console.log("selectedItem",selectedItem);
             <div className="modal-header">
               <img
                 src={
-                  logo
+                  logo !=null
                     ? `${BASE_IMAGE_URL}/${logo}`
-                    : {FALLBACK_IMAGE}
+                    : FALLBACK_IMAGE
                 }
                 className="modal-shop-logo"
                 alt="logo"
@@ -301,26 +304,26 @@ console.log("selectedItem",selectedItem);
             {/* STATS */}
             <div className="modal-stats">
               <div className="stat-card">
-                <span>💰 Wallet</span>
+                <span> Wallet</span>
                 <strong>
                   ₹ {entity?.wallet_balance ||
    entity?.wallet_balance ||
-   entity?.wallet_balance}
+   entity?.wallet_balance || 0}
                 </strong>
               </div>
               <div className="stat-card">
-                <span>📦 Orders</span>
+                <span> Orders</span>
                 <strong>
                   {entity?.total_orders ||
    entity?.total_orders ||
-   entity?.total_orders}
+   entity?.total_orders || 0}
                 </strong>
               </div>
             </div>
 
             {/* CONTACT */}
             <div className="modal-section">
-              <h4>📞 Contact</h4>
+              <h4> Contact</h4>
               <div>
                 📍                   {entity?.address ||
    entity?.address ||
@@ -370,19 +373,36 @@ console.log("selectedItem",selectedItem);
 
             {/* GALLERY */}
             <div className="modal-section">
-              <h4>🖼️ Gallery</h4>
+              <h4> Gallery</h4>
 
               {images.length === 0 ? (
                 <p>No images uploaded</p>
               ) : (
                 <div className="modal-gallery">
-                  {images.map((img, i) => (
-                    <img
-                      key={i}
-                      src={`${BASE_IMAGE_URL}/${img}` || FALLBACK_IMAGE}
-                      alt="item"
-                    />
-                  ))}
+                   {imageArray.length > 0 ? (
+    imageArray.map((img, index) => (
+      <div key={index} className="gallery-item">
+        <img
+          src={`${BASE_IMAGE_URL}/${img.trim()}` || FALLBACK_IMAGE}
+          alt={`shop image ${index + 1}`}
+          loading="lazy"
+          onError={(e) => {
+            e.target.onerror = null; // prevent infinite loop
+            e.target.src = FALLBACK_IMAGE;
+          }}
+        />
+      </div>
+    ))
+  ) : (
+    <div className="gallery-item">
+      <img
+        src={FALLBACK_IMAGE}
+        alt="no image available"
+        loading="lazy"
+      />
+    </div>
+  )}
+
                 </div>
               )}
             </div>

@@ -16,7 +16,7 @@ import {
   getExecutivePerformance,
   createExecutive,
 } from "../../service/apiService";
-
+import { Modal, Button } from "react-bootstrap";
 import ExecutiveManagementSkeleton from "./skeletons/ExecutiveManagementSkeleton";
 import "./ExecutiveManagement.css";
 
@@ -27,7 +27,8 @@ function ExecutiveManagement() {
   const [loading, setLoading] = useState(true);
   const [executives, setExecutives] = useState([]);
   const [performanceData, setPerformanceData] = useState([]);
-
+const [showDeleteModal, setShowDeleteModal] = useState(false);
+const [selectedId, setSelectedId] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const [credentials, setCredentials] = useState(null);
   const [form, setForm] = useState({
@@ -160,12 +161,20 @@ function ExecutiveManagement() {
     loadAll();
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Delete this executive?")) {
-      await deleteExecutive(id);
-      loadAll();
-    }
-  };
+const handleDelete = (id) => {
+  setSelectedId(id);
+  setShowDeleteModal(true);
+};
+
+const confirmDelete = async () => {
+  try {
+    await deleteExecutive(selectedId);
+    setShowDeleteModal(false);
+    loadAll();
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   if (loading) return <ExecutiveManagementSkeleton />;
 
@@ -318,6 +327,25 @@ function ExecutiveManagement() {
            </table>
   </div>
 </div>
+{/* delete popup */}
+<Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+  <Modal.Header closeButton>
+    <Modal.Title>Confirm Delete</Modal.Title>
+  </Modal.Header>
+
+  <Modal.Body>
+    Are you sure you want to delete this executive?
+  </Modal.Body>
+
+  <Modal.Footer>
+    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+      Cancel
+    </Button>
+    <Button variant="danger" onClick={confirmDelete}>
+      Delete
+    </Button>
+  </Modal.Footer>
+</Modal>
 </div>
   );
 }

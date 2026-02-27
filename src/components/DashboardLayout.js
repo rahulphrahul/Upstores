@@ -56,6 +56,7 @@ const menus = {
     { name: "Customers", path: "/dashboard/super-admin/customers", icon: <Users {...iconStyle} /> },
     { name: "Category", path: "/dashboard/super-admin/categories", icon: <Tags {...iconStyle} /> },
     { name: "Banners", path: "/dashboard/super-admin/banners", icon: <Image {...iconStyle} /> },
+    { name: "Wallet Management", path: "/dashboard/super-admin/wallet-management", icon: <Wallet  {...iconStyle} /> },
     { name: "Settings", path: "/dashboard/super-admin/settings", icon: <Settings {...iconStyle} /> },
   ],
 

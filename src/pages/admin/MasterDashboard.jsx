@@ -4,7 +4,7 @@ import React, {
   useRef,
   useLayoutEffect,
 } from "react";
-
+import { toast } from "react-toastify";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
@@ -268,20 +268,26 @@ monthlyChart.set("wheelX", "panX");
   /* =========================
      FUND ACTION
   ========================= */
- const onWalletAction = async (req, action) => {
-    try {
-      await handleWalletRequest(
-        req.user_id,        // request_id
-        action,        // approve | rejected
-        "service"       // shop_type
-      );
-  
-      loadAll(); // refresh list
-    } catch (err) {
-      console.error("Wallet action failed", err);
-      alert("Failed to update wallet request");
-    }
-  };
+const onWalletAction = async (req, action) => {
+  try {
+    await handleWalletRequest(
+      req.user_id,
+      action,
+      "service"
+    );
+
+    toast.success(
+      action === "approve"
+        ? "Wallet request approved successfully "
+        : "Wallet request rejected successfully "
+    );
+
+    loadAll(); // refresh list
+  } catch (err) {
+    console.error("Wallet action failed", err);
+    toast.error("Failed to update wallet request ");
+  }
+};
 
   /* =========================
      SKELETON

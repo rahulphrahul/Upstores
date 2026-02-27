@@ -222,10 +222,13 @@ function ShopManagement() {
                         {!shopLoading && selectedShop && (() => {
 
                             const logo =
-                                selectedShop.media?.find(m => m.logo && m.logo !== "")?.logo;
+                                selectedShop.media.length>0 ? selectedShop.media?.find(m => m.logo && m.logo !== "")?.logo:null;
 
                             const images =
                                 selectedShop.media?.filter(m => m.images).map(m => m.images) || [];
+                                const imageArray = images && images.length >0
+  ? images[0].split(",").filter((img) => img.trim() !== "")
+  : [];
 
                             return (
                                 <div className="shop-modal-content">
@@ -234,9 +237,9 @@ function ShopManagement() {
                                     <div className="modal-header">
                                         <img
                                             src={
-                                                logo
+                                                logo!=null
                                                     ? `${BASE_IMAGE_URL}/${logo}`
-                                                    : {FALLBACK_IMAGE}
+                                                    : FALLBACK_IMAGE
                                             }
                                             className="modal-shop-logo"
                                             alt="Shop Logo"
@@ -255,7 +258,7 @@ function ShopManagement() {
                                                 <Wallet size={18} weight="duotone" />
                                                 Wallet
                                             </span>
-                                            <strong>₹ {selectedShop.shop.wallet_balance}</strong>
+                                            <strong>₹ {selectedShop.shop.wallet_balance || 0}</strong>
                                         </div>
 
                                         <div className="stat-card">
@@ -263,7 +266,7 @@ function ShopManagement() {
                                                 <Package size={18} weight="duotone" />
                                                 Orders
                                             </span>
-                                            <strong>{selectedShop.shop.total_orders}</strong>
+                                            <strong>{selectedShop.shop.total_orders || 0}</strong>
                                         </div>
                                     </div>
 
@@ -317,13 +320,30 @@ function ShopManagement() {
                                             <p>No images uploaded</p>
                                         ) : (
                                             <div className="modal-gallery">
-                                                {images.map((img, i) => (
-                                                    <img
-                                                        key={i}
-                                                        src={`${BASE_IMAGE_URL}/${img}` || FALLBACK_IMAGE}
-                                                        alt="Shop"
-                                                    />
-                                                ))}
+                                                {imageArray.length > 0 ? (
+    imageArray.map((img, index) => (
+      <div key={index} className="gallery-item">
+        <img
+          src={`${BASE_IMAGE_URL}/${img.trim()}` || FALLBACK_IMAGE}
+          alt={`shop image ${index + 1}`}
+          loading="lazy"
+          onError={(e) => {
+            e.target.onerror = null; // prevent infinite loop
+            e.target.src = FALLBACK_IMAGE;
+          }}
+        />
+      </div>
+    ))
+  ) : (
+    <div className="gallery-item">
+      <img
+        src={FALLBACK_IMAGE}
+        alt="no image available"
+        loading="lazy"
+      />
+    </div>
+  )}
+
                                             </div>
                                         )}
                                     </div>

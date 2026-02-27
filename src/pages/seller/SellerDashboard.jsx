@@ -44,14 +44,14 @@ if (loading) return <p>Loading seller details...</p>;
 if (!seller) return <p>No seller data available.</p>;
 
 const logo =
-  seller?.media?.find(m => m.logo && m.logo !== "")?.logo || null;
+  seller?.media?.length >0 ? seller?.media?.find(m => m.logo && m.logo !== "")?.logo :null;
 
 const images =
   seller?.media?.filter(m => m.images)?.map(m => m.images) || [];
 
 
 
-const imageArray = images
+const imageArray = images && images.length >0
   ? images[0].split(",").filter((img) => img.trim() !== "")
   : [];
   console.log("imgara",imageArray);
@@ -64,9 +64,9 @@ console.log("tetet",seller);
         <div className="seller-header-content">
           <img
             src={
-                   logo
+                   logo!=null
                      ? `${BASE_IMAGE_URL}/${logo}`
-                     : {FALLBACK_IMAGE}
+                     : FALLBACK_IMAGE
                  }
             alt={seller.seller?.name}
             className="seller-avatar"

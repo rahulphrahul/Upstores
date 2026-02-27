@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 // === Student Pages ===
 
 import MasterDashboard from './pages/admin/MasterDashboard';
+import AdminWalletManagement from './pages/admin/AdminWalletManagement';
 import ExecutiveManagement from './pages/admin/ExecutiveManagement';
 import ShopManagement from './pages/admin/ShopManagement';
 import CustomerManagement from './pages/admin/CustomerManagement';
@@ -131,6 +132,14 @@ function App() {
             element={
               <RoleProtectedRoute user={user} allowedRoles={['admin']}>
                 <MasterDashboard />
+              </RoleProtectedRoute>
+            }
+          />
+           <Route
+            path="super-admin/wallet-management"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['admin']}>
+                <AdminWalletManagement />
               </RoleProtectedRoute>
             }
           />
