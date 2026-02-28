@@ -1,9 +1,15 @@
-import React, { useState } from "react";
-import { createBanner } from "../../service/apiService";
-import "./SellerManagement.css"; // reuse same CSS
+import React, { useEffect, useState } from "react";
+import { createBanner, getBanners, deleteBanner } from "../../service/apiService";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { BASEPATH } from "../../config/config";
 
 function BannerManagement() {
   const [loading, setLoading] = useState(false);
+  const [banners, setBanners] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+const [currentPage, setCurrentPage] = useState(1);
+const [itemsPerPage] = useState(5);
   const [form, setForm] = useState({
     title: "",
     text: "",
@@ -14,6 +20,23 @@ function BannerManagement() {
     image: null,
   });
 
+  useEffect(() => {
+    fetchBanners();
+  }, []);
+
+  const fetchBanners = async () => {
+    try {
+      const res = await getBanners();
+      if (res.status === "success") {
+        setBanners(res.data);
+      } else {
+        toast.error("Failed to fetch banners");
+      }
+    } catch {
+      toast.error("Server error while fetching banners");
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -23,176 +46,274 @@ function BannerManagement() {
     setForm((prev) => ({ ...prev, image: e.target.files[0] }));
   };
 
+  const resetForm = () => {
+    setForm({
+      title: "",
+      text: "",
+      button_text: "",
+      gradient_start: "#FF512F",
+      gradient_end: "#DD2476",
+      position: "top",
+      image: null,
+    });
+    setEditingId(null);
+  };
+// Pagination calculations
+const indexOfLastItem = currentPage * itemsPerPage;
+const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+const currentItems = banners.slice(indexOfFirstItem, indexOfLastItem);
+const totalPages = Math.ceil(banners.length / itemsPerPage);
+
+const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+const goToPrevious = () => {
+  if (currentPage > 1) setCurrentPage(currentPage - 1);
+};
+
+const goToNext = () => {
+  if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+};
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.image) {
-      alert("Please upload banner image");
-      return;
-    }
-
     const fd = new FormData();
     Object.keys(form).forEach((key) => {
-      fd.append(key, form[key]);
+      if (form[key] !== null) {
+        fd.append(key, form[key]);
+      }
     });
 
+    if (editingId) {
+      fd.append("id", editingId);
+    }
+
     setLoading(true);
+
     try {
       const res = await createBanner(fd);
+
       if (res.status === "success") {
-        alert("Banner created successfully");
-        setForm({
-          title: "",
-          text: "",
-          button_text: "",
-          gradient_start: "#FF512F",
-          gradient_end: "#DD2476",
-          position: "top",
-          image: null,
-        });
+        toast.success(res.message);
+        resetForm();
+        fetchBanners();
       } else {
-        alert(res.message || "Failed to create banner");
+        toast.error(res.message || "Failed to save banner");
       }
-    } catch (err) {
-      alert("Server error");
+    } catch {
+      toast.error("Server error");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleEdit = (banner) => {
+    setEditingId(banner.id);
+    setForm({
+      title: banner.title,
+      text: banner.text || "",
+      button_text: banner.button_text || "",
+      gradient_start: banner.gradient_start,
+      gradient_end: banner.gradient_end,
+      position: banner.position,
+      image: null,
+    });
+
+    toast.info("Editing banner...");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure to delete?")) return;
+
+    try {
+      const res = await deleteBanner(id);
+
+      if (res.status === "success") {
+        toast.success(res.message);
+        fetchBanners();
+      } else {
+        toast.error(res.message || "Delete failed");
+      }
+    } catch {
+      toast.error("Server error while deleting");
+    }
+  };
+
   return (
     <div className="seller-page">
-      {/* Page Header */}
+      
+      {/* ✅ TOASTER CONTAINER */}
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        theme="colored"
+      />
+
       <h2 className="page-title">Banner Management</h2>
 
-      {/* Card – same as Seller page */}
-      <div className="card shadow-sm p-4 bg-white rounded-lg">
-        <h4 className="mb-4 font-semibold text-lg">
-          Create New Banner
-        </h4>
+      {/* FORM */}
+      <div className="card shadow-sm p-4 bg-white rounded-lg mb-4">
+        <h4>{editingId ? "Edit Banner" : "Create New Banner"}</h4>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Title */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Title
-            </label>
+        <form onSubmit={handleSubmit} className="space-y-3">
+
+          <input
+            type="text"
+            name="title"
+            placeholder="Title"
+            value={form.title}
+            onChange={handleChange}
+            className="form-control"
+            required
+          />
+
+          <textarea
+            name="text"
+            placeholder="Text"
+            value={form.text}
+            onChange={handleChange}
+            className="form-control mb-2"
+          />
+
+          <input
+            type="text"
+            name="button_text"
+            placeholder="Button Text"
+            value={form.button_text}
+            onChange={handleChange}
+            className="form-control mb-2"
+          />
+
+          <div className="d-flex gap-3">
             <input
-              type="text"
-              name="title"
-              value={form.title}
+              type="color"
+              name="gradient_start"
+              value={form.gradient_start}
               onChange={handleChange}
-              className="w-full border rounded-md px-3 py-2 text-sm"
-              required
             />
-          </div>
-
-          {/* Text */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Text
-            </label>
-            <textarea
-              name="text"
-              value={form.text}
-              onChange={handleChange}
-              className="w-full border rounded-md px-3 py-2 text-sm"
-              rows={3}
-            />
-          </div>
-
-          {/* Button Text */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Button Text
-            </label>
             <input
-              type="text"
-              name="button_text"
-              value={form.button_text}
+              type="color"
+              name="gradient_end"
+              value={form.gradient_end}
               onChange={handleChange}
-              className="w-full border rounded-md px-3 py-2 text-sm"
             />
           </div>
 
-          {/* Gradients */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Gradient Start
-              </label>
-              <input
-                type="color"
-                name="gradient_start"
-                value={form.gradient_start}
-                onChange={handleChange}
-                className="w-full h-10"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Gradient End
-              </label>
-              <input
-                type="color"
-                name="gradient_end"
-                value={form.gradient_end}
-                onChange={handleChange}
-                className="w-full h-10"
-              />
-            </div>
-          </div>
-
-          {/* Position */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Position
-            </label>
-            <select
-              name="position"
-              value={form.position}
-              onChange={handleChange}
-              className="w-full border rounded-md px-3 py-2 text-sm"
-            >
-              <option value="top">Top</option>
-              <option value="bottom">Bottom</option>
-            </select>
-          </div>
-
-          {/* Image */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Banner Image
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="text-sm"
-              required
-            />
-          </div>
-
-          {/* Preview */}
-          <div
-            className="h-32 rounded-lg flex items-center justify-center text-white font-semibold"
-            style={{
-              background: `linear-gradient(90deg, ${form.gradient_start}, ${form.gradient_end})`,
-            }}
+          <select
+            name="position"
+            value={form.position}
+            onChange={handleChange}
+            className="form-control"
           >
-            Banner Preview
-          </div>
+            <option value="top">Top</option>
+            <option value="bottom">Bottom</option>
+          </select>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn btn-primary px-6"
-          >
-            {loading ? "Creating..." : "Create Banner"}
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="form-control"
+          />
+
+          <button className="btn btn-primary" disabled={loading}>
+            {loading ? "Saving..." : editingId ? "Update Banner" : "Create Banner"}
           </button>
         </form>
+      </div>
+
+      {/* LIST */}
+      <div className="card shadow-sm p-4 bg-white rounded-lg">
+        <h4>Banner List</h4>
+
+        <table className="table table-bordered">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Title</th>
+              <th>Position</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {banners.length > 0 ? (
+            currentItems.map((banner) => (
+                <tr key={banner.id}>
+                  <td>
+                    <img
+                      src={`${BASEPATH}/${banner.image}`}
+                      alt=""
+                      width="80"
+                    />
+                  </td>
+                  <td>{banner.title}</td>
+                  <td>{banner.position}</td>
+                  <td>
+                    <button
+                      className="btn btn-sm btn-warning me-2"
+                      onClick={() => handleEdit(banner)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn btn-sm btn-danger"
+                      onClick={() => handleDelete(banner.id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="text-center">
+                  No banners found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+        {totalPages > 1 && (
+  <div className="d-flex justify-content-between align-items-center mt-3">
+
+    <button
+      className="btn btn-sm btn-secondary"
+      onClick={goToPrevious}
+      disabled={currentPage === 1}
+    >
+      Previous
+    </button>
+
+    <div>
+      {[...Array(totalPages)].map((_, index) => (
+        <button
+          key={index}
+          onClick={() => paginate(index + 1)}
+          className={`btn btn-sm mx-1 ${
+            currentPage === index + 1
+              ? "btn-primary"
+              : "btn-outline-primary"
+          }`}
+        >
+          {index + 1}
+        </button>
+      ))}
+    </div>
+
+    <button
+      className="btn btn-sm btn-secondary"
+      onClick={goToNext}
+      disabled={currentPage === totalPages}
+    >
+      Next
+    </button>
+
+  </div>
+)}
       </div>
     </div>
   );

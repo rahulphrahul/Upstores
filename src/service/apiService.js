@@ -169,6 +169,15 @@ export const getCategories = async (main_type) => {
 
   return res.json();
 };
+/* ============================
+   DELETE CATEGORY
+============================ */
+export const deleteCategory = async (id) =>
+  fetch(`${BASE_URL}/categories/deleteCategory.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id }),
+  }).then(res => res.json());
 
 export const addPurchase = async (formData) => {
   const res = await fetch(
@@ -515,6 +524,19 @@ export const createBanner = async (formData) => {
     method: "POST",
     body: formData,
   }).then((res) => res.json());
+};
+
+export const deleteBanner = async (id) => {
+  const res = await fetch(`${BASE_URL}/banners/delete.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id }),
+  });
+  return res.json();
+};
+export const getBanners = async () => {
+  const res = await fetch(`${BASE_URL}/banners/list.php`);
+  return res.json();
 };
 // shop
 
