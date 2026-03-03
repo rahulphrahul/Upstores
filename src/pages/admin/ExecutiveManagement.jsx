@@ -16,67 +16,90 @@ import {
   getExecutivePerformance,
   createExecutive,
 } from "../../service/apiService";
+
 import { Modal, Button } from "react-bootstrap";
 import ExecutiveManagementSkeleton from "./skeletons/ExecutiveManagementSkeleton";
 import "./ExecutiveManagement.css";
 
 function ExecutiveManagement() {
+
   /* =========================
      STATE
   ========================= */
+
   const [loading, setLoading] = useState(true);
   const [executives, setExecutives] = useState([]);
   const [performanceData, setPerformanceData] = useState([]);
-const [showDeleteModal, setShowDeleteModal] = useState(false);
-const [selectedId, setSelectedId] = useState(null);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+
   const [showAdd, setShowAdd] = useState(false);
   const [credentials, setCredentials] = useState(null);
+
   const [form, setForm] = useState({
     name: "",
     phone: "",
     email: "",
     username: "",
   });
+
   const [creating, setCreating] = useState(false);
+
+  /* =========================
+     SEARCH + PAGINATION
+  ========================= */
+
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 10;
 
   /* =========================
      CHART
   ========================= */
+
   const chartDiv = useRef(null);
   const rootRef = useRef(null);
 
   /* =========================
      LOAD DATA
   ========================= */
-  const loadAll = async () => {
+
+  const loadAll = async (currentPage = page, currentSearch = search) => {
     try {
       setLoading(true);
+
       const [execRes, perfRes] = await Promise.all([
-        getExecutives(),
+        getExecutives({
+          page: currentPage,
+          limit: limit,
+          search: currentSearch,
+        }),
         getExecutivePerformance(),
       ]);
-      setExecutives(execRes);
+
+      setExecutives(execRes.data);
+      setTotalPages(execRes.totalPages || 1);
       setPerformanceData(perfRes);
+
+    } catch (error) {
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadAll();
-  }, []);
+    loadAll(page, search);
+  }, [page]);
 
   /* =========================
      PERFORMANCE CHART
   ========================= */
+
   useLayoutEffect(() => {
-    if (
-      loading ||
-      performanceData.length === 0 ||
-      !chartDiv.current
-    ) {
-      return;
-    }
+    if (loading || performanceData.length === 0 || !chartDiv.current) return;
 
     if (rootRef.current) {
       rootRef.current.dispose();
@@ -129,15 +152,13 @@ const [selectedId, setSelectedId] = useState(null);
     xAxis.data.setAll(parsed);
     series.data.setAll(parsed);
 
-    series.appear(1000);
-    chart.appear(1000, 100);
-
     return () => root.dispose();
   }, [loading, performanceData]);
 
   /* =========================
-     ADD EXECUTIVE
+     ACTIONS
   ========================= */
+
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -153,109 +174,43 @@ const [selectedId, setSelectedId] = useState(null);
     }
   };
 
-  /* =========================
-     ACTIONS
-  ========================= */
   const handleToggleStatus = async (id, status) => {
     await toggleExecutiveStatus(id, status);
     loadAll();
   };
 
-const handleDelete = (id) => {
-  setSelectedId(id);
-  setShowDeleteModal(true);
-};
+  const handleDelete = (id) => {
+    setSelectedId(id);
+    setShowDeleteModal(true);
+  };
 
-const confirmDelete = async () => {
-  try {
+  const confirmDelete = async () => {
     await deleteExecutive(selectedId);
     setShowDeleteModal(false);
     loadAll();
-  } catch (error) {
-    console.error(error);
-  }
-};
+  };
 
   if (loading) return <ExecutiveManagementSkeleton />;
 
   /* =========================
      UI
   ========================= */
+
   return (
     <div className="exec-page">
-      {/* HEADER */}
+
       <div className="page-header">
         <h2 className="page-title">Executive Management</h2>
         <button
           className="btn btn-primary"
           onClick={() => {
             setShowAdd(!showAdd);
-            setCredentials(null); 
+            setCredentials(null);
           }}
         >
           {showAdd ? "Close" : "+ Add Executive"}
         </button>
       </div>
-
-      {/* ADD EXECUTIVE SECTION */}
-      {showAdd && (
-        <div className="card">
-          <h4>Add New Executive</h4>
-
-          {!credentials ? (
-            <div className="form-grid">
-              <input
-                name="name"
-                placeholder="Full Name"
-                value={form.name}
-                onChange={handleChange}
-              />
-              <input
-                name="phone"
-                placeholder="Phone"
-                value={form.phone}
-                onChange={handleChange}
-              />
-              <input
-                name="email"
-                placeholder="Email"
-                value={form.email}
-                onChange={handleChange}
-              />
-              <input
-                name="username"
-                placeholder="Username"
-                value={form.username}
-                onChange={handleChange}
-              />
-
-              <div className="form-actions">
-                <button
-                  className="btn btn-outline"
-                  onClick={() => setShowAdd(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="btn btn-primary"
-                  onClick={handleCreate}
-                  disabled={creating}
-                >
-                  Create Executive
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="credentials-box">
-              <p><strong>Username:</strong> {credentials.username}</p>
-              <p><strong>Password:</strong> {credentials.password}</p>
-              <small>
-                ⚠ Share securely. Password will not be shown again.
-              </small>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* PERFORMANCE */}
       <div className="card">
@@ -264,89 +219,157 @@ const confirmDelete = async () => {
       </div>
 
       {/* TABLE */}
-     <div className="card">
-  <div className="table-wrapper">
-    <table className="data-table">
+      <div className="card">
 
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Shops</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {executives.map(e => (
-              <tr key={e.id}>
-                <td>{e.name}</td>
-                <td>{e.phone}</td>
-                <td>{e.email || "-"}</td>
-                <td>{e.shops_count}</td>
-                <td>
-                  <span className={`status ${e.status}`}>
-                    {e.status}
-                  </span>
-                </td>
-                <td>
-                  <button
-                    className={`btn ${
-                      e.status === "active"
-                        ? "btn-suspend"
-                        : "btn-activate"
-                    }`}
-                    onClick={() =>
-                      handleToggleStatus(e.id, e.status)
-                    }
-                  >
-                    {e.status === "active"
-                      ? "Suspend"
-                      : "Activate"}
-                  </button>
+        {/* SEARCH BAR */}
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: 15
+        }}>
 
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => handleDelete(e.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
+          <input
+            type="text"
+            placeholder="Search by name or phone..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setPage(1);
+                loadAll(1, search);
+              }
+            }}
+            style={{
+              width: "250px",
+              padding: "6px",
+              borderRadius: "4px",
+              border: "1px solid #ccc"
+            }}
+          />
 
-            {executives.length === 0 && (
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              setPage(1);
+              loadAll(1, search);
+            }}
+          >
+            Search
+          </button>
+        </div>
+
+        <div className="table-wrapper">
+          <table className="data-table">
+            <thead>
               <tr>
-                <td colSpan="6" className="empty">
-                  No executives found
-                </td>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Shops</th>
+                <th>Status</th>
+                <th>Action</th>
               </tr>
-            )}
-          </tbody>
-           </table>
-  </div>
-</div>
-{/* delete popup */}
-<Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
-  <Modal.Header closeButton>
-    <Modal.Title>Confirm Delete</Modal.Title>
-  </Modal.Header>
+            </thead>
+            <tbody>
+              {executives.map(e => (
+                <tr key={e.id}>
+                  <td>{e.name}</td>
+                  <td>{e.phone}</td>
+                  <td>{e.email || "-"}</td>
+                  <td>{e.shops_count}</td>
+                  <td>
+                    <span className={`status ${e.status}`}>
+                      {e.status}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      className={`btn ${
+                        e.status === "active"
+                          ? "btn-suspend"
+                          : "btn-activate"
+                      }`}
+                      onClick={() =>
+                        handleToggleStatus(e.id, e.status)
+                      }
+                    >
+                      {e.status === "active"
+                        ? "Suspend"
+                        : "Activate"}
+                    </button>
 
-  <Modal.Body>
-    Are you sure you want to delete this executive?
-  </Modal.Body>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => handleDelete(e.id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
 
-  <Modal.Footer>
-    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-      Cancel
-    </Button>
-    <Button variant="danger" onClick={confirmDelete}>
-      Delete
-    </Button>
-  </Modal.Footer>
-</Modal>
-</div>
+              {executives.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="empty">
+                    No executives found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* PAGINATION */}
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "10px",
+          marginTop: "20px"
+        }}>
+          <button
+            className="btn btn-outline"
+            disabled={page === 1}
+            onClick={() => setPage(prev => prev - 1)}
+          >
+            Previous
+          </button>
+
+          <span>
+            Page {page} of {totalPages}
+          </span>
+
+          <button
+            className="btn btn-outline"
+            disabled={page === totalPages}
+            onClick={() => setPage(prev => prev + 1)}
+          >
+            Next
+          </button>
+        </div>
+
+      </div>
+
+      {/* DELETE MODAL */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          Are you sure you want to delete this executive?
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={confirmDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+    </div>
   );
 }
 

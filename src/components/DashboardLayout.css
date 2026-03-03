@@ -61,6 +61,18 @@ body {
 ========================= */
 .menu {
   flex: 1;
+  overflow-y: auto;
+
+  /* Hide scrollbar - Firefox */
+  scrollbar-width: none;
+
+  /* Hide scrollbar - IE & Edge */
+  -ms-overflow-style: none;
+}
+
+/* Hide scrollbar - Chrome, Safari */
+.menu::-webkit-scrollbar {
+  display: none;
 }
 
 .menu-item {
@@ -106,6 +118,7 @@ body {
 .logout-section {
   padding: 12px;
   border-top: 1px solid #e5e7eb;
+  margin-top: auto;
 }
 
 .logout-btn {

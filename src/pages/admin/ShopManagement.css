@@ -12,7 +12,30 @@
   margin-bottom: 18px;
   letter-spacing: 0.3px;
 }
+.search-input {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    width: 250px;
+}
 
+.pagination {
+    margin-top: 15px;
+    display: flex;
+    gap: 6px;
+}
+
+.page-btn {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+}
+
+.page-btn.active {
+    background: #2563eb;
+    color: white;
+}
 
 /* =========================
    CARD

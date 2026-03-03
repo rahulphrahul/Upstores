@@ -4,6 +4,7 @@ import {
     getPendingShopFunds,
     handleWalletRequest,
     shopFundAction,
+    deleteShop,
     getShopLoginDetails,
     toggleShopStatus,
 } from "../../service/apiService";
@@ -33,21 +34,34 @@ function ShopManagement() {
     const [showShopModal, setShowShopModal] = useState(false);
     const [selectedShop, setSelectedShop] = useState(null);
     const [shopLoading, setShopLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
+    const [search, setSearch] = useState("");
+    const limit = 10;
+const [searchInput, setSearchInput] = useState("");
 
-    const loadAll = async () => {
-        setLoading(true);
-        const [shopsRes, pendingRes] = await Promise.all([
-            getShops(),
-            getPendingShopFunds(),
-        ]);
-        setShops(shopsRes);
-        setPending(pendingRes);
-        setLoading(false);
-    };
+const loadAll = async () => {
+    setLoading(true);
 
-    useEffect(() => {
-        loadAll();
-    }, []);
+    const shopsRes = await getShops(page, search);
+
+    setShops(shopsRes?.data || []);
+    setTotal(shopsRes?.total || 0);
+
+    const pendingRes = await getPendingShopFunds();
+    setPending(pendingRes || []);
+
+    setLoading(false);
+};
+
+useEffect(() => {
+   loadAll();
+}, [page, search]);
+
+const handleSearch = () => {
+   setPage(1);       // reset to page 1
+   setSearch(searchInput);  // set actual search
+};
 
     const onWalletAction = async (req, action) => {
         try {
@@ -92,6 +106,7 @@ function ShopManagement() {
                     <p className="text-gray-500 text-sm">No pending requests</p>
                 ) : (
                     <div className="overflow-x-auto">
+        
                         <table className="w-full border-collapse">
                             <thead>
                                 <tr className="bg-gray-100 text-left text-sm text-gray-600">
@@ -147,6 +162,33 @@ function ShopManagement() {
             {/* Shops Table */}
            <div className="card">
   <div className="table-scroll">
+      <div className="table-header">
+    <input
+        type="text"
+        placeholder="Search shop..."
+        value={searchInput}
+        onChange={(e) => setSearchInput(e.target.value)}
+        className="search-input"
+    />
+
+    <button
+        className="btn btn-primary"
+        onClick={handleSearch}
+    >
+        Search
+    </button>
+
+    <button
+        className="btn btn-secondary"
+  onClick={() => {
+    setSearchInput("");
+    setSearch("");
+    setPage(1);
+}}
+    >
+        Reset
+    </button>
+</div>
     <table className="data-table">
 
                     <thead>
@@ -176,21 +218,38 @@ function ShopManagement() {
                                     </span>
                                 </td>
                                 <td>
-                                    <button
-                                        className={`btn ${
-                                            s.status === "active"
-                                                ? "btn-suspend"
-                                                : "btn-activate"
-                                        }`}
-                                        onClick={() =>
-                                            toggleShopStatus(s.id, s.status).then(loadAll)
-                                        }
-                                    >
-                                        {s.status === "active"
-                                            ? "Suspend"
-                                            : "Activate"}
-                                    </button>
-                                </td>
+    <div className="flex gap-2">
+        <button
+            className={`btn ${
+                s.status === "active"
+                    ? "btn-suspend"
+                    : "btn-activate"
+            }`}
+            onClick={(e) => {
+                e.stopPropagation();
+                toggleShopStatus(s.id, s.status).then(loadAll);
+            }}
+        >
+            {s.status === "active"
+                ? "Suspend"
+                : "Activate"}
+        </button>
+
+        <button
+            className="btn btn-danger"
+            onClick={async (e) => {
+                e.stopPropagation();
+
+                if (window.confirm("Are you sure to delete this shop?")) {
+                    await deleteShop(s.id);
+                    loadAll();
+                }
+            }}
+        >
+            Delete
+        </button>
+    </div>
+</td>
                             </tr>
                         ))}
 
@@ -201,6 +260,17 @@ function ShopManagement() {
                         )}
                     </tbody>
                 </table>
+                <div className="pagination">
+    {Array.from({ length: Math.ceil(total / limit) }, (_, i) => (
+        <button
+            key={i}
+            className={`page-btn ${page === i + 1 ? "active" : ""}`}
+            onClick={() => setPage(i + 1)}
+        >
+            {i + 1}
+        </button>
+    ))}
+</div>
             </div>
 </div>
             {/* SHOP DETAILS MODAL */}

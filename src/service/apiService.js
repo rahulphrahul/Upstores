@@ -41,9 +41,21 @@ export const fundAction = async (id, action) => {
   return res.json();
 };
 /* ================= EXECUTIVES ================= */
+export const getExecutives = async ({
+  page = 1,
+  limit = 10,
+  search = ""
+}) => {
+  const params = new URLSearchParams({
+    page,
+    limit,
+    search,
+  }).toString();
 
-export const getExecutives = async () => {
-  const res = await fetch(`${BASE_URL}/executives/list.php`);
+  const res = await fetch(
+    `${BASE_URL}/executives/list.php?${params}`
+  );
+
   return res.json();
 };
 
@@ -85,8 +97,16 @@ export const getExecutivePerformance = async () => {
 };
 /* ================= SHOPS ================= */
 
-export const getShops = async () =>
-  fetch(`${BASE_URL}/shops/list.php`).then(res => res.json());
+export const getShops = async (page = 1, search = "") =>
+  fetch(`${BASE_URL}/shops/list.php?page=${page}&limit=10&search=${search}`)
+    .then(res => res.json());
+
+export const deleteShop = async (id) =>
+  fetch(`${BASE_URL}/shops/delete.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `id=${id}`
+  }).then(res => res.json());
 
 export const getPendingShopFunds = async () =>
   fetch(`${BASE_URL}/shops/pending-funds.php`).then(res => res.json());
@@ -307,8 +327,16 @@ export const updateExecutiveServiceStatus = async (
   return res.json();
 };
 /* ================= Sellers ================= */  
-export const getSellers = async () => 
-  fetch(`${BASE_URL}/sellers/get_sellers.php`).then(res => res.json());
+export const getSellers = async (page = 1, search = "") =>
+  fetch(`${BASE_URL}/sellers/get_sellers.php?page=${page}&limit=10&search=${search}`)
+    .then(res => res.json());
+
+export const deleteSeller = async (id) =>
+  fetch(`${BASE_URL}/sellers/delete_seller.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `id=${id}`
+  }).then(res => res.json());
 
 
 export const updateSellerStatus = async (sellerId, status) => {
@@ -321,11 +349,24 @@ export const updateSellerStatus = async (sellerId, status) => {
 };
 /* ================= SERVICES ================= */
 
-export const getServices = async () => {
-  const res = await fetch(`${BASE_URL}/services/get_services.php`);
+export const getServices = async (page = 1, search = "") => {
+  const res = await fetch(
+    `${BASE_URL}/services/get_services.php?page=${page}&search=${search}`
+  );
   return res.json();
 };
 
+export const deleteService = async (id) => {
+  const formData = new FormData();
+  formData.append("id", id);
+
+  const res = await fetch(`${BASE_URL}/services/delete_service.php`, {
+    method: "POST",
+    body: formData,
+  });
+
+  return res.json();
+};
 export const updateServiceStatus = async (id, status) => {
   const res = await fetch(`${BASE_URL}/services/update_service_status.php`, {
     method: "POST",
@@ -425,8 +466,22 @@ export const sendPasswordResetEmail = async (email) => {
   });
   return res.json();
 };
-export const getCustomers = async () => {
-  const res = await fetch(`${BASE_URL}/customers/list.php`);
+export const getCustomers = async (page = 1, search = "") => {
+  const res = await fetch(
+    `${BASE_URL}/customers/list.php?page=${page}&search=${search}`
+  );
+  return res.json();
+};
+
+export const deleteCustomer = async (id) => {
+  const formData = new FormData();
+  formData.append("id", id);
+
+  const res = await fetch(`${BASE_URL}/customers/delete.php`, {
+    method: "POST",
+    body: formData,
+  });
+
   return res.json();
 };
 
@@ -734,7 +789,35 @@ export const requestWalletFund = async (formData) => {
   });
   return res.json();
 };
+/* =========================
+   ADMIN: CUSTOMER WITHDRAWALS
+========================= */
 
+/* =========================
+   ADMIN: CUSTOMER WITHDRAWALS
+========================= */
+
+export const getCustomerWithdrawals = async (
+  from = "",
+  to = "",
+  name = ""
+) => {
+  const params = new URLSearchParams({ from, to, name }).toString();
+
+  const res = await fetch(
+    `${BASE_URL}/admin/get_customer_withdrawals.php?${params}`
+  );
+
+  return res.json();
+};
+export const exportCustomerWithdrawals = (from = "", to = "") => {
+  const params = new URLSearchParams({ from, to }).toString();
+
+  window.open(
+    `${BASE_URL}/admin/export_customer_withdrawals.php?${params}`,
+    "_blank"
+  );
+};
 /* =========================
    ADMIN: APPROVE WALLET REQUEST
 ========================= */

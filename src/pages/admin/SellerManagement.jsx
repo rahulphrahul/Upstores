@@ -4,6 +4,7 @@ import {
   getWalletRequests,
   updateSellerStatus,
   handleWalletRequest,
+  deleteSeller,
   getSellerLoginDetails
 } from "../../service/apiService";
 import "./SellerManagement.css";
@@ -31,27 +32,30 @@ function SellerManagement() {
   const [showSellerModal, setShowSellerModal] = useState(false);
   const [selectedSeller, setSelectedSeller] = useState(null);
   const [sellerLoading, setSellerLoading] = useState(false);
+  const [page, setPage] = useState(1);
+const [total, setTotal] = useState(0);
+const [search, setSearch] = useState("");
+const [searchInput, setSearchInput] = useState("");
+const limit = 10;
 
   const shop_type = "seller";
 
-  const loadSellers = async () => {
-    setLoading(true);
-    try {
-      const [sellersRes, pendingRes] = await Promise.all([
-        getSellers(),
-        getWalletRequests(shop_type),
-      ]);
+const loadSellers = async () => {
+  setLoading(true);
+  try {
+    const sellersRes = await getSellers(page, search);
+    const pendingRes = await getWalletRequests(shop_type);
 
-      setSellers(sellersRes?.data || sellersRes || []);
-      setPending(pendingRes?.data || pendingRes || []);
-    } catch (err) {
-      console.error("Load error", err);
-      setSellers([]);
-      setPending([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setSellers(sellersRes?.data || []);
+    setTotal(sellersRes?.total || 0);
+    setPending(pendingRes?.data || pendingRes || []);
+  } catch (err) {
+    console.error("Load error", err);
+    setSellers([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const onWalletAction = async (req, action) => {
     try {
@@ -63,9 +67,14 @@ function SellerManagement() {
     }
   };
 
-  useEffect(() => {
-    loadSellers();
-  }, []);
+ useEffect(() => {
+  loadSellers();
+}, [page, search]);
+
+const handleSearch = () => {
+  setPage(1);
+  setSearch(searchInput);
+};
 
   const toggleStatus = async (seller) => {
     const newStatus = seller.status === "active" ? "suspended" : "active";
@@ -148,6 +157,30 @@ function SellerManagement() {
       {/* Sellers Table */}
      <div className="card">
   <div className="table-scroll">
+    <div className="table-header">
+  <input
+    type="text"
+    placeholder="Search seller..."
+    value={searchInput}
+    onChange={(e) => setSearchInput(e.target.value)}
+    className="search-input"
+  />
+
+  <button className="btn btn-primary" onClick={handleSearch}>
+    Search
+  </button>
+
+  <button
+    className="btn btn-secondary"
+    onClick={() => {
+      setSearchInput("");
+      setSearch("");
+      setPage(1);
+    }}
+  >
+    Reset
+  </button>
+</div>
     <table className="data-table">
 
           <thead>
@@ -175,14 +208,32 @@ function SellerManagement() {
                 <td>
                   <span className={`status ${s.status}`}>{s.status}</span>
                 </td>
-                <td>
-                  <button
-                    className={`btn ${s.status === "active" ? "btn-suspend" : "btn-activate"}`}
-                    onClick={() => toggleStatus(s)}
-                  >
-                    {s.status === "active" ? "Suspend" : "Activate"}
-                  </button>
-                </td>
+               <td>
+  <div className="flex gap-2">
+    <button
+      className={`btn ${s.status === "active" ? "btn-suspend" : "btn-activate"}`}
+      onClick={(e) => {
+        e.stopPropagation();
+        toggleStatus(s);
+      }}
+    >
+      {s.status === "active" ? "Suspend" : "Activate"}
+    </button>
+
+    <button
+      className="btn btn-danger"
+      onClick={async (e) => {
+        e.stopPropagation();
+        if (window.confirm("Delete this seller?")) {
+          await deleteSeller(s.id);
+          loadSellers();
+        }
+      }}
+    >
+      Delete
+    </button>
+  </div>
+</td>
               </tr>
             ))}
 
@@ -193,6 +244,17 @@ function SellerManagement() {
             )}
           </tbody>
         </table>
+        <div className="pagination">
+  {Array.from({ length: Math.ceil(total / limit) }, (_, i) => (
+    <button
+      key={i}
+      className={`page-btn ${page === i + 1 ? "active" : ""}`}
+      onClick={() => setPage(i + 1)}
+    >
+      {i + 1}
+    </button>
+  ))}
+</div>
       </div>
 </div>
       {/* Seller Modal */}

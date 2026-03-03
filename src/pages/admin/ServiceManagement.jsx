@@ -4,6 +4,7 @@ import {
   updateServiceStatus,
   handleWalletRequest,
   getWalletRequests,
+  deleteService,
   getServiceLoginDetails
 } from "../../service/apiService";
 import "./ServiceManagement.css";
@@ -31,27 +32,33 @@ function ServiceManagement() {
   const [showServiceModal, setShowServiceModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const [serviceLoading, setServiceLoading] = useState(false);
+  const [page, setPage] = useState(1);
+const [total, setTotal] = useState(0);
+const [searchInput, setSearchInput] = useState("");
+const [search, setSearch] = useState("");
+const limit = 10;
 
   const shop_type = "service";
 
-  const loadServices = async () => {
-    setLoading(true);
-    try {
-      const [serviceRes, pendingRes] = await Promise.all([
-        getServices(),
-        getWalletRequests(shop_type),
-      ]);
+const loadServices = async () => {
+  setLoading(true);
+  try {
+    const [serviceRes, pendingRes] = await Promise.all([
+      getServices(page, search),
+      getWalletRequests(shop_type),
+    ]);
 
-      setServices(serviceRes?.data || serviceRes || []);
-      setPending(pendingRes?.data || pendingRes || []);
-    } catch (err) {
-      console.error("Load error", err);
-      setServices([]);
-      setPending([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setServices(serviceRes?.data || []);
+    setTotal(serviceRes?.total || 0);
+    setPending(pendingRes?.data || pendingRes || []);
+  } catch (err) {
+    console.error("Load error", err);
+    setServices([]);
+    setPending([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const onWalletAction = async (req, action) => {
     try {
@@ -63,9 +70,9 @@ function ServiceManagement() {
     }
   };
 
-  useEffect(() => {
-    loadServices();
-  }, []);
+useEffect(() => {
+  loadServices();
+}, [page, search]);
 
   const toggleStatus = async (service) => {
     const newStatus = service.status === "active" ? "inactive" : "active";
@@ -148,6 +155,33 @@ function ServiceManagement() {
       {/* Services Table */}
       <div className="card">
   <div className="table-scroll">
+<div className="search-bar">
+  <input
+    type="text"
+    placeholder="Search services..."
+    value={searchInput}
+    onChange={(e) => setSearchInput(e.target.value)}
+  />
+
+  <button className="btn btn-primary"
+    onClick={() => {
+      setPage(1);
+      setSearch(searchInput);
+    }}
+  >
+    Search
+  </button>
+
+  <button className="btn btn-secondary"
+    onClick={() => {
+      setSearchInput("");
+      setSearch("");
+      setPage(1);
+    }}
+  >
+    Reset
+  </button>
+</div>
     <table className="data-table">
 
           <thead>
@@ -184,6 +218,17 @@ function ServiceManagement() {
                   >
                     {s.status === "active" ? "Suspend" : "Activate"}
                   </button>
+                  <button
+  className="btn btn-danger"
+  onClick={(e) => {
+    e.stopPropagation();
+    if (window.confirm("Are you sure to delete?")) {
+      deleteService(s.id).then(() => loadServices());
+    }
+  }}
+>
+  Delete
+</button>
                 </td>
               </tr>
             ))}
@@ -195,6 +240,17 @@ function ServiceManagement() {
             )}
           </tbody>
         </table>
+     <div className="pagination">
+  {Array.from({ length: Math.ceil(total / limit) }, (_, i) => (
+    <button
+      key={i}
+      className={`page-btn ${page === i + 1 ? "active" : ""}`}
+      onClick={() => setPage(i + 1)}
+    >
+      {i + 1}
+    </button>
+  ))}
+</div>
       </div>
 </div>
       {/* SERVICE MODAL */}

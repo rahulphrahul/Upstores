@@ -3,6 +3,8 @@ import {
   resetWallets,
   getResetHistory,
   exportHistory,
+  getCustomerWithdrawals,
+  exportCustomerWithdrawals
 } from "../../service/apiService";
 import {
   Container,
@@ -12,206 +14,247 @@ import {
   Form,
   Button,
   Table,
-  Badge, Pagination
+  Badge,
+  Pagination
 } from "react-bootstrap";
-
+import { toast, ToastContainer } from "react-toastify";
 
 const AdminWalletManagement = () => {
-  const [type, setType] = useState("all");
+
   const [reason, setReason] = useState("");
   const [history, setHistory] = useState([]);
+  const [withdrawals, setWithdrawals] = useState([]);
+
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-  const [role, setRole] = useState("");
- const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 10;
+  const [searchName, setSearchName] = useState("");
 
-  // Pagination Logic
-  const indexOfLast = currentPage * recordsPerPage;
-  const indexOfFirst = indexOfLast - recordsPerPage;
-  const currentRecords = history.slice(indexOfFirst, indexOfLast);
+  const [loading, setLoading] = useState(false);
 
-  const totalPages = Math.ceil(history.length / recordsPerPage);
+  // PAGINATION
+  const [historyPage, setHistoryPage] = useState(1);
+  const [withdrawalPage, setWithdrawalPage] = useState(1);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const recordsPerPage = 5;
+
+  // ================= LOAD HISTORY =================
   const loadHistory = async () => {
-    const res = await getResetHistory(from, to, role);
+    const res = await getResetHistory(from, to);
     if (res.status) setHistory(res.data);
+  };
+
+  // ================= LOAD WITHDRAWALS =================
+  const loadWithdrawals = async () => {
+    const res = await getCustomerWithdrawals(from, to, searchName);
+    if (res.status) setWithdrawals(res.data);
   };
 
   useEffect(() => {
     loadHistory();
+    loadWithdrawals(); // ✅ NOW CALLS ON PAGE LOAD
   }, []);
 
+  // ================= RESET =================
   const handleReset = async () => {
-    if (!reason) return alert("Enter reason");
-    if (!window.confirm("Are you sure you want to reset wallets?")) return;
+    if (!reason) return toast.error("Enter reason");
 
-    const res = await resetWallets(type, reason);
+    if (!window.confirm("Confirm reset?")) return;
+
+    setLoading(true);
+
+    const res = await resetWallets("admin", reason);
 
     if (res.status) {
-      alert(res.message);
+      toast.success(res.message);
       setReason("");
       loadHistory();
     } else {
-      alert(res.message);
+      toast.error(res.message);
     }
+
+    setLoading(false);
+  };
+
+  // ================= PAGINATION LOGIC =================
+  const paginate = (data, page) => {
+    const indexOfLast = page * recordsPerPage;
+    const indexOfFirst = indexOfLast - recordsPerPage;
+    return data.slice(indexOfFirst, indexOfLast);
+  };
+
+  const renderPagination = (data, page, setPage) => {
+    const totalPages = Math.ceil(data.length / recordsPerPage);
+    if (totalPages <= 1) return null;
+
+    return (
+      <Pagination className="justify-content-center">
+        {[...Array(totalPages)].map((_, i) => (
+          <Pagination.Item
+            key={i}
+            active={i + 1 === page}
+            onClick={() => setPage(i + 1)}
+          >
+            {i + 1}
+          </Pagination.Item>
+        ))}
+      </Pagination>
+    );
   };
 
   return (
-    <Container fluid className="mt-4">
-      <h3 className="mb-4"> Wallet Management</h3>
+    <Container className="mt-4">
+      <ToastContainer />
 
-      {/* Reset Section */}
-      <Card className="shadow-sm mb-4">
-        <Card.Header className="fw-bold">Reset Wallet</Card.Header>
+      <h3>Admin Points Management</h3>
+
+      {/* RESET */}
+      <Card className="mb-4">
         <Card.Body>
-          <Row className="align-items-end">
-            <Col md={3}>
-              <Form.Group>
-                <Form.Label>Reset Type</Form.Label>
-                <Form.Select
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
-                >
-                  <option value="all">All</option>
-                  <option value="customer">Customer</option>
-                  <option value="seller">Seller</option>
-                  <option value="shop">Shop</option>
-                  <option value="service">Service</option>
-                </Form.Select>
-              </Form.Group>
+          <Row>
+            <Col md={8}>
+              <Form.Control
+                placeholder="Reason"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+              />
             </Col>
-
-            <Col md={5}>
-              <Form.Group>
-                <Form.Label>Reason</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter reset reason"
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                />
-              </Form.Group>
-            </Col>
-
-            <Col md={2}>
+            <Col md={4}>
               <Button
                 variant="danger"
-                className="w-100"
                 onClick={handleReset}
+                disabled={loading}
               >
-                Reset Wallet
+                Reset Admin Points
               </Button>
             </Col>
           </Row>
         </Card.Body>
       </Card>
 
-      {/* History Section */}
-      <Card className="shadow-sm">
-        <Card.Header className="fw-bold">Reset History</Card.Header>
+      {/* HISTORY */}
+      <Card className="mb-4">
+        <Card.Header>Reset History</Card.Header>
         <Card.Body>
+
           <Row className="mb-3">
             <Col md={3}>
-              <Form.Control
-                type="date"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-              />
+              <Form.Control type="date" value={from}
+                onChange={(e) => setFrom(e.target.value)} />
             </Col>
-
             <Col md={3}>
-              <Form.Control
-                type="date"
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
-              />
+              <Form.Control type="date" value={to}
+                onChange={(e) => setTo(e.target.value)} />
             </Col>
-
             <Col md={3}>
-              <Form.Select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-              >
-                <option value="">All Role</option>
-                <option value="customer">Customer</option>
-                <option value="seller">Seller</option>
-              </Form.Select>
+              <Button onClick={loadHistory}>Search</Button>
             </Col>
-
-            <Col md={3} className="d-flex gap-2">
-              <Button variant="primary" onClick={loadHistory}>
-                Filter
-              </Button>
+            <Col md={3}>
               <Button variant="success" onClick={exportHistory}>
                 Export CSV
               </Button>
             </Col>
           </Row>
 
-          <Table striped bordered hover responsive>
-            <thead className="table-dark">
+          <Table bordered>
+            <thead>
               <tr>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Source Table</th>
-                <th>Wallet</th>
-                <th>PV</th>
+                <th>ID</th>
+                <th>Old Points</th>
+                <th>Old PV</th>
                 <th>Reason</th>
+                <th>Reset By</th>
                 <th>Date</th>
               </tr>
             </thead>
             <tbody>
-             {currentRecords.length > 0 ? (
-            currentRecords.map((h) => (
-                  <tr key={h.id}>
-                    <td>{h.name}</td>
-                    <td>
-                      <Badge bg="info">{h.role}</Badge>
-                    </td>
-                    <td>{h.source_table}</td>
-                    <td>₹ {h.old_wallet_amount}</td>
-                    <td>{h.old_pv_balance}</td>
-                    <td>{h.reset_reason}</td>
-                    <td>{h.reset_at}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="6" className="text-center">
-                    No history found
-                  </td>
+              {paginate(history, historyPage).map((h) => (
+                <tr key={h.id}>
+                  <td>{h.id}</td>
+                  <td>{h.old_wallet_amount}</td>
+                  <td>{h.old_pv_balance}</td>
+                  <td>{h.reset_reason}</td>
+                  <td>{h.reset_by_name}</td>
+                  <td>{h.reset_at}</td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </Table>
-           {/* Pagination UI */}
-      {totalPages > 1 && (
-        <Pagination className="justify-content-center">
-          <Pagination.Prev
-            disabled={currentPage === 1}
-            onClick={() => paginate(currentPage - 1)}
-          />
 
-          {[...Array(totalPages)].map((_, index) => (
-            <Pagination.Item
-              key={index + 1}
-              active={index + 1 === currentPage}
-              onClick={() => paginate(index + 1)}
-            >
-              {index + 1}
-            </Pagination.Item>
-          ))}
+          {renderPagination(history, historyPage, setHistoryPage)}
 
-          <Pagination.Next
-            disabled={currentPage === totalPages}
-            onClick={() => paginate(currentPage + 1)}
-          />
-        </Pagination>
-      )}
         </Card.Body>
       </Card>
+
+      {/* WITHDRAWALS */}
+      <Card>
+        <Card.Header>Customer Withdrawals</Card.Header>
+        <Card.Body>
+
+          <Row className="mb-3">
+            <Col md={3}>
+              <Form.Control
+                placeholder="Search Name"
+                value={searchName}
+                onChange={(e) => setSearchName(e.target.value)}
+              />
+            </Col>
+            <Col md={3}>
+              <Button onClick={loadWithdrawals}>Search</Button>
+            </Col>
+            <Col md={3}>
+              <Button
+                variant="success"
+                onClick={() =>
+                  exportCustomerWithdrawals(from, to)
+                }
+              >
+                Export CSV
+              </Button>
+            </Col>
+          </Row>
+
+          <Table bordered>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginate(withdrawals, withdrawalPage).map((w) => (
+                <tr key={w.id}>
+                  <td>{w.id}</td>
+                  <td>{w.name}</td>
+                  <td>{w.email}</td>
+                  <td>₹ {w.amount}</td>
+              <Badge
+  bg={
+    w.status === "active"
+      ? "success"
+      : w.status === "rejected"
+      ? "danger"
+      : "warning"
+  }
+>
+  {w.status === "active"
+    ? "Success"
+    : w.status || "Pending"}
+</Badge>
+                  <td>{w.created_at}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+
+          {renderPagination(withdrawals, withdrawalPage, setWithdrawalPage)}
+
+        </Card.Body>
+      </Card>
+
     </Container>
   );
 };

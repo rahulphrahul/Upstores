@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./CustomerManagement.css";
-import { getCustomers,updateWallet } from "../../service/apiService";
+import { getCustomers,updateWallet,deleteCustomer } from "../../service/apiService";
 import { toast } from "react-toastify";
 import { BASE_CUSTM_IMG_URL,FALLBACK_IMAGE } from "../../config/config";
 
@@ -11,15 +11,23 @@ function CustomerManagement() {
   const [showQrModal, setShowQrModal] = useState(false);
   const [expandedRow, setExpandedRow] = useState(null);
   const [amount, setAmount] = useState("");
+  const [page, setPage] = useState(1);
+const [total, setTotal] = useState(0);
+const [searchInput, setSearchInput] = useState("");
+const [search, setSearch] = useState("");
+const limit = 10;
+useEffect(() => {
+  loadCustomers();
+}, [page, search]);
 
-  useEffect(() => {
-    loadCustomers();
-  }, []);
+const loadCustomers = async () => {
+  const res = await getCustomers(page, search);
 
-  const loadCustomers = async () => {
-    const res = await getCustomers();
-    if (res.status) setCustomers(res.data);
-  };
+  if (res.status) {
+    setCustomers(res.data);
+    setTotal(res.total);
+  }
+};
 
   const toggleReferrals = (id) => {
     setExpandedRow(expandedRow === id ? null : id);
@@ -51,6 +59,33 @@ const saveWalletAdjustment = async () => {
 
       <div className="card">
   <div className="table-scroll">
+    <div className="search-bar">
+  <input
+    type="text"
+    placeholder="Search customers..."
+    value={searchInput}
+    onChange={(e) => setSearchInput(e.target.value)}
+  />
+
+  <button className="btn btn-primary"
+    onClick={() => {
+      setPage(1);
+      setSearch(searchInput);
+    }}
+  >
+    Search
+  </button>
+
+  <button className="btn btn-secondary"
+    onClick={() => {
+      setSearchInput("");
+      setSearch("");
+      setPage(1);
+    }}
+  >
+    Reset
+  </button>
+</div>
     <table className="data-table">
 
           <thead>
@@ -96,6 +131,16 @@ const saveWalletAdjustment = async () => {
                     >
                       QR
                     </button>
+                    <button
+  className="action-btn delete-btn"
+  onClick={() => {
+    if (window.confirm("Delete this customer?")) {
+      deleteCustomer(c.customer_id).then(() => loadCustomers());
+    }
+  }}
+>
+  Delete
+</button>
                   </td>
                 </tr>
 
@@ -121,6 +166,17 @@ const saveWalletAdjustment = async () => {
             )}
           </tbody>
         </table>
+      <div className="pagination">
+  {Array.from({ length: Math.ceil(total / limit) }, (_, i) => (
+    <button
+      key={i}
+      className={`page-btn ${page === i + 1 ? "active" : ""}`}
+      onClick={() => setPage(i + 1)}
+    >
+      {i + 1}
+    </button>
+  ))}
+</div>
       </div>
 </div>
       {/* WALLET MODAL */}
