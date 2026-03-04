@@ -9,6 +9,7 @@ function BannerManagement() {
   const [banners, setBanners] = useState([]);
   const [editingId, setEditingId] = useState(null);
 const [currentPage, setCurrentPage] = useState(1);
+const [imagePreview, setImagePreview] = useState(null);
 const [itemsPerPage] = useState(5);
   const [form, setForm] = useState({
     title: "",
@@ -42,22 +43,29 @@ const [itemsPerPage] = useState(5);
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleImageChange = (e) => {
-    setForm((prev) => ({ ...prev, image: e.target.files[0] }));
-  };
+const handleImageChange = (e) => {
+  const file = e.target.files[0];
 
-  const resetForm = () => {
-    setForm({
-      title: "",
-      text: "",
-      button_text: "",
-      gradient_start: "#FF512F",
-      gradient_end: "#DD2476",
-      position: "top",
-      image: null,
-    });
-    setEditingId(null);
-  };
+  setForm((prev) => ({ ...prev, image: file }));
+
+  if (file) {
+    setImagePreview(URL.createObjectURL(file));
+  }
+};
+const resetForm = () => {
+  setForm({
+    title: "",
+    text: "",
+    button_text: "",
+    gradient_start: "#FF512F",
+    gradient_end: "#DD2476",
+    position: "top",
+    image: null,
+  });
+
+  setEditingId(null);
+  setImagePreview(null);  
+};
 // Pagination calculations
 const indexOfLastItem = currentPage * itemsPerPage;
 const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -106,21 +114,25 @@ const goToNext = () => {
     }
   };
 
-  const handleEdit = (banner) => {
-    setEditingId(banner.id);
-    setForm({
-      title: banner.title,
-      text: banner.text || "",
-      button_text: banner.button_text || "",
-      gradient_start: banner.gradient_start,
-      gradient_end: banner.gradient_end,
-      position: banner.position,
-      image: null,
-    });
+const handleEdit = (banner) => {
+  setEditingId(banner.id);
 
-    toast.info("Editing banner...");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  setForm({
+    title: banner.title,
+    text: banner.text || "",
+    button_text: banner.button_text || "",
+    gradient_start: banner.gradient_start,
+    gradient_end: banner.gradient_end,
+    position: banner.position,
+    image: null,
+  });
+
+  //  Set existing image preview
+  setImagePreview(`${BASEPATH}/${banner.image}`);
+
+  toast.info("Editing banner...");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure to delete?")) return;
@@ -219,7 +231,17 @@ const goToNext = () => {
             onChange={handleImageChange}
             className="form-control"
           />
-
+{imagePreview && (
+  <div className="mt-2">
+    <p className="mb-1">Image Preview:</p>
+    <img
+      src={imagePreview}
+      alt="Preview"
+      width="150"
+      className="img-thumbnail"
+    />
+  </div>
+)}
           <button className="btn btn-primary" disabled={loading}>
             {loading ? "Saving..." : editingId ? "Update Banner" : "Create Banner"}
           </button>
