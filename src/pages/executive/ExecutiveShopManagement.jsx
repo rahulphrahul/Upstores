@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import {
   getExecutiveShops,
   createExecutiveShop,
@@ -123,7 +123,7 @@ const removeCategoryRow = (index) => {
     if (!file) return;
 
     if (file.size > MAX_IMAGE_SIZE) {
-      alert(`Logo must be under ${MAX_IMAGE_MB}MB`);
+      toast.error(`Logo must be under ${MAX_IMAGE_MB}MB`);
       return;
     }
 
@@ -135,7 +135,7 @@ const removeCategoryRow = (index) => {
 
     for (let f of files) {
       if (f.size > MAX_IMAGE_SIZE) {
-        alert(`Each image must be under ${MAX_IMAGE_MB}MB`);
+        toast.error(`Each image must be under ${MAX_IMAGE_MB}MB`);
         return;
       }
     }
@@ -148,7 +148,7 @@ const removeCategoryRow = (index) => {
   ========================= */
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
-      alert("Geolocation not supported");
+      toast.error("Geolocation not supported");
       return;
     }
 
@@ -165,7 +165,7 @@ const removeCategoryRow = (index) => {
       },
       () => {
         setLocating(false);
-        alert("Location access failed");
+        toast.error("Location access failed");
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );

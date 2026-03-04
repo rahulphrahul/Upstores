@@ -83,7 +83,7 @@ const saveWalletAdjustment = async () => {
       setPage(1);
     }}
   >
-    Reset
+    Clear
   </button>
 </div>
     <table className="data-table">

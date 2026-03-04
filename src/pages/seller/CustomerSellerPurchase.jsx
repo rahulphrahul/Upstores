@@ -5,7 +5,7 @@ import {
   getShopPurchases,
   updatePurchaseStatus
 } from "../../service/apiService";
-
+import { toast, ToastContainer } from "react-toastify";
 const CustomerSellerPurchase = ({ user }) => {
     const sellerId=user.id;
     // console.log("idss",sellerId);
@@ -55,7 +55,7 @@ const shop_type="shop";
         )
       );
     } else {
-      alert("Failed to update status");
+      toast.error("Failed to update status");
     }
   };
 

@@ -5,6 +5,7 @@ import {
   getShopPurchases,
   updatePurchaseStatus
 } from "../../service/apiService";
+import { toast } from "react-toastify";
 
 const CustomerServicePurchase = ({ user }) => {
     // console.log("user",user);
@@ -55,7 +56,7 @@ const shop_type="service";
         )
       );
     } else {
-      alert("Failed to update status");
+      toast.error("Failed to update status");
     }
   };
 

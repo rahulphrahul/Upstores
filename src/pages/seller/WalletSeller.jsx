@@ -6,7 +6,7 @@ import {
   getWalletHistory,
   requestWalletFund
 } from "../../service/apiService";
-
+import { toast, ToastContainer } from "react-toastify";
 export default function WalletSeller() {
   const [balance, setBalance] = useState(0);
   const [history, setHistory] = useState([]);
@@ -41,7 +41,7 @@ export default function WalletSeller() {
 
   const submitRequest = async () => {
     if (!amount || parseFloat(amount) <= 0) {
-      alert("Please enter a valid amount");
+      toast.error("Please enter a valid amount");
       return;
     }
 
@@ -53,16 +53,16 @@ export default function WalletSeller() {
     try {
       const res = await requestWalletFund(formData);
       if (res.success) {
-        alert("Wallet fund request submitted successfully!");
+        toast.success("Wallet fund request submitted successfully!");
         setAmount("");
         setProof(null);
         loadData();
       } else {
-        alert(res.message || "Failed to submit wallet request");
+        toast.error(res.message || "Failed to submit wallet request");
       }
     } catch (err) {
       console.error("Error submitting wallet request:", err);
-      alert("Something went wrong");
+      toast.error("Something went wrong");
     }
   };
 

@@ -247,15 +247,30 @@ function ExecutiveManagement() {
             }}
           />
 
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              setPage(1);
-              loadAll(1, search);
-            }}
-          >
-            Search
-          </button>
+         <div style={{ display: "flex", gap: "8px" }}>
+  <button
+    className="btn btn-primary"
+    onClick={() => {
+      setPage(1);
+      loadAll(1, search);
+    }}
+  >
+    Search
+  </button>
+
+  {search && (
+    <button
+      className="btn btn-outline"
+      onClick={() => {
+        setSearch("");
+        setPage(1);
+        loadAll(1, "");
+      }}
+    >
+      Clear
+    </button>
+  )}
+</div>
         </div>
 
         <div className="table-wrapper">

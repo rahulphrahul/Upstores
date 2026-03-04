@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-
+import { toast, ToastContainer } from "react-toastify";
 export default function StudentLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,7 +15,7 @@ export default function StudentLogin() {
       localStorage.setItem("student", JSON.stringify(res.data.student));
       window.location.href = "/student/dashboard";
     } else {
-      alert(res.data.message);
+      toast.success(res.data.message);
     }
   };
 

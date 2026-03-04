@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { scanCustomerQR, addPurchase, getCategories } from "../../service/apiService";
-
+import { toast, ToastContainer } from "react-toastify";
 export default function ScanCustomerServiceQR() {
   const scannerRef = useRef(null);
    const user = JSON.parse(localStorage.getItem("user"));
@@ -99,7 +99,7 @@ export default function ScanCustomerServiceQR() {
 const submit = async () => {
 
   if (!qr || !bill) {
-    alert("QR and bill required");
+    toast.error("QR and bill required");
     return;
   }
 
@@ -111,7 +111,7 @@ const submit = async () => {
     }));
 
   if (items.length === 0) {
-    alert("Enter at least one category amount");
+    toast.error("Enter at least one category amount");
     return;
   }
 
@@ -130,7 +130,7 @@ const submit = async () => {
     const qrRes = await scanCustomerQR(qrFormData);
 
     if (qrRes.status !== "success") {
-      alert(qrRes.message || "Invalid QR");
+      toast.error(qrRes.message || "Invalid QR");
       setLoading(false);
       return;
     }
@@ -150,16 +150,16 @@ const submit = async () => {
     const purchaseRes = await addPurchase(formData);
 
     if (purchaseRes.success) {
-      alert("Purchase confirmed & points issued");
+      toast.success("Purchase confirmed & points issued");
       setQr("");
       setCategoryAmounts({});
       setBill(null);
     } else {
-      alert(purchaseRes.message || "Purchase failed");
+      toast.error(purchaseRes.message || "Purchase failed");
     }
 
   } catch (err) {
-    alert("Server error");
+    toast.error("Server error");
   } finally {
     setLoading(false);
   }

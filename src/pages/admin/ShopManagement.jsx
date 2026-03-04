@@ -25,6 +25,7 @@ import {
   QrCode,
   ImageSquare
 } from "phosphor-react";
+import { toast, ToastContainer } from "react-toastify";
 
 
 function ShopManagement() {
@@ -69,7 +70,7 @@ const handleSearch = () => {
             loadAll();
         } catch (err) {
             console.error("Wallet action failed", err);
-            alert("Failed to update wallet request");
+            toast.error("Failed to update wallet request");
         }
     };
 
@@ -94,6 +95,7 @@ const handleSearch = () => {
 
     return (
         <div className="shop-page">
+             <ToastContainer position="top-right" autoClose={2000} />
             <h2 className="page-title">Shop Management</h2>
 
             {/* Pending Approvals */}
@@ -186,7 +188,7 @@ const handleSearch = () => {
     setPage(1);
 }}
     >
-        Reset
+        Clear
     </button>
 </div>
     <table className="data-table">

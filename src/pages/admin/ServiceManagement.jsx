@@ -13,7 +13,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { shopIcon } from "../../utils/leafletIcon";
 import ShopManagementSkeleton from "./skeletons/ShopManagementSkeleton";
-
+import { toast, ToastContainer } from "react-toastify";
 /* PHOSPHOR ICONS */
 import {
   Wallet,
@@ -66,7 +66,7 @@ const loadServices = async () => {
       loadServices();
     } catch (err) {
       console.error("Wallet action failed", err);
-      alert("Failed to update wallet request");
+      toast.error("Failed to update wallet request");
     }
   };
 
@@ -101,6 +101,7 @@ useEffect(() => {
 
   return (
     <div className="service-page">
+       <ToastContainer position="top-right" autoClose={2000} />
       <h2 className="page-title">Service Management</h2>
 
       {/* Pending Approvals */}
@@ -179,7 +180,7 @@ useEffect(() => {
       setPage(1);
     }}
   >
-    Reset
+    Clear
   </button>
 </div>
     <table className="data-table">

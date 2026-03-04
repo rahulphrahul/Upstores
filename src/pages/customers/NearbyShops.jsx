@@ -15,6 +15,7 @@ import "./NearbyShops.css";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
 import shadowUrl from "leaflet/dist/images/marker-shadow.png";
+import { toast, ToastContainer } from "react-toastify";
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: iconRetinaUrl,
@@ -74,7 +75,7 @@ const images =
         if (res.status === "success") {
           setItems(res.data);
         } else {
-          alert(res.message || "Error fetching data");
+        toast.error(res.message || "Error fetching data");
         }
         setLoading(false);
       })
@@ -83,7 +84,7 @@ const images =
 
   const fetchLocation = () => {
     if (!navigator.geolocation) {
-      alert("Geolocation not supported");
+      toast.error("Geolocation not supported");
       return;
     }
 
@@ -95,7 +96,7 @@ const images =
         fetchData(lat, lng, category);
       },
       (err) => {
-        alert("Unable to get location: " + err.message);
+        toast.error("Unable to get location: " + err.message);
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );

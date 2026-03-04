@@ -6,7 +6,7 @@ import {
     getUsers
 } from '../../service/apiService';
 import './PettyCash.css';
-
+import { toast, ToastContainer } from "react-toastify";
 function PettyCash({ user }) {
     const [balance, setBalance] = useState(0);
     const [transactions, setTransactions] = useState([]);
@@ -55,9 +55,9 @@ function PettyCash({ user }) {
         e.preventDefault();
 
         const amt = parseFloat(entry.amount);
-        if (!amt || amt <= 0) return alert('Enter valid amount');
+        if (!amt || amt <= 0) return toast.error('Enter valid amount');
         if (entry.type === 'expense' && !entry.spent_by)
-            return alert('Please select who spent');
+            return toast.error('Please select who spent');
 
         let newBalance = parseFloat(balance) || 0;
 
@@ -66,7 +66,7 @@ function PettyCash({ user }) {
         } else {
             if (entry.spend_from === 'petty_cash') {
                 if (amt > newBalance)
-                    return alert('Insufficient petty cash balance');
+                    return toast.error('Insufficient petty cash balance');
                 newBalance -= amt;
             }
             // If spend_from === 'other', balance remains unchanged
@@ -88,7 +88,7 @@ function PettyCash({ user }) {
         const res = await addPettyCash(newTxn);
 
         if (res.status === 'success') {
-            alert('Transaction saved');
+            toast.error('Transaction saved');
             loadTransactions();
             setEntry({
                 type: 'expense',
@@ -99,7 +99,7 @@ function PettyCash({ user }) {
                 amount: '',
             });
         } else {
-            alert('Error saving transaction');
+            toast.error('Error saving transaction');
         }
     };
 

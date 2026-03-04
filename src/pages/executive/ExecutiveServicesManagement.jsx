@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import {
   getExecutiveServices,
   addExecutiveService,
@@ -88,7 +88,7 @@ const paginatedServices = services.slice(
   const handleLogoChange = (e) => {
     const file = e.target.files[0];
     if (file && file.size > 2 * 1024 * 1024) {
-      alert("Logo must be under 2MB");
+      toast.error("Logo must be under 2MB");
       return;
     }
     setLogo(file);
@@ -98,7 +98,7 @@ const paginatedServices = services.slice(
     const files = Array.from(e.target.files);
     for (let f of files) {
       if (f.size > 2 * 1024 * 1024) {
-        alert("Each image must be under 2MB");
+        toast.error("Each image must be under 2MB");
         return;
       }
     }
@@ -177,7 +177,7 @@ const handleCategoryChange = (index, field, value) => {
   ========================= */
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
-      alert("Geolocation not supported");
+      toast.error("Geolocation not supported");
       return;
     }
 
@@ -194,7 +194,7 @@ const handleCategoryChange = (index, field, value) => {
       },
       () => {
         setLocating(false);
-        alert("Unable to fetch location");
+        toast.error("Unable to fetch location");
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );

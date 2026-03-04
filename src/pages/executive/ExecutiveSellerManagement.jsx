@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import {
   getExecutiveSellers,
   addExecutiveSeller,
@@ -112,7 +112,7 @@ setCurrentPage(1);
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > MAX_IMAGE_SIZE) {
-      alert(`Logo must be under ${MAX_IMAGE_MB}MB`);
+      toast.error(`Logo must be under ${MAX_IMAGE_MB}MB`);
       return;
     }
     setForm((prev) => ({ ...prev, logo: file }));
@@ -122,7 +122,7 @@ setCurrentPage(1);
     const files = Array.from(e.target.files);
     for (let f of files) {
       if (f.size > MAX_IMAGE_SIZE) {
-        alert(`Each image must be under ${MAX_IMAGE_MB}MB`);
+        toast.error(`Each image must be under ${MAX_IMAGE_MB}MB`);
         return;
       }
     }
@@ -134,7 +134,7 @@ setCurrentPage(1);
   ========================= */
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
-      alert("Geolocation not supported");
+      toast.error("Geolocation not supported");
       return;
     }
 
@@ -151,7 +151,7 @@ setCurrentPage(1);
       },
       () => {
         setLocating(false);
-        alert("Location access failed");
+        toast.error("Location access failed");
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );

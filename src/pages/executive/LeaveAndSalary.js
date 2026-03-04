@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Form, Button, Table, Badge } from 'react-bootstrap';
 import { applyLeave, getStaffLeavesSelf, getStaffSalaries } from '../../service/apiService';
-
+import { toast, ToastContainer } from "react-toastify";
 function LeaveAndSalary({ user }) {
   const [leaveForm, setLeaveForm] = useState({ leave_date: '', reason: '' });
   const [leaves, setLeaves] = useState([]);
@@ -31,14 +31,14 @@ function LeaveAndSalary({ user }) {
 
   const handleApplyLeave = async (e) => {
     e.preventDefault();
-    if (!leaveForm.leave_date || !leaveForm.reason) return alert('Fill all fields');
+    if (!leaveForm.leave_date || !leaveForm.reason) return toast.error('Fill all fields');
     const res = await applyLeave({ staff_id: user.id, ...leaveForm });
     if (res.status === 'success') {
-      alert('Leave applied successfully!');
+      toast.success('Leave applied successfully!');
       setLeaveForm({ leave_date: '', reason: '' });
       loadLeaves();
     } else {
-      alert('Failed to apply leave');
+      toast.error('Failed to apply leave');
     }
   };
 
