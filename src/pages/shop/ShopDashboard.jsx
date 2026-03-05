@@ -253,85 +253,109 @@ const imageArray = images && images.length >0
     <div className="qr-actions">
       <button
         className="qr-download-btn"
- onClick={async () => {
+onClick={async () => {
 
-  const size = 1200;
+  const pdfSize = 1500; // Perfect square size
   const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size + 600;
+  canvas.width = pdfSize;
+  canvas.height = pdfSize;
 
   const ctx = canvas.getContext("2d");
 
-  // Background
+  // ===== Background =====
   ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, pdfSize, pdfSize);
 
-  let currentY = 180;
+  const centerX = pdfSize / 2;
 
-  // 🔹 shop Name
-  ctx.fillStyle = "#111827";
-  ctx.font = "bold 80px Arial";
-  ctx.textAlign = "center";
-  ctx.fillText(
-    shop.shop.name,
-    size / 2,
-    currentY
-  );
+  // ===== QR VALUE =====
+  const qrValue = `https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+    shop.scanner_code[0].scanner_code
+  )}&type=shop`;
 
-  currentY += 20;
-
-  // 🔹 Generate HD QR (1000px internally)
-  const qrDataUrl = await QRCode.toDataURL(
-    `https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
-      shop.scanner_code[0].scanner_code
-    )}&type=shop`,
-    {
-      width: 1000,   // 
-      margin: 2,
-    }
-  );
+  // ===== Generate HD QR =====
+  const qrDataUrl = await QRCode.toDataURL(qrValue, {
+    width: 1000,  // High resolution
+    margin: 1,
+  });
 
   const qrImg = new Image();
   qrImg.src = qrDataUrl;
 
   qrImg.onload = () => {
 
-    const qrSize = 700;
-    const qrX = (size - qrSize) / 2;
+    const qrSize = 650; // QR display size
 
-    ctx.imageSmoothingEnabled = false; // KEEP BLOCKS SHARP
-    ctx.drawImage(qrImg, qrX, currentY, qrSize, qrSize);
-
-    currentY += qrSize - 160;
-
-    // 🔹 Company Logo
     const logoImg = new Image();
     logoImg.src = companyLogo;
 
     logoImg.onload = () => {
 
-      const logoWidth = qrSize;
+      // ===== Logo same width as QR =====
+     const logoWidth = qrSize;
       const ratio = logoWidth / logoImg.width;
-      const logoHeight = logoImg.height * ratio;
+ const logoHeight = (qrSize * logoImg.height) / logoImg.width;
 
+      // ===== Layout spacing =====
+      const nameHeight = 100;
+      const gap1 = 30;   // name → QR
+      const gap2 = 0;   // QR → logo
+
+      // ===== Calculate total height =====
+      const totalHeight =
+        nameHeight +
+        gap1 +
+        qrSize +
+        gap2 +
+        logoHeight;
+
+      // ===== Start vertically centered =====
+      let currentY = (pdfSize - 1080) / 2;
+
+      // ===== Draw shop Name =====
+      ctx.fillStyle = "#111827";
+      ctx.font = "bold 70px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(
+        shop.shop.name,
+        centerX,
+        currentY + nameHeight / 2
+      );
+
+      currentY += nameHeight + gap1;
+
+      // ===== Draw QR (Sharp) =====
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(
+        qrImg,
+        centerX - qrSize / 2,
+        currentY,
+        qrSize,
+        logoHeight
+      );
+
+      currentY += qrSize -150;
+
+      // ===== Draw Logo =====
       ctx.imageSmoothingEnabled = true;
       ctx.drawImage(
         logoImg,
-        (size - logoWidth) / 2,
+        centerX - logoWidth / 2,
         currentY,
         logoWidth,
         logoHeight
       );
 
-      // 🔹 Create PDF
+      // ===== Export PDF =====
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "px",
-        format: [size, canvas.height],
+        format: [pdfSize, pdfSize],
       });
 
       const imgData = canvas.toDataURL("image/png", 1.0);
-      pdf.addImage(imgData, "PNG", 0, 0, size, canvas.height);
+      pdf.addImage(imgData, "PNG", 0, 0, pdfSize, pdfSize);
 
       pdf.save(`${shop.shop.name}-QR.pdf`);
     };
