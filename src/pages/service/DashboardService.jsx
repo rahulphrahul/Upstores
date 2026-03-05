@@ -5,6 +5,9 @@ import { QRCodeCanvas } from "qrcode.react";
 import { BASE_IMAGE_URL,FALLBACK_IMAGE } from "../../config/config";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { shopIcon } from "../../utils/leafletIcon";
+import companyLogo from "../../assets/logo.png";
+import { jsPDF } from "jspdf";
+import QRCode from "qrcode";
 
 const DashboardService = () => {
   const [service, setService] = useState(null);
@@ -33,8 +36,8 @@ const [qrZoom, setQrZoom] = useState(false);
 
     fetchService();
   }, [serviceId]);
-  if (loading) return <p>Loading seller details...</p>;
-if (!service) return <p>No seller data available.</p>;
+  if (loading) return <p>Loading service details...</p>;
+if (!service) return <p>No service data available.</p>;
   const logo =
   service.media?.length >0? service.media?.find(m => m.logo && m.logo !== "")?.logo:null;
 
@@ -255,67 +258,90 @@ console.log("ssss",service)
         <div className="qr-actions">
           <button
             className="qr-download-btn"
-            onClick={() => {
-              const qrCanvas = document.getElementById("service-qr");
-              if (!qrCanvas) return;
+ onClick={async () => {
 
-              const size = 420;
-              const canvas = document.createElement("canvas");
-              canvas.width = size;
-              canvas.height = size + 120;
+  const size = 1200;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size + 600;
 
-              const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext("2d");
 
-              // Background
-              ctx.fillStyle = "#f8fafc";
-              ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // Background
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-              // Card
-              ctx.fillStyle = "#ffffff";
-              ctx.shadowColor = "rgba(0,0,0,0.15)";
-              ctx.shadowBlur = 25;
-              ctx.fillRect(20, 20, size - 40, size + 80);
-              ctx.shadowBlur = 0;
+  let currentY = 180;
 
-              // Service Name
-              ctx.fillStyle = "#111827";
-              ctx.font = "bold 24px Arial";
-              ctx.textAlign = "center";
-              ctx.fillText(
-                service.service.name,
-                size / 2,
-                60
-              );
+  // 🔹 service Name
+  ctx.fillStyle = "#111827";
+  ctx.font = "bold 80px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(
+    service.service.name,
+    size / 2,
+    currentY
+  );
 
-              // // Owner
-              // ctx.fillStyle = "#6b7280";
-              // ctx.font = "16px Arial";
-              // ctx.fillText(
-              //   `Owner: ${service.service.owner_name}`,
-              //   size / 2,
-              //   90
-              // );
+  currentY += 20;
 
-              // QR
-              const qrSize = 240;
-              const qrX = (size - qrSize) / 2;
-              const qrY = 120;
-              ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+  // 🔹 Generate HD QR (1000px internally)
+  const qrDataUrl = await QRCode.toDataURL(
+    `https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+      service.scanner_code[0].scanner_code
+    )}&type=service`,
+    {
+      width: 1000,   // 
+      margin: 2,
+    }
+  );
 
-              // Footer
-              ctx.fillStyle = "#9ca3af";
-              ctx.font = "14px Arial";
-              ctx.fillText(
-                "Scan to view details",
-                size / 2,
-                qrY + qrSize + 40
-              );
+  const qrImg = new Image();
+  qrImg.src = qrDataUrl;
 
-              const link = document.createElement("a");
-              link.download = `${service.service.name}-qr-card.png`;
-              link.href = canvas.toDataURL("image/png");
-              link.click();
-            }}
+  qrImg.onload = () => {
+
+    const qrSize = 700;
+    const qrX = (size - qrSize) / 2;
+
+    ctx.imageSmoothingEnabled = false; // KEEP BLOCKS SHARP
+    ctx.drawImage(qrImg, qrX, currentY, qrSize, qrSize);
+
+    currentY += qrSize - 160;
+
+    // 🔹 Company Logo
+    const logoImg = new Image();
+    logoImg.src = companyLogo;
+
+    logoImg.onload = () => {
+
+      const logoWidth = qrSize;
+      const ratio = logoWidth / logoImg.width;
+      const logoHeight = logoImg.height * ratio;
+
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(
+        logoImg,
+        (size - logoWidth) / 2,
+        currentY,
+        logoWidth,
+        logoHeight
+      );
+
+      // 🔹 Create PDF
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [size, canvas.height],
+      });
+
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      pdf.addImage(imgData, "PNG", 0, 0, size, canvas.height);
+
+      pdf.save(`${service.service.name}-QR.pdf`);
+    };
+  };
+}}
           >
             Download QR
           </button>
