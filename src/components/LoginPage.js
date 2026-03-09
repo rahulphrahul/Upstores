@@ -7,12 +7,14 @@ import ChangePasswordModal from "./ChangePasswordModal";
 import { checkEmailExists } from "../service/apiService";
 import { FALLBACK_IMAGE } from "../config/config";
 import { Link } from "react-router-dom";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 function LoginPage({ setUser }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
+   const [showPassword, setShowPassword] = useState(false);
   const [loggedUser, setLoggedUser] = useState(null);
 const [firstLogin, setFirstLogin] = useState(false);
 
@@ -90,15 +92,30 @@ const handleEmailBlur = async () => {
                   </Form.Group>
 
                   <Form.Group className="mb-3">
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control
-                      type="password"
-                      placeholder="Enter password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                  </Form.Group>
+  <Form.Label>Password</Form.Label>
+  <div style={{ position: "relative" }}>
+    <Form.Control
+      type={showPassword ? "text" : "password"}
+      placeholder="Enter password"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      required
+    />
+
+    <span
+      onClick={() => setShowPassword(!showPassword)}
+      style={{
+        position: "absolute",
+        right: "10px",
+        top: "50%",
+        transform: "translateY(-50%)",
+        cursor: "pointer"
+      }}
+    >
+      {showPassword ? "👁‍🗨" : "👁"}
+    </span>
+  </div>
+</Form.Group>
 
 
                   <div className="d-flex justify-content-between align-items-center mb-3">
