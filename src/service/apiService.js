@@ -457,6 +457,15 @@ export const getServiceLoginDetails = async (serviceId) => {
   const res = await fetch(`${BASE_URL}/services/get_login_services.php?service_id=${serviceId}`);
   return res.json();
 };
+export const resetPassword = async (token, password) => {
+  const res = await fetch(`${BASE_URL}/auth/reset_password.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, password }),
+  });
+
+  return res.json();
+};
 // apiService.js
 export const sendPasswordResetEmail = async (email) => {
   const res = await fetch(`${BASE_URL}/auth/forgot_password.php`, {
