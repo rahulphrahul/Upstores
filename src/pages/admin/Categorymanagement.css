@@ -1,0 +1,317 @@
+.admin-category-management {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+.admin-category-management__title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #001ae3;
+}
+
+.admin-category-management__panel {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 28px;
+  box-shadow: 0 8px 20px rgba(0, 26, 227, 0.12);
+  min-width: 0;
+}
+
+.admin-category-management__section-title {
+  margin: 0 0 20px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #001ae3;
+}
+
+.admin-category-management__form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.admin-category-management__form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: end;
+  gap: 16px;
+  width: min(100%, 1120px);
+  margin-right: auto;
+}
+
+.admin-category-management__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.admin-category-management__field--action {
+  justify-content: flex-end;
+}
+
+.admin-category-management__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.admin-category-management__input,
+.admin-category-management__select,
+.admin-category-management__file {
+  min-height: 46px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d6dbff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-category-management__file {
+  display: block;
+  padding: 10px 12px;
+}
+
+.admin-category-management__input:focus,
+.admin-category-management__select:focus,
+.admin-category-management__file:focus {
+  border-color: #001ae3;
+  box-shadow: 0 0 0 4px rgba(0, 26, 227, 0.08);
+}
+
+.admin-category-management__button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.admin-category-management__button {
+  min-height: 46px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.admin-category-management__button:hover {
+  transform: translateY(-1px);
+}
+
+.admin-category-management__button--primary {
+  width: 100%;
+  box-sizing: border-box;
+  background: #001ae3;
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(0, 26, 227, 0.18);
+}
+
+.admin-category-management__button--primary:hover {
+  background: #0013b0;
+}
+
+.admin-category-management__button--secondary {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.admin-category-management__button--secondary:hover {
+  background: #cbd5e1;
+}
+
+.admin-category-management__button--edit {
+  background: #f59e0b;
+  color: #ffffff;
+}
+
+.admin-category-management__button--edit:hover {
+  background: #d97706;
+}
+
+.admin-category-management__button--danger {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.admin-category-management__button--danger:hover {
+  background: #b91c1c;
+}
+
+.admin-category-management__divider {
+  margin: 0;
+  border: none;
+  border-top: 1px solid #e5e7eb;
+}
+
+.admin-category-management__table-scroll {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+}
+
+.admin-category-management__table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+}
+
+.admin-category-management__table thead {
+  background: #eef2ff;
+}
+
+.admin-category-management__table th,
+.admin-category-management__table td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+.admin-category-management__table th {
+  color: #001ae3;
+  font-weight: 600;
+}
+
+.admin-category-management__table td {
+  color: #1f2937;
+}
+
+.admin-category-management__table tbody tr:hover {
+  background: #f8faff;
+}
+
+.admin-category-management__type-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.admin-category-management__icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 1px solid #dbe3ff;
+  background: #f8fafc;
+  padding: 4px;
+}
+
+.admin-category-management__action-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.admin-category-management__empty-cell {
+  padding: 24px 16px;
+  text-align: center;
+  color: #64748b;
+}
+
+.admin-category-management__pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-category-management__page-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #dbe3ff;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-category-management__page-btn:hover {
+  border-color: #001ae3;
+  color: #001ae3;
+}
+
+.admin-category-management__page-btn.active {
+  background: #001ae3;
+  color: #ffffff;
+  border-color: #001ae3;
+  box-shadow: 0 8px 18px rgba(0, 26, 227, 0.18);
+}
+
+@media (max-width: 1100px) {
+  .admin-category-management__form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-category-management {
+    gap: 20px;
+  }
+
+  .admin-category-management__title {
+    font-size: 20px;
+  }
+
+  .admin-category-management__panel {
+    padding: 20px;
+  }
+
+  .admin-category-management__form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-category-management__button {
+    width: 100%;
+  }
+
+  .admin-category-management__action-group {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 576px) {
+  .admin-category-management__title {
+    font-size: 18px;
+  }
+
+  .admin-category-management__panel {
+    padding: 16px;
+  }
+
+  .admin-category-management__table {
+    min-width: 560px;
+  }
+}

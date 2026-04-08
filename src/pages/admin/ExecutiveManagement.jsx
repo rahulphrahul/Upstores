@@ -20,6 +20,30 @@ import { Modal, Button } from "react-bootstrap";
 import ExecutiveManagementSkeleton from "./skeletons/ExecutiveManagementSkeleton";
 import "./ExecutiveManagement.css";
 
+const normalizeExecutiveRows = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.executives)) return payload.executives;
+  if (Array.isArray(payload?.data?.executives)) {
+    return payload.data.executives;
+  }
+  return [];
+};
+
+const normalizePerformanceRows = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.performance)) return payload.performance;
+  return [];
+};
+
+const getPerformanceTotal = (item) => {
+  const rawValue =
+    item?.transactions ?? item?.total ?? item?.amount ?? item?.value ?? 0;
+  const parsedValue = Number(rawValue);
+  return Number.isFinite(parsedValue) ? parsedValue : 0;
+};
+
 function ExecutiveManagement() {
   /* =========================
      STATE
@@ -65,9 +89,16 @@ const loadAll = async (currentPage = page, currentSearch = search) => {
       getExecutivePerformance(),
     ]);
 
-      setExecutives(execRes.data);
-      setTotalPages(execRes.totalPages || 1);
-    setPerformanceData(perfRes);
+    setExecutives(normalizeExecutiveRows(execRes));
+    setTotalPages(
+      Number(
+        execRes?.totalPages ??
+          execRes?.pagination?.totalPages ??
+          execRes?.data?.totalPages ??
+          1
+      ) || 1
+    );
+    setPerformanceData(normalizePerformanceRows(perfRes));
 
   } catch (error) {
     console.error(error);
@@ -86,6 +117,7 @@ useEffect(() => {
   useLayoutEffect(() => {
     if (
       loading ||
+      !Array.isArray(performanceData) ||
       performanceData.length === 0 ||
       !chartDiv.current
     ) {
@@ -97,10 +129,12 @@ useEffect(() => {
       rootRef.current = null;
     }
 
-    const parsed = performanceData.map(p => ({
-      name: p.name,
-      transactions: Number(p.transactions),
-    }));
+    const parsed = performanceData
+      .map((p) => ({
+        name: p?.name ?? p?.executive_name ?? p?.label ?? "",
+        transactions: getPerformanceTotal(p),
+      }))
+      .filter((item) => item.name);
 
     const root = am5.Root.new(chartDiv.current);
     rootRef.current = root;
@@ -201,10 +235,10 @@ const confirmDelete = async () => {
       <div className="page-header">
         <h2 className="page-title">Executive Management</h2>
         <button
-          className="btn btn-primary"
+          className="btn btn-primary exec-add-btn"
           onClick={() => {
             setShowAdd(!showAdd);
-            setCredentials(null); 
+            setCredentials(null);
           }}
         >
           {showAdd ? "Close" : "+ Add Executive"}
@@ -214,7 +248,7 @@ const confirmDelete = async () => {
       {/* ADD EXECUTIVE SECTION */}
       {showAdd && (
         <div className="card">
-          <h4>Add New Executive</h4>
+          <h4 className="exec-card-title">Add New Executive</h4>
 
           {!credentials ? (
             <div className="form-grid">
@@ -245,13 +279,15 @@ const confirmDelete = async () => {
 
               <div className="form-actions">
                 <button
+                  type="button"
                   className="btn btn-outline"
                   onClick={() => setShowAdd(false)}
                 >
                   Cancel
                 </button>
                 <button
-                  className="btn btn-primary"
+                  type="button"
+                  className="btn btn-primary exec-search-btn"
                   onClick={handleCreate}
                   disabled={creating}
                 >
@@ -273,7 +309,7 @@ const confirmDelete = async () => {
 
       {/* PERFORMANCE */}
       <div className="card">
-        <h4>Executive Performance</h4>
+        <h4 className="exec-card-title">Executive Performance</h4>
         <div ref={chartDiv} className="chart-box" />
       </div>
 
@@ -281,11 +317,7 @@ const confirmDelete = async () => {
      <div className="card">
 
         {/* SEARCH BAR */}
-        <div style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: 15
-        }}>
+        <div className="exec-toolbar">
 
           <input
             type="text"
@@ -298,38 +330,35 @@ const confirmDelete = async () => {
                 loadAll(1, search);
               }
             }}
-            style={{
-              width: "250px",
-              padding: "6px",
-              borderRadius: "4px",
-              border: "1px solid #ccc"
-            }}
+            className="exec-search-input"
           />
 
-         <div style={{ display: "flex", gap: "8px" }}>
-  <button
-    className="btn btn-primary"
-    onClick={() => {
-      setPage(1);
-      loadAll(1, search);
-    }}
-  >
-    Search
-  </button>
+          <div className="exec-toolbar-actions">
+            <button
+              type="button"
+              className="btn btn-primary exec-search-btn"
+              onClick={() => {
+                setPage(1);
+                loadAll(1, search);
+              }}
+            >
+              Search
+            </button>
 
-  {search && (
-    <button
-      className="btn btn-outline"
-      onClick={() => {
-        setSearch("");
-        setPage(1);
-        loadAll(1, "");
-      }}
-    >
-      Clear
-    </button>
-  )}
-</div>
+            {search && (
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() => {
+                  setSearch("");
+                  setPage(1);
+                  loadAll(1, "");
+                }}
+              >
+                Clear
+              </button>
+            )}
+          </div>
         </div>
 
   <div className="table-wrapper">
@@ -353,32 +382,36 @@ const confirmDelete = async () => {
                 <td>{e.email || "-"}</td>
                 <td>{e.shops_count}</td>
                 <td>
-                  <span className={`status ${e.status}`}>
+                  <span className={`status exec-status ${e.status}`}>
                     {e.status}
                   </span>
                 </td>
                 <td>
-                  <button
-                    className={`btn ${
-                      e.status === "active"
-                        ? "btn-suspend"
-                        : "btn-activate"
-                    }`}
-                    onClick={() =>
-                      handleToggleStatus(e.id, e.status)
-                    }
-                  >
-                    {e.status === "active"
-                      ? "Suspend"
-                      : "Activate"}
-                  </button>
+                  <div className="exec-table-actions">
+                    <button
+                      type="button"
+                      className={`btn exec-action-btn ${
+                        e.status === "active"
+                          ? "btn-suspend exec-suspend-btn"
+                          : "btn-activate exec-activate-btn"
+                      }`}
+                      onClick={() =>
+                        handleToggleStatus(e.id, e.status)
+                      }
+                    >
+                      {e.status === "active"
+                        ? "Suspend"
+                        : "Activate"}
+                    </button>
 
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => handleDelete(e.id)}
-                  >
-                    Delete
-                  </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger exec-delete-btn"
+                      onClick={() => handleDelete(e.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -395,32 +428,31 @@ const confirmDelete = async () => {
   </div>
 
         {/* PAGINATION */}
-        <div style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "10px",
-          marginTop: "20px"
-        }}>
-          <button
-            className="btn btn-outline"
-            disabled={page === 1}
-            onClick={() => setPage(prev => prev - 1)}
-          >
-            Previous
-          </button>
+        {totalPages > 1 && (
+          <div className="exec-pagination">
+            <button
+              type="button"
+              className="btn btn-outline"
+              disabled={page === 1}
+              onClick={() => setPage(prev => prev - 1)}
+            >
+              Previous
+            </button>
 
-          <span>
-            Page {page} of {totalPages}
-          </span>
+            <span className="exec-pagination-info">
+              Page {page} of {totalPages}
+            </span>
 
-          <button
-            className="btn btn-outline"
-            disabled={page === totalPages}
-            onClick={() => setPage(prev => prev + 1)}
-          >
-            Next
-          </button>
-</div>
+            <button
+              type="button"
+              className="btn btn-outline"
+              disabled={page === totalPages}
+              onClick={() => setPage(prev => prev + 1)}
+            >
+              Next
+            </button>
+          </div>
+        )}
 
       </div>
 

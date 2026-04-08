@@ -1,22 +1,12 @@
-import React, { useEffect, useState } from "react";
-import {
-  Container,
-  Card,
-  Form,
-  Button,
-  Table,
-  Badge,
-  Pagination,
-  Row,
-  Col
-} from "react-bootstrap";
+import React, { useCallback, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./Categorymanagement.css";
 
 import {
   addCategory,
   getCategories,
-  deleteCategory
+  deleteCategory,
 } from "../../service/apiService";
 
 const Categorymanagement = () => {
@@ -25,29 +15,26 @@ const Categorymanagement = () => {
   const [mainType, setMainType] = useState("");
   const [icon, setIcon] = useState(null);
   const [editId, setEditId] = useState(null);
-
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 5;
 
   const MAX_FILE_SIZE = 2 * 1024 * 1024;
 
-  /* ================= FETCH ================= */
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const res = await getCategories("");
       if (res.status === "success") {
-        setCategories(res.data);
+        setCategories(res.data || []);
       }
     } catch {
       toast.error("Failed to fetch categories");
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
 
-  /* ================= ICON ================= */
   const handleIconChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -65,7 +52,6 @@ const Categorymanagement = () => {
     setIcon(file);
   };
 
-  /* ================= SUBMIT ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -95,25 +81,27 @@ const Categorymanagement = () => {
     }
   };
 
-  /* ================= DELETE ================= */
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure?")) return;
 
-    const res = await deleteCategory(id);
+    try {
+      const res = await deleteCategory(id);
 
-    if (res.status === "success") {
-      toast.success("Deleted successfully");
-      fetchCategories();
-    } else {
-      toast.error(res.message);
+      if (res.status === "success") {
+        toast.success("Deleted successfully");
+        fetchCategories();
+      } else {
+        toast.error(res.message);
+      }
+    } catch {
+      toast.error("Failed to delete category");
     }
   };
 
-  /* ================= EDIT ================= */
-  const handleEdit = (cat) => {
-    setEditId(cat.id);
-    setName(cat.name);
-    setMainType(cat.main_type);
+  const handleEdit = (category) => {
+    setEditId(category.id);
+    setName(category.name);
+    setMainType(category.main_type);
     setIcon(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -125,154 +113,182 @@ const Categorymanagement = () => {
     setIcon(null);
   };
 
-  /* ================= PAGINATION ================= */
   const indexOfLast = currentPage * recordsPerPage;
   const indexOfFirst = indexOfLast - recordsPerPage;
   const currentRecords = categories.slice(indexOfFirst, indexOfLast);
   const totalPages = Math.ceil(categories.length / recordsPerPage);
 
   return (
-    <Container className="mt-4">
+    <div className="admin-category-management">
       <ToastContainer position="top-right" autoClose={2000} />
+      <h2 className="admin-category-management__title">Category Management</h2>
 
-      <Card className="shadow-sm">
-        <Card.Body>
-          <h4 className="mb-4">
-            {editId ? "Edit Category" : "Category Management"}
-          </h4>
+      <div className="admin-category-management__panel">
+        <h4 className="admin-category-management__section-title">
+          {editId ? "Edit Category" : "Add Category"}
+        </h4>
 
-          {/* ================= FORM ================= */}
-          <Form onSubmit={handleSubmit}>
-            <Row>
-              <Col md={4}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Name</Form.Label>
-                  <Form.Control
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </Form.Group>
-              </Col>
+        <form
+          className="admin-category-management__form"
+          onSubmit={handleSubmit}
+        >
+          <div className="admin-category-management__form-grid">
+            <div className="admin-category-management__field">
+              <label className="admin-category-management__label" htmlFor="name">
+                Name
+              </label>
+              <input
+                id="name"
+                className="admin-category-management__input"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
 
-              <Col md={4}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Main Type</Form.Label>
-                  <Form.Select
-                    value={mainType} style={{height:"45px"}}
-                    onChange={(e) => setMainType(e.target.value)}
-                  >
-                    <option value="">Select</option>
-                    <option value="shop">Shop</option>
-                    <option value="seller">Seller</option>
-                    <option value="service">Service</option>
-                  </Form.Select>
-                </Form.Group>
-              </Col>
+            <div className="admin-category-management__field">
+              <label
+                className="admin-category-management__label"
+                htmlFor="mainType"
+              >
+                Main Type
+              </label>
+              <select
+                id="mainType"
+                className="admin-category-management__select"
+                value={mainType}
+                onChange={(e) => setMainType(e.target.value)}
+              >
+                <option value="">Select</option>
+                <option value="shop">Shop</option>
+                <option value="seller">Seller</option>
+                <option value="service">Service</option>
+              </select>
+            </div>
 
-              <Col md={4}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Icon</Form.Label>
-                  <Form.Control
-                    type="file"
-                    accept="image/*"
-                    onChange={handleIconChange}
-                  />
-                </Form.Group>
-              </Col>
+            <div className="admin-category-management__field">
+              <label className="admin-category-management__label" htmlFor="icon">
+                Icon
+              </label>
+              <input
+                id="icon"
+                className="admin-category-management__file"
+                type="file"
+                accept="image/*"
+                onChange={handleIconChange}
+              />
+            </div>
 
-              <Col md={4} className="d-flex align-items-end">
-                <Button type="submit" className="w-100">
-                  {editId ? "Update" : "Add"}
-                </Button>
-              </Col>
-            </Row>
+            <div className="admin-category-management__field admin-category-management__field--action">
+              <button
+                type="submit"
+                className="admin-category-management__button admin-category-management__button--primary"
+              >
+                {editId ? "Update" : "Add"}
+              </button>
+            </div>
+          </div>
 
-            {editId && (
-              <Button
-                variant="secondary"
-                size="sm"
+          {editId && (
+            <div className="admin-category-management__button-row">
+              <button
+                type="button"
+                className="admin-category-management__button admin-category-management__button--secondary"
                 onClick={resetForm}
-                className="mb-3"
               >
                 Cancel Edit
-              </Button>
-            )}
-          </Form>
+              </button>
+            </div>
+          )}
+        </form>
+      </div>
 
-          <hr />
+      <div className="admin-category-management__panel">
+        <h4 className="admin-category-management__section-title">
+          Category List
+        </h4>
 
-          {/* ================= TABLE ================= */}
-          <h5 className="mb-3">Category List</h5>
-
-          <Table bordered hover responsive>
-            <thead className="table-dark">
+        <div className="admin-category-management__table-scroll">
+          <table className="admin-category-management__table">
+            <thead>
               <tr>
                 <th>Name</th>
                 <th>Type</th>
                 <th>Icon</th>
-                <th width="150">Action</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {currentRecords.length > 0 ? (
-                currentRecords.map((cat) => (
-                  <tr key={cat.id}>
-                    <td>{cat.name}</td>
+                currentRecords.map((category) => (
+                  <tr key={category.id}>
+                    <td>{category.name}</td>
                     <td>
-                      <Badge bg="info">{cat.main_type}</Badge>
+                      <span className="admin-category-management__type-badge">
+                        {category.main_type}
+                      </span>
                     </td>
                     <td>
                       <img
-                        src={`${process.env.REACT_APP_BASE_URL}/categories/category-icons/${cat.icon}`}
-                        alt=""
-                        width="40"
+                        src={`${process.env.REACT_APP_BASE_URL}/categories/category-icons/${category.icon}`}
+                        alt={`${category.name} icon`}
+                        className="admin-category-management__icon"
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                        }}
                       />
                     </td>
                     <td>
-                      <Button
-                        size="sm"
-                        variant="warning"
-                        onClick={() => handleEdit(cat)}
-                      >
-                        Edit
-                      </Button>{" "}
-                      <Button
-                        size="sm"
-                        variant="danger"
-                        onClick={() => handleDelete(cat.id)}
-                      >
-                        Delete
-                      </Button>
+                      <div className="admin-category-management__action-group">
+                        <button
+                          type="button"
+                          className="admin-category-management__button admin-category-management__button--edit"
+                          onClick={() => handleEdit(category)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-category-management__button admin-category-management__button--danger"
+                          onClick={() => handleDelete(category.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className="text-center">
+                  <td
+                    colSpan="4"
+                    className="admin-category-management__empty-cell"
+                  >
                     No categories found
                   </td>
                 </tr>
               )}
             </tbody>
-          </Table>
+          </table>
+        </div>
 
-          {/* ================= PAGINATION ================= */}
-          {totalPages > 1 && (
-            <Pagination className="justify-content-center">
-              {[...Array(totalPages)].map((_, index) => (
-                <Pagination.Item
-                  key={index}
-                  active={index + 1 === currentPage}
-                  onClick={() => setCurrentPage(index + 1)}
-                >
-                  {index + 1}
-                </Pagination.Item>
-              ))}
-            </Pagination>
-          )}
-        </Card.Body>
-      </Card>
-    </Container>
+        {totalPages > 1 && (
+          <div className="admin-category-management__pagination">
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index}
+                type="button"
+                className={`admin-category-management__page-btn ${
+                  index + 1 === currentPage ? "active" : ""
+                }`}
+                onClick={() => setCurrentPage(index + 1)}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
