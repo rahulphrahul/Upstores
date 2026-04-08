@@ -124,7 +124,8 @@ export default function WalletSeller() {
       </div>
 
       {/* Filters */}
-      <div className="row mb-3">
+      <hr className="my-4" />
+      <div className="row mb-3 mt-4">
         <div className="col-md-2">
           <label>From Date</label>
           <input

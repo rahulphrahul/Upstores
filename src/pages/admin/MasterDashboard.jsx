@@ -268,12 +268,12 @@ monthlyChart.set("wheelX", "panX");
   /* =========================
      FUND ACTION
   ========================= */
-const onWalletAction = async (req, action) => {
+const onWalletAction = async (req, action,type) => {
   try {
     await handleWalletRequest(
-      req.user_id,
+      req.id,
       action,
-      "service"
+      type,
     );
 
     toast.success(
@@ -465,19 +465,19 @@ console.log("stauttsus",stats.data);
           </thead>
           <tbody>
             {pending.map((p) => (
-              <tr key={p.user_id}>
+              <tr key={p.id}>
                 <td>{p.shop}</td>
                 <td>₹ {p.amount}</td>
                 <td>
                   <button
                     className="approve-btn"
-                    onClick={() => onWalletAction(p, "approve")}
+                    onClick={() => onWalletAction(p, "approve",p.user_type)}
                   >
                     Approve
                   </button>
                   <button
                     className="reject-btn"
-                    onClick={() => onWalletAction(p, "reject")}
+                    onClick={() => onWalletAction(p, "rejected",p.user_type)}
                   >
                     Reject
                   </button>

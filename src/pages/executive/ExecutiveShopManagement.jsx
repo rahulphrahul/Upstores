@@ -180,6 +180,34 @@ const removeCategoryRow = (index) => {
     return;
   }
 
+  if (!form.logo) {
+    toast.error("Shop logo is required");
+    return;
+  }
+
+  if (!form.images || form.images.length === 0) {
+    toast.error("Please select at least 1 shop gallery image");
+    return;
+  }
+
+  const rows = form.category_commissions || [];
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    if (!row.category_id) {
+      toast.error(`Select a category for row ${i + 1}`);
+      return;
+    }
+    if (row.commission === "" || row.commission === null || row.commission === undefined) {
+      toast.error(`Enter commission (%) for row ${i + 1}`);
+      return;
+    }
+    const commissionNum = Number(row.commission);
+    if (!Number.isFinite(commissionNum) || commissionNum < 0 || commissionNum > 100) {
+      toast.error(`Commission must be between 0 and 100 (row ${i + 1})`);
+      return;
+    }
+  }
+
   const fd = new FormData();
 
   Object.entries(form).forEach(([key, value]) => {

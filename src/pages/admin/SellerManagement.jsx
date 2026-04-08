@@ -60,7 +60,7 @@ const loadSellers = async () => {
 
   const onWalletAction = async (req, action) => {
     try {
-      await handleWalletRequest(req.user_id, action, "seller");
+      await handleWalletRequest(req.id, action, "seller");
       loadSellers();
     } catch (err) {
       console.error("Wallet action failed", err);
@@ -127,7 +127,7 @@ const handleSearch = () => {
 
               <tbody>
                 {pending.map((p) => (
-                  <tr key={p.user_id} className="border-b hover:bg-gray-50 transition">
+                  <tr key={p.id} className="border-b hover:bg-gray-50 transition">
                     <td className="p-3 font-medium text-gray-800">{p.shop}</td>
                     <td className="p-3 text-gray-700 font-semibold">₹{p.amount}</td>
                     <td className="p-3">
