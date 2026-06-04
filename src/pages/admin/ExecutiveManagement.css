@@ -1,20 +1,23 @@
 .exec-page {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* consistent spacing between sections */
 }
 
 .page-title {
   font-size: 24px;
   font-weight: 600;
   color: #001ae3;
-  margin-bottom: 1.5rem;
+  margin-bottom: 20px; /* aligned with layout spacing */
 }
-
+ 
 /* CARD */
 .card {
   background: #fff;
   border-radius: 14px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  padding: 24px;              /* consistent internal spacing */
+  margin-bottom: 12px;        /* aligned with dashboard spacing */
   box-shadow: 0 8px 20px rgba(0, 26, 227, 0.12);
 }
 
@@ -22,6 +25,7 @@
 .data-table {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 16px; /* breathing space inside card */
 }
 
 .data-table th,
@@ -71,6 +75,7 @@
 .chart-box {
   height: 280px;
   width: 100%;
+  margin-top: 16px; /* aligned spacing */
 }
 
 /* SKELETON */
@@ -81,22 +86,17 @@
 }
 
 @keyframes shimmer {
-  0% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 0.9;
-  }
-  100% {
-    opacity: 0.6;
-  }
+  0% { opacity: 0.6; }
+  50% { opacity: 0.9; }
+  100% { opacity: 0.6; }
 }
 
 .empty {
   text-align: center;
-  padding: 1rem;
+  padding: 20px; /* aligned spacing */
   color: #777;
 }
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -125,4 +125,62 @@
   padding: 14px;
   border-radius: 10px;
   margin-bottom: 10px;
+}
+/* HEADER FIX */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* TABLE WRAPPER */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.data-table {
+  min-width: 700px;
+}
+
+/* FORM GRID */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.form-actions {
+  grid-column: span 2;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-header .btn {
+    width: 100%;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    grid-column: span 1;
+    flex-direction: column;
+  }
+
+  .chart-box {
+    height: 220px;
+  }
 }

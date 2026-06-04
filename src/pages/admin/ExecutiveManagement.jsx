@@ -16,7 +16,7 @@ import {
   getExecutivePerformance,
   createExecutive,
 } from "../../service/apiService";
-
+import { Modal, Button } from "react-bootstrap";
 import ExecutiveManagementSkeleton from "./skeletons/ExecutiveManagementSkeleton";
 import "./ExecutiveManagement.css";
 
@@ -27,9 +27,14 @@ function ExecutiveManagement() {
   const [loading, setLoading] = useState(true);
   const [executives, setExecutives] = useState([]);
   const [performanceData, setPerformanceData] = useState([]);
-
+const [showDeleteModal, setShowDeleteModal] = useState(false);
+const [selectedId, setSelectedId] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const [credentials, setCredentials] = useState(null);
+  const [search, setSearch] = useState("");
+const [page, setPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
+const limit = 10;
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -47,23 +52,33 @@ function ExecutiveManagement() {
   /* =========================
      LOAD DATA
   ========================= */
-  const loadAll = async () => {
-    try {
-      setLoading(true);
-      const [execRes, perfRes] = await Promise.all([
-        getExecutives(),
-        getExecutivePerformance(),
-      ]);
-      setExecutives(execRes);
-      setPerformanceData(perfRes);
-    } finally {
-      setLoading(false);
-    }
-  };
+const loadAll = async (currentPage = page, currentSearch = search) => {
+  try {
+    setLoading(true);
 
-  useEffect(() => {
-    loadAll();
-  }, []);
+    const [execRes, perfRes] = await Promise.all([
+      getExecutives({
+        page: currentPage,
+        limit: limit,
+        search: currentSearch,
+      }),
+      getExecutivePerformance(),
+    ]);
+
+      setExecutives(execRes.data);
+      setTotalPages(execRes.totalPages || 1);
+    setPerformanceData(perfRes);
+
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  loadAll(page, search);
+}, [page]);
 
   /* =========================
      PERFORMANCE CHART
@@ -160,12 +175,20 @@ function ExecutiveManagement() {
     loadAll();
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Delete this executive?")) {
-      await deleteExecutive(id);
-      loadAll();
-    }
-  };
+const handleDelete = (id) => {
+  setSelectedId(id);
+  setShowDeleteModal(true);
+};
+
+const confirmDelete = async () => {
+  try {
+    await deleteExecutive(selectedId);
+    setShowDeleteModal(false);
+    loadAll();
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   if (loading) return <ExecutiveManagementSkeleton />;
 
@@ -181,7 +204,7 @@ function ExecutiveManagement() {
           className="btn btn-primary"
           onClick={() => {
             setShowAdd(!showAdd);
-            setCredentials(null);
+            setCredentials(null); 
           }}
         >
           {showAdd ? "Close" : "+ Add Executive"}
@@ -255,8 +278,63 @@ function ExecutiveManagement() {
       </div>
 
       {/* TABLE */}
-      <div className="card">
-        <table className="data-table">
+     <div className="card">
+
+        {/* SEARCH BAR */}
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: 15
+        }}>
+
+          <input
+            type="text"
+            placeholder="Search by name or phone..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setPage(1);
+                loadAll(1, search);
+              }
+            }}
+            style={{
+              width: "250px",
+              padding: "6px",
+              borderRadius: "4px",
+              border: "1px solid #ccc"
+            }}
+          />
+
+         <div style={{ display: "flex", gap: "8px" }}>
+  <button
+    className="btn btn-primary"
+    onClick={() => {
+      setPage(1);
+      loadAll(1, search);
+    }}
+  >
+    Search
+  </button>
+
+  {search && (
+    <button
+      className="btn btn-outline"
+      onClick={() => {
+        setSearch("");
+        setPage(1);
+        loadAll(1, "");
+      }}
+    >
+      Clear
+    </button>
+  )}
+</div>
+        </div>
+
+  <div className="table-wrapper">
+    <table className="data-table">
+
           <thead>
             <tr>
               <th>Name</th>
@@ -313,9 +391,59 @@ function ExecutiveManagement() {
               </tr>
             )}
           </tbody>
-        </table>
+           </table>
+  </div>
+
+        {/* PAGINATION */}
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "10px",
+          marginTop: "20px"
+        }}>
+          <button
+            className="btn btn-outline"
+            disabled={page === 1}
+            onClick={() => setPage(prev => prev - 1)}
+          >
+            Previous
+          </button>
+
+          <span>
+            Page {page} of {totalPages}
+          </span>
+
+          <button
+            className="btn btn-outline"
+            disabled={page === totalPages}
+            onClick={() => setPage(prev => prev + 1)}
+          >
+            Next
+          </button>
+</div>
+
       </div>
-    </div>
+
+      {/* DELETE MODAL */}
+<Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+  <Modal.Header closeButton>
+    <Modal.Title>Confirm Delete</Modal.Title>
+  </Modal.Header>
+
+  <Modal.Body>
+    Are you sure you want to delete this executive?
+  </Modal.Body>
+
+  <Modal.Footer>
+    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+      Cancel
+    </Button>
+    <Button variant="danger" onClick={confirmDelete}>
+      Delete
+    </Button>
+  </Modal.Footer>
+</Modal>
+</div>
   );
 }
 

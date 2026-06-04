@@ -1,0 +1,500 @@
+import React, { useEffect, useState } from "react";
+import "./SellerDashboard.css";
+import { getSellerLoginDetails } from "../../service/apiService";
+import { QRCodeCanvas } from "qrcode.react";
+import { BASE_IMAGE_URL,FALLBACK_IMAGE } from "../../config/config";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { shopIcon } from "../../utils/leafletIcon";
+import companyLogo from "../../assets/logo.png";
+import { jsPDF } from "jspdf";
+import QRCode from "qrcode";
+
+const SellerDashboard = () => {
+  const [seller, setSeller] = useState(null);
+  const [loading, setLoading] = useState(true);
+const [qrZoom, setQrZoom] = useState(false);
+
+  //  Get logged-in user (SAME AS SERVICE)
+  const user = JSON.parse(localStorage.getItem("user"));
+  const sellerId = user?.seller_id || user?.id;
+  
+  useEffect(() => {
+    const fetchSeller = async () => {
+      try {
+        const data = await getSellerLoginDetails(sellerId);
+        console.log("seller api data:", data);
+
+        if (data.status === "success") {
+          setSeller(data.data);
+        } else {
+          console.error("Failed to fetch seller:", data.message);
+        }
+      } catch (err) {
+        console.error("Error fetching seller:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (sellerId) {
+      fetchSeller();
+    } else {
+      console.error("Seller ID missing");
+      setLoading(false);
+    }
+  }, [sellerId]);
+if (loading) return <p>Loading seller details...</p>;
+if (!seller) return <p>No seller data available.</p>;
+
+const sellerLogo =
+  seller?.media?.length >0 ? seller?.media?.find(m => m.logo && m.logo !== "")?.logo :null;
+
+const images =
+  seller?.media?.filter(m => m.images)?.map(m => m.images) || [];
+
+
+
+const imageArray = images && images.length >0
+  ? images[0].split(",").filter((img) => img.trim() !== "")
+  : [];
+  console.log("imgara",imageArray);
+
+console.log("tetet",seller);
+  return (
+    <div className="seller-page">
+      {/* HEADER */}
+      <div className="seller-header">
+        <div className="seller-header-content">
+          <img
+           src={
+  sellerLogo != null
+    ? `${BASE_IMAGE_URL}/${sellerLogo}`
+    : FALLBACK_IMAGE
+}
+            alt={seller.seller?.name}
+            className="seller-avatar"
+          />
+
+          <div className="seller-info">
+            <h1 className="seller-name">{seller.seller?.name}</h1>
+            <p className="seller-bio">{seller.seller?.description}</p>
+
+            <div className="seller-meta">
+              {/* <span className="seller-rating">
+                 {seller.rating || 0} ({seller.review_count || 0} reviews)
+              </span> */}
+              <span className="seller-joined">
+                Joined{" "}
+                {seller.seller?.created_at
+                  ? new Date(seller.seller.created_at).toLocaleDateString()
+                  : "-"}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+ {/* STATS */}
+<section className="stats-section">
+  <div className="stats-grid">
+    <div className="stat-card">
+      <span className="stat-title">Total Purchases</span>
+      <span className="stat-value">
+        {seller.stats?.total_purchases || 0}
+      </span>
+    </div>
+
+    <div className="stat-card success">
+      <span className="stat-title">Confirmed</span>
+      <span className="stat-value">
+        {seller.stats?.confirmed_purchases || 0}
+      </span>
+    </div>
+
+    <div className="stat-card warning">
+      <span className="stat-title">Pending</span>
+      <span className="stat-value">
+        {seller.stats?.pending_purchases || 0}
+      </span>
+    </div>
+
+    <div className="stat-card revenue">
+      <span className="stat-title">Total Revenue</span>
+      <span className="stat-value">
+        ₹{seller.stats?.total_revenue || 0}
+      </span>
+    </div>
+  </div>
+</section>
+      {/* CONTENT */}
+      <div className="seller-content">
+        <div className="seller-main">
+          {/* WALLET */}
+          <section className="seller-wallet-section">
+            <h2 className="section-title"> Seller Wallet</h2>
+
+            <div className="seller-wallet-card">
+              <div className="seller-wallet-balance">
+                <span className="balance-label">Available Balance</span>
+                <div className="balance-amount">
+                  <span className="balance-currency">₹</span>
+                  <span className="balance-value">
+                    {seller.seller?.wallet_balance || "0.00"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="seller-wallet-stats">
+                <div className="wallet-stat-item">
+                  <span>Total Customers</span>
+                  <span>{seller?.transactions?.[0]?.customers_count || 0}</span>
+                </div>
+
+                {/* <div className="wallet-stat-item">
+                  <span>Total Products</span>
+                  <span>{seller.total_products || 0}</span>
+                </div>
+
+                <div className="wallet-stat-item">
+                  <span>Total Earnings</span>
+                  <span>₹ {seller.total_earnings || 0}</span>
+                </div> */}
+              </div>
+            </div>
+          </section>
+          {/* TRANSACTIONS */}
+          <section className="transactions-section">
+            <h2 className="section-title">Transactions</h2>
+            <div className="transactions-list">
+              {seller.transactions.length === 0 && (
+                <p>No transactions</p>
+              )}
+
+              {seller.transactions.map((tx) => (
+                <div key={tx.id} className="transaction-item">
+                  <div>
+                    <span>{tx.created_at}</span>
+                  </div>
+                  <div>
+                    <span className={tx.type}>
+                      {tx.type === "credit" ? "+" : "-"}₹{tx.amount}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* PRODUCTS */}
+          {/* <section className="products-section">
+            <h2 className="section-title"> Products</h2>
+
+            <div className="products-grid">
+              {seller.products?.map((product) => (
+                <div key={product.id} className="product-card">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="product-image"
+                  />
+
+                  <div className="product-details">
+                    <h3>{product.name}</h3>
+                    <p>₹ {product.price}</p>
+
+                    <div className="product-stats">
+                      <span>Stock: {product.stock}</span>
+                      <span>Sold: {product.sold}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section> */}
+
+          {/* STORE IMAGES */}
+<section className="gallery-section">
+  <h2 className="section-title"> Seller Gallery</h2>
+
+  {images.length === 0 ? (
+    <p className="text-muted">No Seller images uploaded</p>
+  ) : (
+   <div className="shop-gallery">
+   
+     {imageArray.length > 0 ? (
+       imageArray.map((img, index) => (
+         <div key={index} className="gallery-item">
+           <img
+             src={`${BASE_IMAGE_URL}/${img.trim()}` || FALLBACK_IMAGE}
+             alt={`shop image ${index + 1}`}
+             loading="lazy"
+             onError={(e) => {
+               e.target.onerror = null; // prevent infinite loop
+               e.target.src = FALLBACK_IMAGE;
+             }}
+           />
+         </div>
+       ))
+     ) : (
+       <div className="gallery-item">
+         <img
+           src={FALLBACK_IMAGE}
+           alt="no image available"
+           loading="lazy"
+         />
+       </div>
+     )}
+   
+   </div>
+  )}
+</section>        </div>
+
+        {/* SIDEBAR */}
+        <div className="seller-sidebar">
+          {/* QR */}
+        <section className="seller-qr-section">
+  <div className="qr-master-card">
+
+    {/* Header */}
+    <div className="qr-header">
+      <h2 className="qr-title">Seller QR</h2>
+      <span className="qr-badge">Instant Access</span>
+    </div>
+
+    {/* Seller Info */}
+    <div className="qr-owner">
+      <strong>{seller.seller?.name}</strong>
+      <span>Owner: {seller.seller?.owner_name || "-"}</span>
+    </div>
+
+    {/* QR */}
+    {seller?.scanner_code?.[0]?.scanner_code && (
+      <>
+      <div
+  className="qr-wrapper"
+  onClick={() => setQrZoom(true)}
+>
+          <QRCodeCanvas
+            id="seller-qr"
+            value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+              seller.scanner_code[0].scanner_code
+            )}&type=seller`}
+            size={190}
+            level="H"
+            includeMargin
+          />
+        </div>
+
+        <p className="qr-caption">
+          Scan to view details
+        </p>
+
+        <div className="qr-actions">
+          <button
+            className="qr-download-btn"
+onClick={async () => {
+
+  const pdfSize = 1500; // Perfect square size
+  const canvas = document.createElement("canvas");
+  canvas.width = pdfSize;
+  canvas.height = pdfSize;
+
+  const ctx = canvas.getContext("2d");
+
+  // ===== Background =====
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, pdfSize, pdfSize);
+
+  const centerX = pdfSize / 2;
+
+  // ===== QR VALUE =====
+  const qrValue = `https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+    seller.scanner_code[0].scanner_code
+  )}&type=seller`;
+
+  // ===== Generate HD QR =====
+  const qrDataUrl = await QRCode.toDataURL(qrValue, {
+    width: 1000,  // High resolution
+    margin: 1,
+  });
+
+  const qrImg = new Image();
+  qrImg.src = qrDataUrl;
+
+  qrImg.onload = () => {
+
+    const qrSize = 650; // QR display size
+
+    const logoImg = new Image();
+    logoImg.src = companyLogo;
+
+    logoImg.onload = () => {
+
+      // ===== Logo same width as QR =====
+     const logoWidth = qrSize;
+      const ratio = logoWidth / logoImg.width;
+ const logoHeight = (qrSize * logoImg.height) / logoImg.width;
+
+      // ===== Layout spacing =====
+      const nameHeight = 100;
+      const gap1 = 30;   // name → QR
+      const gap2 = 0;   // QR → logo
+
+      // ===== Calculate total height =====
+      const totalHeight =
+        nameHeight +
+        gap1 +
+        qrSize +
+        gap2 +
+        logoHeight;
+
+      // ===== Start vertically centered =====
+      let currentY = (pdfSize - 1080) / 2;
+
+      // ===== Draw Seller Name =====
+      ctx.fillStyle = "#111827";
+      ctx.font = "bold 70px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(
+        seller.seller.name,
+        centerX,
+        currentY + nameHeight / 2
+      );
+
+      currentY += nameHeight + gap1;
+
+      // ===== Draw QR (Sharp) =====
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(
+        qrImg,
+        centerX - qrSize / 2,
+        currentY,
+        qrSize,
+        logoHeight
+      );
+
+      currentY += qrSize -150;
+
+      // ===== Draw Logo =====
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(
+        logoImg,
+        centerX - logoWidth / 2,
+        currentY,
+        logoWidth,
+        logoHeight
+      );
+
+      // ===== Export PDF =====
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [pdfSize, pdfSize],
+      });
+
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      pdf.addImage(imgData, "PNG", 0, 0, pdfSize, pdfSize);
+
+      pdf.save(`${seller.seller.name}-QR.pdf`);
+    };
+  };
+}}
+          >
+            Download QR
+          </button>
+        </div>
+      </>
+    )}
+  </div>
+</section>
+<section className="commission-section">
+  <h2 className="section-title"> Categories</h2>
+
+  <div className="commission-card">
+    {seller.categories?.length > 0 ? (
+      seller.categories.map((cat) => (
+        <div key={cat.id} className="commission-row">
+          <span className="commission-category">
+            {cat.name}
+          </span>
+          <span className="commission-value">
+            {cat.commission}%
+          </span>
+        </div>
+      ))
+    ) : (
+      <p className="text-muted">No Categories Found</p>
+    )}
+  </div>
+</section>
+
+          {/* CONTACT */}
+          <section className="seller-contact-section">
+            <h2 className="section-title"> Seller Information</h2>
+
+            <div className="seller-contact-card">
+              <div className="contact-item">
+                📍 {seller.user?.[0]?.address || "-"}
+              </div>
+              <div className="contact-item">
+                📞 {seller.user?.[0]?.phone || "-"}
+              </div>
+              <div className="contact-item">
+                ✉️ {seller.user?.[0]?.email || "-"}
+              </div>
+            </div>
+          </section>
+            {/* location map */}
+                    <section className="map-section">
+            <h2 className="section-title"> Seller Location</h2>
+          
+            {seller.seller.latitude && seller.seller.longitude ? (
+              <MapContainer
+                center={[seller.seller.latitude, seller.seller.longitude]}
+                zoom={16}
+                style={{ height: "250px", width: "100%", borderRadius: "12px" }}
+              >
+                <TileLayer
+                  attribution='&copy; OpenStreetMap contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+          
+                <Marker
+                  position={[seller.seller.latitude, seller.seller.longitude]}
+                  icon={shopIcon}
+                >
+                  <Popup>
+                    <strong>{seller.seller.name}</strong>
+                  </Popup>
+                </Marker>
+              </MapContainer>
+            ) : (
+              <p>Location not available</p>
+            )}
+          </section>
+        </div>
+      </div>
+      {qrZoom && (
+  <div
+    className="qr-zoom-overlay"
+    onClick={() => setQrZoom(false)}
+  >
+    <div className="qr-zoom-box">
+      <QRCodeCanvas
+        value={`https://semicoloninnovations.in/upstores/api/scanner_qr.php?code=${encodeURIComponent(
+          seller?.scanner_code?.[0]?.scanner_code || ""
+        )}&type=seller`}
+        size={320}
+        level="H"
+        includeMargin
+      />
+      <p className="qr-zoom-text">Tap anywhere to close</p>
+    </div>
+  </div>
+)}
+
+    </div>
+  );
+};
+
+export default SellerDashboard;

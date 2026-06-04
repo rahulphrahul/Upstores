@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getShopDetails } from "../../service/apiService";
 import "./ViewShop.css";
-
+import { toast, ToastContainer } from "react-toastify";
 function ViewShop({ shopId, onClose }) {
   console.log("shopId",onClose);
   const [shop, setShop] = useState(null);
@@ -15,11 +15,11 @@ function ViewShop({ shopId, onClose }) {
       if (res.status === "success") {
         setShop(res.data);
       } else {
-        alert(res.message || "Shop details not found");
+        toast.error(res.message || "Shop details not found");
       }
     } catch (err) {
       console.error(err);
-      alert("Error fetching shop details");
+      toast.error("Error fetching shop details");
     }
     setLoading(false);
   };

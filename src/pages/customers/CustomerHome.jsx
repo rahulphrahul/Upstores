@@ -1,5 +1,8 @@
-import React from "react";
-import "./CustomerHome.css";
+import React, { useState } from 'react';
+import Drawer from '../../components/Drawer';
+import NotificationPanel from '../../components/NotificationPanel';
+import './CustomerHome.css';
+import { FALLBACK_IMAGE } from '../../config/config';
 
 /* ===== TEMP DATA (Replace with API later) ===== */
 

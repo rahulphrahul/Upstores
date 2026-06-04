@@ -1,29 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./CustomerManagement.css";
+import { getCustomers,updateWallet,deleteCustomer } from "../../service/apiService";
+import { toast } from "react-toastify";
+import { BASE_CUSTM_IMG_URL,FALLBACK_IMAGE } from "../../config/config";
 
 function CustomerManagement() {
-  const [customers, setCustomers] = useState([
-    {
-      id: 1,
-      name: "Arjun Kumar",
-      phone: "9876543210",
-      wallet: 2400,
-      referrals: ["Ravi", "Suresh"],
-    },
-    {
-      id: 2,
-      name: "Meera Nair",
-      phone: "9123456789",
-      wallet: 1200,
-      referrals: [],
-    },
-  ]);
-
+  const [customers, setCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
   const [expandedRow, setExpandedRow] = useState(null);
   const [amount, setAmount] = useState("");
+  const [page, setPage] = useState(1);
+const [total, setTotal] = useState(0);
+const [searchInput, setSearchInput] = useState("");
+const [search, setSearch] = useState("");
+const limit = 10;
+useEffect(() => {
+  loadCustomers();
+}, [page, search]);
+
+const loadCustomers = async () => {
+  const res = await getCustomers(page, search);
+
+  if (res.status) {
+    setCustomers(res.data);
+    setTotal(res.total);
+  }
+};
 
   const toggleReferrals = (id) => {
     setExpandedRow(expandedRow === id ? null : id);
@@ -35,23 +39,55 @@ function CustomerManagement() {
     setShowWalletModal(true);
   };
 
-  const saveWalletAdjustment = () => {
-    setCustomers((prev) =>
-      prev.map((c) =>
-        c.id === selectedCustomer.id
-          ? { ...c, wallet: c.wallet + Number(amount) }
-          : c
-      )
-    );
+const saveWalletAdjustment = async () => {
+  try {
+    await updateWallet(selectedCustomer.user_id, Number(amount));
+
+    toast.success("Wallet updated successfully ");
+
     setShowWalletModal(false);
-  };
+    loadCustomers(); // refresh from DB
+  } catch (error) {
+    toast.error("Failed to update wallet ❌");
+    console.error(error);
+  }
+};
 
   return (
     <div className="customer-page">
       <h2 className="page-title">Customer Management</h2>
 
       <div className="card">
-        <table className="data-table">
+  <div className="table-scroll">
+    <div className="search-bar">
+  <input
+    type="text"
+    placeholder="Search customers..."
+    value={searchInput}
+    onChange={(e) => setSearchInput(e.target.value)}
+  />
+
+  <button className="btn btn-primary"
+    onClick={() => {
+      setPage(1);
+      setSearch(searchInput);
+    }}
+  >
+    Search
+  </button>
+
+  <button className="btn btn-secondary"
+    onClick={() => {
+      setSearchInput("");
+      setSearch("");
+      setPage(1);
+    }}
+  >
+    Clear
+  </button>
+</div>
+    <table className="data-table">
+
           <thead>
             <tr>
               <th>Name</th>
@@ -63,45 +99,57 @@ function CustomerManagement() {
           </thead>
 
           <tbody>
-            {customers.map((customer) => (
-              <React.Fragment key={customer.id}>
+            {customers.map((c) => (
+              <React.Fragment key={c.id}>
                 <tr>
-                  <td>{customer.name}</td>
-                  <td>{customer.phone}</td>
-                  <td>{customer.wallet}</td>
+                  <td>{c.name}</td>
+                  <td>{c.phone}</td>
+                  <td>{c.wallet ?? 0}</td>
+
                   <td>
                     <button
                       className="link-btn"
-                      onClick={() => toggleReferrals(customer.id)}
+                      onClick={() => toggleReferrals(c.id)}
                     >
-                      {customer.referrals.length} View
+                      {c.referrals.length} View
                     </button>
                   </td>
+
                   <td>
                     <button
                       className="action-btn"
-                      onClick={() => openWalletModal(customer)}
+                      onClick={() => openWalletModal(c)}
                     >
                       Wallet
                     </button>
                     <button
                       className="action-btn"
                       onClick={() => {
-                        setSelectedCustomer(customer);
+                        setSelectedCustomer(c);
                         setShowQrModal(true);
                       }}
                     >
                       QR
                     </button>
+                    <button
+  className="action-btn delete-btn"
+  onClick={() => {
+    if (window.confirm("Delete this customer?")) {
+      deleteCustomer(c.customer_id).then(() => loadCustomers());
+    }
+  }}
+>
+  Delete
+</button>
                   </td>
                 </tr>
 
-                {expandedRow === customer.id && (
+                {expandedRow === c.id && (
                   <tr className="referral-row">
                     <td colSpan="5">
                       <strong>Referrals:</strong>{" "}
-                      {customer.referrals.length > 0
-                        ? customer.referrals.join(", ")
+                      {c.referrals.length
+                        ? c.referrals.join(", ")
                         : "No referrals"}
                     </td>
                   </tr>
@@ -109,7 +157,7 @@ function CustomerManagement() {
               </React.Fragment>
             ))}
 
-            {customers.length === 0 && (
+            {!customers.length && (
               <tr>
                 <td colSpan="5" className="empty-text">
                   No customers found
@@ -118,8 +166,19 @@ function CustomerManagement() {
             )}
           </tbody>
         </table>
+      <div className="pagination">
+  {Array.from({ length: Math.ceil(total / limit) }, (_, i) => (
+    <button
+      key={i}
+      className={`page-btn ${page === i + 1 ? "active" : ""}`}
+      onClick={() => setPage(i + 1)}
+    >
+      {i + 1}
+    </button>
+  ))}
+</div>
       </div>
-
+</div>
       {/* WALLET MODAL */}
       {showWalletModal && (
         <div className="modal-overlay">
@@ -152,14 +211,20 @@ function CustomerManagement() {
       )}
 
       {/* QR MODAL */}
-      {showQrModal && (
+      {showQrModal && selectedCustomer && (
         <div className="modal-overlay">
           <div className="modal-box center">
-            <h3>Customer QR Code</h3>
+            <h3>{selectedCustomer.name} QR Code</h3>
 
-            <div className="qr-placeholder">
-              QR CODE
-            </div>
+            {selectedCustomer.qr_image ? (
+              <img
+                src={BASE_CUSTM_IMG_URL + selectedCustomer.qr_image || FALLBACK_IMAGE}
+                alt="QR"
+                className="qr-img"
+              />
+            ) : (
+              <p>No QR available</p>
+            )}
 
             <button
               className="primary-btn"

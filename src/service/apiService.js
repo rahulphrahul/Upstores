@@ -41,9 +41,21 @@ export const fundAction = async (id, action) => {
   return res.json();
 };
 /* ================= EXECUTIVES ================= */
+export const getExecutives = async ({
+  page = 1,
+  limit = 10,
+  search = ""
+}) => {
+  const params = new URLSearchParams({
+    page,
+    limit,
+    search,
+  }).toString();
 
-export const getExecutives = async () => {
-  const res = await fetch(`${BASE_URL}/executives/list.php`);
+  const res = await fetch(
+    `${BASE_URL}/executives/list.php?${params}`
+  );
+
   return res.json();
 };
 
@@ -85,8 +97,16 @@ export const getExecutivePerformance = async () => {
 };
 /* ================= SHOPS ================= */
 
-export const getShops = async () =>
-  fetch(`${BASE_URL}/shops/list.php`).then(res => res.json());
+export const getShops = async (page = 1, search = "") =>
+  fetch(`${BASE_URL}/shops/list.php?page=${page}&limit=10&search=${search}`)
+    .then(res => res.json());
+
+export const deleteShop = async (id) =>
+  fetch(`${BASE_URL}/shops/delete.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `id=${id}`
+  }).then(res => res.json());
 
 export const getPendingShopFunds = async () =>
   fetch(`${BASE_URL}/shops/pending-funds.php`).then(res => res.json());
@@ -118,12 +138,18 @@ export const getExecutiveShops = async (executiveId) =>
     `${BASE_URL}/executives/shops/list.php?executive_id=${executiveId}`
   ).then(res => res.json());
 
-export const createExecutiveShop = async (data) =>
-  fetch(`${BASE_URL}/executives/shops/create.php`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  }).then(res => res.json());
+export const createExecutiveShop = async (formData) => {
+  const res = await fetch(
+    `${BASE_URL}/executives/shops/create.php`,
+    {
+      method: "POST",
+      body: formData, // ✅ send FormData directly
+    }
+  );
+
+  return res.json();
+};
+
 
 export const toggleExecutiveShopStatus = async (data) =>
   fetch(`${BASE_URL}/executives/shops/toggle-status.php`, {
@@ -137,27 +163,69 @@ export const toggleExecutiveShopStatus = async (data) =>
 /* ============================
    GET EXECUTIVE SELLERS
 ============================ */
-export const getExecutiveSellers = async (executive_id) => {
-  return fetch(
-    `${BASE_URL}/sellers/get_executive_seller.php?executive_id=${executive_id}`
-  ).then((res) => res.json());
+export const getExecutiveSellers = async (executiveId) => {
+  const res = await fetch(
+    `${BASE_URL}/sellers/get_executive_seller.php?executive_id=${executiveId}`
+  );
+
+  if (!res.ok) {
+    throw new Error("API failed");
+  }
+
+  return res.json();
 };
+
 /* ============================
    GET Categories
 ============================ */
-export const getCategories = async () =>
-  fetch(`${BASE_URL}/categories/getCategories.php`).then(res => res.json());
+export const getCategories = async (main_type) => {
+  const res = await fetch(
+    `${BASE_URL}/categories/getCategories.php?main_type=${main_type}`
+  );
+
+  if (!res.ok) {
+    throw new Error("API failed");
+  }
+
+  return res.json();
+};
+/* ============================
+   DELETE CATEGORY
+============================ */
+export const deleteCategory = async (id) =>
+  fetch(`${BASE_URL}/categories/deleteCategory.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id }),
+  }).then(res => res.json());
+
+export const addPurchase = async (formData) => {
+  const res = await fetch(
+    `${BASE_URL}/customer/add_purchase.php`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+
+  return res.json();
+};
 
 /* ============================
    ADD EXECUTIVE SELLER
 ============================ */
-export const addExecutiveSeller = async (data) => {
-  return fetch(`${BASE_URL}/sellers/add_executive_seller.php`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  }).then((res) => res.json());
+export const addExecutiveSeller = async (formData) => {
+  const res = await fetch(
+    `${BASE_URL}/sellers/add_executive_seller.php`,
+    {
+      method: "POST",
+      body: formData, // ✅ FormData
+    }
+  );
+
+  return res.json();
 };
+
 
 
 /* ============================
@@ -201,29 +269,43 @@ export const getExecutiveServices = async (executiveId) => {
   return res.json();
 };
 
-export const addExecutiveService = async (data) => {
-  const res = await fetch(
+export const addExecutiveService = async (formData) => {
+const res = await fetch(
     `${BASE_URL}/services/add_executive_services.php`,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: formData, // ✅ FormData
     }
   );
+
   return res.json();
+};
+export const checkEmailExists = async (email) => {
+  return fetch(`${BASE_URL}/auth/check-email.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  }).then(res => res.json());
 };
 
 export const updateExecutiveService = async (data) => {
+  const fd = new FormData();
+
+  Object.keys(data).forEach(key => {
+    fd.append(key, data[key]);
+  });
+
   const res = await fetch(
-    `${BASE_URL}/services/update_executive_services.php`,
+    `${BASE_URL}/services/update_executive_service.php`,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: fd, // ✅ no headers needed
     }
   );
-  return res.json();
+
+  return await res.json();
 };
+
 
 export const updateExecutiveServiceStatus = async (
   serviceId,
@@ -245,8 +327,16 @@ export const updateExecutiveServiceStatus = async (
   return res.json();
 };
 /* ================= Sellers ================= */  
-export const getSellers = async () => 
-  fetch(`${BASE_URL}/sellers/get_sellers.php`).then(res => res.json());
+export const getSellers = async (page = 1, search = "") =>
+  fetch(`${BASE_URL}/sellers/get_sellers.php?page=${page}&limit=10&search=${search}`)
+    .then(res => res.json());
+
+export const deleteSeller = async (id) =>
+  fetch(`${BASE_URL}/sellers/delete_seller.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `id=${id}`
+  }).then(res => res.json());
 
 
 export const updateSellerStatus = async (sellerId, status) => {
@@ -259,11 +349,24 @@ export const updateSellerStatus = async (sellerId, status) => {
 };
 /* ================= SERVICES ================= */
 
-export const getServices = async () => {
-  const res = await fetch(`${BASE_URL}/services/get_services.php`);
+export const getServices = async (page = 1, search = "") => {
+  const res = await fetch(
+    `${BASE_URL}/services/get_services.php?page=${page}&search=${search}`
+  );
   return res.json();
 };
 
+export const deleteService = async (id) => {
+  const formData = new FormData();
+  formData.append("id", id);
+
+  const res = await fetch(`${BASE_URL}/services/delete_service.php`, {
+    method: "POST",
+    body: formData,
+  });
+
+  return res.json();
+};
 export const updateServiceStatus = async (id, status) => {
   const res = await fetch(`${BASE_URL}/services/update_service_status.php`, {
     method: "POST",
@@ -299,6 +402,35 @@ export const getExecutiveNearbyShops = async (executiveId, latitude, longitude) 
   const res = await fetch(`${BASE_URL}/shops/get_executive_nearby_shops.php?executive_id=${executiveId}&latitude=${latitude}&longitude=${longitude}`);
   return res.json();
 };
+export const getExecutiveNearbyServices = async (executiveId, latitude, longitude) => {
+  const res = await fetch(`${BASE_URL}/services/get_executive_nearby_services.php?executive_id=${executiveId}&latitude=${latitude}&longitude=${longitude}`);
+  return res.json();
+};
+export const getExecutiveNearbySellers = async (executiveId, latitude, longitude) => {
+  const res = await fetch(`${BASE_URL}/sellers/get_executive_nearby_sellers.php?executive_id=${executiveId}&latitude=${latitude}&longitude=${longitude}`);
+  return res.json();
+};
+
+export const getNearbyItemDetails = async (id, type) => {
+  let endpoint = "";
+   let type_id = "";
+
+  if (type === "sellers") {
+    endpoint = "sellers/get_login_seller.php";
+    type_id="seller_id";
+  } else if (type === "shops") {
+    endpoint = "shops/shop_login_details.php";
+    type_id="shop_id";
+  } else if (type === "services") {
+    endpoint = "services/get_login_services.php";
+    type_id="service_id";
+  }
+
+  const res = await fetch(`${BASE_URL}/${endpoint}?${type_id}=${id}`);
+  return res.json();
+};
+
+
 
 /* ================= purchase history ================= */
 export const getPurchaseHistory = async (executiveId) => {
@@ -312,12 +444,107 @@ export const getShopDetails = async (shopId) => {
   return res.json();
 };
 
+export const getShopLoginDetails = async (shopId) => {
+  const res = await fetch(`${BASE_URL}/shops/shop_login_details.php?shop_id=${shopId}`);
+  return res.json();
+};
 // ================== OPTIONAL: GET SHOP SERVICES ==================
 export const getShopServices = async (shopId) => {
   const res = await fetch(`${BASE_URL}/services/get_services.php?shop_id=${shopId}`);
   return res.json();
 };
+export const getServiceLoginDetails = async (serviceId) => {
+  const res = await fetch(`${BASE_URL}/services/get_login_services.php?service_id=${serviceId}`);
+  return res.json();
+};
+export const resetPassword = async (token, password) => {
+  const res = await fetch(`${BASE_URL}/auth/reset_password.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, password }),
+  });
 
+  return res.json();
+};
+// apiService.js
+export const sendPasswordResetEmail = async (email) => {
+  const res = await fetch(`${BASE_URL}/auth/forgot_password.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  return res.json();
+};
+export const getCustomers = async (page = 1, search = "") => {
+  const res = await fetch(
+    `${BASE_URL}/customers/list.php?page=${page}&search=${search}`
+  );
+  return res.json();
+};
+
+export const deleteCustomer = async (id) => {
+  const formData = new FormData();
+  formData.append("id", id);
+
+  const res = await fetch(`${BASE_URL}/customers/delete.php`, {
+    method: "POST",
+    body: formData,
+  });
+
+  return res.json();
+};
+
+export const updateWallet = async (userId, amount) => {
+  const res = await fetch(`${BASE_URL}/customers/update-wallet.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_id: userId,
+      amount
+    }),
+  });
+  return res.json();
+};
+// shop purchase transaction
+
+export const getPurchasePendingCount = async (shopId) => {
+  const res = await fetch(
+    `${BASE_URL}/customers/get_purchase_pending_count.php?shop_id=${shopId}`
+  );
+  return res.json();
+};
+export const getShopPurchases = async (shopId) => {
+  const res = await fetch(
+    `${BASE_URL}/shops/get_shop_purchases.php?shop_id=${shopId}`
+  );
+  return res.json();
+};
+
+
+
+export const updatePurchaseStatus = async ({ shop_id, status, reason,shop_type }) => {
+  const res = await fetch(
+    `${BASE_URL}/shops/update_purchase_status.php`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        shop_id,
+        status,
+        reason,
+        shop_type
+      })
+    }
+  );
+
+  return res.json();
+};
+
+
+export const getSellerLoginDetails = async (sellerId) => {
+  const res = await fetch(`${BASE_URL}/sellers/get_login_seller.php?seller_id=${sellerId}`);
+  return res.json();
+};
 // ================== OPTIONAL: UPDATE SHOP STATUS ==================
 export const updateShopStatus = async (shopId, status) => {
   const res = await fetch(`${BASE_URL}/shops/update_shop_status.php`, {
@@ -345,6 +572,436 @@ export const getTopCarouselImages = async () =>
 export const getBottomCarouselImages = async () =>
   fetch(`${BASE_URL}/customers/carousel.php?type=bottom`)
     .then(res => res.json());
+
+
+// category add
+export const addCategory = async (formData) => {
+  return fetch(`${BASE_URL}/categories/create.php`, {
+    method: "POST",
+    body: formData, // FormData (DO NOT set headers)
+  }).then((res) => res.json());
+};
+
+// banners create
+export const createBanner = async (formData) => {
+  return fetch(`${BASE_URL}/banners/create.php`, {
+    method: "POST",
+    body: formData,
+  }).then((res) => res.json());
+};
+
+export const deleteBanner = async (id) => {
+  const res = await fetch(`${BASE_URL}/banners/delete.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id }),
+  });
+  return res.json();
+};
+export const getBanners = async () => {
+  const res = await fetch(`${BASE_URL}/banners/list.php`);
+  return res.json();
+};
+// shop
+
+export const getShopDashboard = async (shopId) => {
+  const res = await fetch(
+    `/api/shops/dashboard.php?shop_id=${shopId}`
+  );
+  return res.json(); // NOT res.data
+};
+
+
+export const getShopProfile = async (shopId) => {
+  const res = await fetch(
+    `${BASE_URL}/shops/profile.php?shop_id=${shopId}`
+  );
+  return res.json();
+};
+
+/* =========================
+   SHOP QR
+========================= */
+
+export const getShopQR = async (shopId) => {
+  const res = await fetch(
+    `${BASE_URL}/shops/shop_qr.php?shop_id=${shopId}`
+  );
+  return res.json();
+};
+
+/* =========================
+   FAST BILLING (SCAN CUSTOMER QR)
+========================= */
+
+export const scanCustomerQR = async (formData) => {
+  const res = await fetch(
+    `${BASE_URL}/shops/scan_customer_qr.php`,
+    {
+      method: "POST",
+      body: formData, // ✅ FormData only
+    }
+  );
+  return res.json();
+};
+
+
+/* =========================
+   PURCHASE REQUESTS
+   (Customer → Shop Approval)
+========================= */
+
+export const getPurchaseRequests = async (shopId) => {
+  const res = await fetch(
+    `${BASE_URL}/shops/purchase_requests.php?shop_id=${shopId}`
+  );
+  return res.json();
+};
+
+export const approvePurchase = async (purchaseId) => {
+  const res = await fetch(
+    `${BASE_URL}/shops/approve_purchase.php`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ purchase_id: purchaseId }),
+    }
+  );
+  return res.json();
+};
+
+export const rejectPurchase = async (purchaseId, reason) => {
+  const res = await fetch(
+    `${BASE_URL}/shop/reject_purchase.php`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        purchase_id: purchaseId,
+        reason,
+      }),
+    }
+  );
+  return res.json();
+};
+
+/* =========================
+   PURCHASE HISTORY
+========================= */
+
+export const getPurchaseHistorys = async (shopId, filters = {}) => {
+  const params = new URLSearchParams({
+    shop_id: shopId,
+    ...filters,
+  }).toString();
+
+  const res = await fetch(
+    `${BASE_URL}/shops/purchase_history.php?${params}`
+  );
+  return res.json();
+};
+
+/* =========================
+   WALLET
+========================= */
+
+export const getWalletDetails = async (shopId) => {
+  const res = await fetch(
+    `${BASE_URL}/shops/wallet.php?shop_id=${shopId}`
+  );
+  return res.json();
+};
+
+export const requestFund = async (formData) => {
+  return fetch(
+    `${BASE_URL}/shops/fund_request.php`,
+    {
+      method: "POST",
+      body: formData, // FormData (proof image + amount)
+    }
+  ).then((res) => res.json());
+};
+
+/* =========================
+   CUSTOMERS (OPTIONAL)
+========================= */
+
+export const getShopCustomers = async (shopId) => {
+  const res = await fetch(
+    `${BASE_URL}/shops/customers.php?shop_id=${shopId}`
+  );
+  return res.json();
+};
+
+/* =========================
+   NOTIFICATIONS
+========================= */
+
+export const getShopNotifications = async (shopId) => {
+  const res = await fetch(
+    `${BASE_URL}/shops/notifications.php?shop_id=${shopId}`
+  );
+  return res.json();
+};
+
+/* =========================
+   SECURITY
+========================= */
+
+// First-time password change / forgot password
+export const changePassword = async (userId, password) => {
+  const fd = new FormData();
+  fd.append("user_id", userId);
+  fd.append("password", password);
+
+  const res = await fetch(
+    `${BASE_URL}/auth/change_password.php`,
+    {
+      method: "POST",
+      body: fd,
+    }
+  );
+  return res.json();
+};
+
+export const getShopPurchaseHistory = async (params) => {
+  const query = new URLSearchParams(params).toString();
+  const res = await fetch(`${BASE_URL}/shops/shop_purchase_history.php?${query}`);
+  return res.json();
+};
+
+/* =========================
+   WALLET MANAGEMENT SUMMARY
+========================= */
+export const getWalletSummary = async (shopId) => {
+  const res = await fetch(`${BASE_URL}/shops/wallet.php?shop_id=${shopId}`);
+  return res.json();
+};
+
+/* =========================
+   WALLET HISTORY
+========================= */
+export const getWalletHistory = async (shopId, from = "", to = "") => {
+  const params = new URLSearchParams({ shop_id: shopId, from, to }).toString();
+  const res = await fetch(`${BASE_URL}/shops/wallet_history.php?${params}`);
+  return res.json();
+};
+
+/* =========================
+   WALLET FUND REQUEST
+========================= */
+export const requestWalletFund = async (formData) => {
+  // formData: shop_id, amount, proof (optional file)
+  const res = await fetch(`${BASE_URL}/shops/fund_request.php`, {
+    method: "POST",
+    body: formData, // FormData object
+  });
+  return res.json();
+};
+/* =========================
+   ADMIN: CUSTOMER WITHDRAWALS
+========================= */
+
+/* =========================
+   ADMIN: CUSTOMER WITHDRAWALS
+========================= */
+
+export const getCustomerWithdrawals = async (
+  from = "",
+  to = "",
+  name = ""
+) => {
+  const params = new URLSearchParams({ from, to, name }).toString();
+
+  const res = await fetch(
+    `${BASE_URL}/admin/get_customer_withdrawals.php?${params}`
+  );
+
+  return res.json();
+};
+export const exportCustomerWithdrawals = (from = "", to = "") => {
+  const params = new URLSearchParams({ from, to }).toString();
+
+  window.open(
+    `${BASE_URL}/admin/export_customer_withdrawals.php?${params}`,
+    "_blank"
+  );
+};
+/* =========================
+   ADMIN: APPROVE WALLET REQUEST
+========================= */
+export const handleWalletRequest = async (requestId, action, shop_type) => {
+  const fd = new FormData();
+  fd.append("request_id", requestId);
+  fd.append("action", action);
+   fd.append("shop_type", shop_type);
+
+  const res = await fetch(`${BASE_URL}/admin/handle_wallet_request.php`, {
+    method: "POST",
+    body: fd,
+  });
+
+  return res.json();
+};
+
+/* =========================
+   ADMIN: REJECT WALLET REQUEST
+========================= */
+export const rejectWalletRequest = async (requestId, reason) => {
+  const fd = new FormData();
+  fd.append("request_id", requestId);
+  fd.append("reason", reason);
+
+  const res = await fetch(`${BASE_URL}/admin/reject_wallet_request.php`, {
+    method: "POST",
+    body: fd,
+  });
+
+  return res.json();
+};
+// reser wallet
+/* RESET */
+export const resetWallets = async (type, reason) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const res = await fetch(`${BASE_URL}/admin/reset_wallets.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      adminId: user?.id,
+      adminName: user?.name,
+      type,
+      reason
+    })
+  });
+
+  return res.json();
+};
+
+/* HISTORY */
+export const getResetHistory = async (from="",to="",role="") => {
+  const params = new URLSearchParams({from,to,role});
+  const res = await fetch(`${BASE_URL}/admin/get_reset_history.php?${params}`);
+  return res.json();
+};
+
+/* EXPORT */
+export const exportHistory = () => {
+  window.open(`${BASE_URL}/admin/export_reset_history.php`,"_blank");
+};
+/* =========================
+   GET WALLET REQUESTS (ADMIN)
+========================= */
+
+export const getWalletRequests = async (shop_type) => {
+  const res = await fetch(
+    `${BASE_URL}/admin/get_pending_requests.php?shop_type=${shop_type}`
+  );
+  return res.json();
+};
+
+
+
+/*==================================
+  service
+===========================================*/
+
+export const scanServiceCustomerQR = async (formData) => {
+  const res = await fetch(
+    `${BASE_URL}/services/scan_customer_qr.php`,
+    {
+      method: "POST",
+      body: formData, // ✅ FormData only
+    }
+  );
+  return res.json();
+};
+
+export const getServicePurchaseHistory = async (params) => {
+  const query = new URLSearchParams(params).toString();
+  const res = await fetch(`${BASE_URL}/services/service_purchase_history.php?${query}`);
+  return res.json();
+};
+
+/* =========================
+   WALLET MANAGEMENT SUMMARY
+========================= */
+export const getServiceWalletSummary = async (shopId) => {
+  const res = await fetch(`${BASE_URL}/services/wallet.php?shop_id=${shopId}`);
+  return res.json();
+};
+
+/* =========================
+   WALLET HISTORY
+========================= */
+export const getServiceWalletHistory = async (shopId, from = "", to = "") => {
+  const params = new URLSearchParams({ shop_id: shopId, from, to }).toString();
+  const res = await fetch(`${BASE_URL}/services/wallet_history.php?${params}`);
+  return res.json();
+};
+
+/* =========================
+   WALLET FUND REQUEST
+========================= */
+export const requestServiceWalletFund = async (formData) => {
+  // formData: shop_id, amount, proof (optional file)
+  const res = await fetch(`${BASE_URL}/services/fund_request.php`, {
+    method: "POST",
+    body: formData, // FormData object
+  });
+  return res.json();
+};
+
+
+/* =========================
+  seller
+========================= */
+
+export const scanSellerCustomerQR = async (formData) => {
+  const res = await fetch(
+    `${BASE_URL}/sellers/scan_customer_qr.php`,
+    {
+      method: "POST",
+      body: formData, // FormData only
+    }
+  );
+  return res.json();
+};
+
+export const getSellerPurchaseHistory = async (params) => {
+  const query = new URLSearchParams(params).toString();
+  const res = await fetch(`${BASE_URL}/sellers/seller_purchase_history.php?${query}`);
+  return res.json();
+};
+
+/* =========================
+   WALLET MANAGEMENT SUMMARY
+========================= */
+export const getSellerWalletSummary = async (shopId) => {
+  const res = await fetch(`${BASE_URL}/sellers/wallet.php?shop_id=${shopId}`);
+  return res.json();
+};
+
+/* =========================
+   WALLET HISTORY
+========================= */
+export const getSellerWalletHistory = async (shopId, from = "", to = "") => {
+  const params = new URLSearchParams({ shop_id: shopId, from, to }).toString();
+  const res = await fetch(`${BASE_URL}/sellers/wallet_history.php?${params}`);
+  return res.json();
+};
+
+/* =========================
+   WALLET FUND REQUEST
+========================= */
+export const requestSellerWalletFund = async (formData) => {
+  // formData: shop_id, amount, proof (optional file)
+  const res = await fetch(`${BASE_URL}/sellers/fund_request.php`, {
+    method: "POST",
+    body: formData, // FormData object
+  });
+  return res.json();
+};
 
 
 export const getCustomerDashboard = () =>

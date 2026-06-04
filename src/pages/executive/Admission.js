@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, Form, Button, Row, Col } from 'react-bootstrap';
 import { addStudent } from '../../service/apiService';
 import './Admission.css';
-
+import { toast, ToastContainer } from "react-toastify";
 function Admission({ user }) {
   const [formData, setFormData] = useState({
     name: '',
@@ -29,7 +29,7 @@ function Admission({ user }) {
     const res = await addStudent(data);
     setLoading(false);
     if (res.status === 'success') {
-      alert('Student added successfully!');
+      toast.success('Student added successfully!');
       setFormData({
         name: '',
         phone: '',
@@ -40,7 +40,7 @@ function Admission({ user }) {
         remarks: '',
       });
     } else {
-      alert('Error: ' + res.message);
+      toast.error('Error: ' + res.message);
     }
   };
 

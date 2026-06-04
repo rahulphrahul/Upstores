@@ -3,12 +3,14 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './components/LoginPage';
 import DashboardLayout from './components/DashboardLayout';
 import RoleProtectedRoute from './components/RoleProtectedRoute';
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 // === Admin Pages ===
 
 // === Student Pages ===
 
 import MasterDashboard from './pages/admin/MasterDashboard';
+import AdminWalletManagement from './pages/admin/AdminWalletManagement';
 import ExecutiveManagement from './pages/admin/ExecutiveManagement';
 import ShopManagement from './pages/admin/ShopManagement';
 import CustomerManagement from './pages/admin/CustomerManagement';
@@ -25,6 +27,28 @@ import AddPurchase from './pages/customers/AddPurchase';
 import SellerManagement from './pages/admin/SellerManagement';
 import ServiceManagement from './pages/admin/ServiceManagement';
 import CustomerHome from './pages/customers/CustomerHome';
+import ShopDashboard from './pages/shop/ShopDashboard';
+import PurchaseHistoryShop from './pages/shop/PurchaseHistory';
+import ScanCustomerQR from './pages/shop/ScanCustomerQR';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
+
+import Wallet from './pages/shop/Wallet';
+import SellerDashboard from './pages/seller/SellerDashboard';
+import DashboardService from './pages/service/DashboardService';
+import Categorymanagement from './pages/admin/Categorymanagement';
+
+import WalletSeller from './pages/seller/WalletSeller';
+import ScanCustomerSellerQR from './pages/seller/ScanCustomerSellerQR';
+import PurchaseSellerHistory from './pages/seller/PurchaseSellerHistory';
+
+import WalletService from './pages/service/WalletService';
+import ScanCustomerServiceQR from './pages/service/ScanCustomerServiceQR';
+import PurchaseServiceHistory from './pages/service/PurchaseServiceHistory';
+import BannerManagement from './pages/admin/Bannermanagement';
+import CustomerPurchase from './pages/shop/CustomerPurchase';
+import CustomerSellerPurchase from './pages/seller/CustomerSellerPurchase';
+import CustomerServicePurchase from './pages/service/CustomerServicePurchase';
 import ScanQR from './pages/customer/ScanQR';
 import ShopDetails from './pages/customer/ShopDetails';
 
@@ -45,25 +69,34 @@ function App() {
         return '/dashboard/executive/home';
       case 'customer':
         return '/dashboard/customer/home';
+      case 'shop':
+        return '/dashboard/shop/home';
+      case 'seller':
+       return '/dashboard/sellers/home';  
+      case 'service':
+       return '/dashboard/service/home';  
       default:
         return '/';
     }
   };
 
   return (
+    <>
+       <ToastContainer position="top-right" autoClose={3000} />
     <Router>
       <Routes>
         {/* === LOGIN === */}
-        <Route
-          path="/"
-          element={
-            user ? (
-              <Navigate to={getDefaultRoute(user.role)} replace />
-            ) : (
-              <LoginPage setUser={setUser} />
-            )
-          }
-        />
+       <Route
+  path="/"
+  element={
+    user? (
+      <Navigate to={getDefaultRoute(user.role)} replace />
+    ) : (
+      <LoginPage setUser={setUser} />
+    )
+  }
+/>
+
         <Route
           path="/register"
           element={
@@ -74,6 +107,16 @@ function App() {
             )
           }
         />
+        <Route
+  path="/forgot-password"
+  element={user ? <Navigate to="/" replace /> : <ForgotPassword />}
+/>
+
+<Route
+  path="/reset-password"
+  element={user ? <Navigate to="/" replace /> : <ResetPassword />}
+/>
+
         {/* === DASHBOARD LAYOUT (Shared) === */}
         <Route
           path="/dashboard/*"
@@ -91,6 +134,14 @@ function App() {
             element={
               <RoleProtectedRoute user={user} allowedRoles={['admin']}>
                 <MasterDashboard />
+              </RoleProtectedRoute>
+            }
+          />
+           <Route
+            path="super-admin/wallet-management"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['admin']}>
+                <AdminWalletManagement />
               </RoleProtectedRoute>
             }
           />
@@ -131,6 +182,22 @@ function App() {
             element={
               <RoleProtectedRoute user={user} allowedRoles={['admin']}>
                 <CustomerManagement />
+              </RoleProtectedRoute>
+            }
+          />
+           <Route
+            path="super-admin/categories"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['admin']}>
+                <Categorymanagement />
+              </RoleProtectedRoute>
+            }
+          />
+           <Route
+            path="super-admin/banners"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['admin']}>
+                <BannerManagement />
               </RoleProtectedRoute>
             }
           />
@@ -276,7 +343,7 @@ function App() {
             path="seller/home"
             element={
               <RoleProtectedRoute user={user} allowedRoles={['seller']}>
-                <ExecutiveDashboard />
+                <ExecutiveDashboard user={user} />
               </RoleProtectedRoute>
             }
           />
@@ -288,6 +355,139 @@ function App() {
               </RoleProtectedRoute>
             }
           /> 
+           {/* SHOPS ROUTES */}
+             <Route
+            path="shop/home"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['shop']}>
+                <ShopDashboard />
+              </RoleProtectedRoute>
+            }
+          /> 
+           <Route
+            path="shop/customer_purchase"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['shop']}>
+                <CustomerPurchase user={user} />
+              </RoleProtectedRoute>
+            }
+          /> 
+         
+           <Route
+            path="shop/customer_qr"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['shop']}>
+                <ScanCustomerQR />
+              </RoleProtectedRoute>
+            }
+          /> 
+           <Route
+            path="shop/purchase_history"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['shop']}>
+                <PurchaseHistoryShop />
+              </RoleProtectedRoute>
+            }
+          /> 
+          
+                     <Route
+            path="shop/wallet_management"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['shop']}>
+                <Wallet />
+              </RoleProtectedRoute>
+            }
+          /> 
+            {/* <Route
+            path="shop/security"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['shop']}>
+                <ShopDashboard />
+              </RoleProtectedRoute>
+            }
+          />  */}
+          {/* seller */}
+           <Route
+            path="sellers/home"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['seller']}>
+                <SellerDashboard />
+              </RoleProtectedRoute>
+            }
+          /> 
+           <Route
+            path="sellers/customer_qr"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['seller']}>
+                <ScanCustomerSellerQR />
+              </RoleProtectedRoute>
+            }
+          /> 
+          <Route
+            path="sellers/customer_purchase"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['seller']}>
+                <CustomerSellerPurchase user={user}/>
+              </RoleProtectedRoute>
+            }
+          /> 
+           <Route
+            path="sellers/purchase_history"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['seller']}>
+                <PurchaseSellerHistory />
+              </RoleProtectedRoute>
+            }
+          /> 
+           <Route
+            path="sellers/wallet_management"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['seller']}>
+                <WalletSeller />
+              </RoleProtectedRoute>
+            }
+          /> 
+           <Route
+            path="service/home"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['service']}>
+                <DashboardService />
+              </RoleProtectedRoute>
+            }
+          /> 
+           <Route
+            path="service/customer_qr"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['service']}>
+                <ScanCustomerServiceQR />
+              </RoleProtectedRoute>
+            }
+          /> 
+            <Route
+            path="service/customer_purchase"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['service']}>
+                <CustomerServicePurchase user={user} />
+              </RoleProtectedRoute>
+            }
+          /> 
+           <Route
+            path="service/purchase_history"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['service']}>
+                <PurchaseServiceHistory />
+              </RoleProtectedRoute>
+            }
+          />
+           <Route
+            path="service/wallet_management"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['service']}>
+                <WalletService />
+              </RoleProtectedRoute>
+            }
+          /> 
+          
           <Route
             path="customer/my-purchase"
             element={
@@ -334,6 +534,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
+    </>
   );
 }
 

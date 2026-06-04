@@ -1,10 +1,27 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { getPurchasePendingCount } from "../service/apiService";
 import { Button } from "react-bootstrap";
 import { FiMenu, FiX } from "react-icons/fi";
 import "./DashboardLayout.css";
 import logo from "../assets/logo.png";
 import Header from "./Header";
+import { FALLBACK_IMAGE } from "../config/config";
+import {
+  LayoutDashboard,
+  Users,
+  Store,
+  UserCircle,
+  Wrench,
+  MapPin,
+  Settings,
+  Tags,
+  Image,
+  QrCode,
+  ShoppingCart,
+  Wallet
+} from "lucide-react";
+
 
 function DashboardLayout({ user, setUser }) {
   const navigate = useNavigate();
@@ -26,47 +43,67 @@ function DashboardLayout({ user, setUser }) {
     }
   };
 
-  const menus = {
-    admin: [
-      { name: "Dashboard", path: "/dashboard/super-admin/home" },
-      { name: "Executives", path: "/dashboard/super-admin/executives" },
-      { name: "Shops", path: "/dashboard/super-admin/shops" },
-      { name: "Sellers", path: "/dashboard/super-admin/sellers" },
-      { name: "Services", path: "/dashboard/super-admin/services" },
-      { name: "Customers", path: "/dashboard/super-admin/customers" },
-      { name: "Settings", path: "/dashboard/super-admin/settings" }
-    ],
-    executive: [
-      { name: "Dashboard", path: "/dashboard/executive/home" },
-      { name: "Shops", path: "/dashboard/executive/shops" },
-      { name: "Sellers", path: "/dashboard/executive/sellers" },
-      { name: "Services", path: "/dashboard/executive/services" },
-      { name: "NearBy Shops", path: "/dashboard/executive/nearby" },
-      // { name: "Purchase History", path: "/dashboard/executive/history" },
-      // { name: "Wallet & Redemption", path: "/dashboard/executive/redeem" },
-      // { name: "Add Purchase", path: "/dashboard/executive/addpurchase" },
+ const iconStyle = { color: "#9CA3AF", size: 18 }; // Tailwind gray-400
+const [pendingCount, setPendingCount] = useState(0);
 
-    ],
-    shop: [
-      { name: "My Home", path: "/dashboard/shop/home" },
-    ],
-    seller: [
-      { name: "My Home", path: "/dashboard/seller/home" },
-    ],
-    service: [
-      { name: "My Home", path: "/dashboard/service/home" },
-    ],
-    customer: [
-      { name: "My Home", path: "/dashboard/customer/home" },
-      { name: "Share", path: "/dashboard/customer/share" },
-      { name: "Scan Qr", path: "/dashboard/customer/scan-qr" },
-      { name: "Customer Tree", path: "/dashboard/customer/customer-tree" },
-      { name: "Customer Purchase", path: "/dashboard/customer/customer-purchase" },
-      { name: "My Purchase", path: "/dashboard/customer/my-purchase" },
-      { name: "Wallet", path: "/dashboard/customer/wallet" },
-      { name: "Shops", path: "/dashboard/customer/shops" },
-    ],
-  };
+const menus = {
+  admin: [
+    { name: "Dashboard", path: "/dashboard/super-admin/home", icon: <LayoutDashboard {...iconStyle} /> },
+    { name: "Executives", path: "/dashboard/super-admin/executives", icon: <Users {...iconStyle} /> },
+    { name: "Shops", path: "/dashboard/super-admin/shops", icon: <Store {...iconStyle} /> },
+    { name: "Sellers", path: "/dashboard/super-admin/sellers", icon: <UserCircle {...iconStyle} /> },
+    { name: "Services", path: "/dashboard/super-admin/services", icon: <Wrench {...iconStyle} /> },
+    { name: "Customers", path: "/dashboard/super-admin/customers", icon: <Users {...iconStyle} /> },
+    { name: "Category", path: "/dashboard/super-admin/categories", icon: <Tags {...iconStyle} /> },
+    { name: "Banners", path: "/dashboard/super-admin/banners", icon: <Image {...iconStyle} /> },
+    { name: "Wallet Management", path: "/dashboard/super-admin/wallet-management", icon: <Wallet  {...iconStyle} /> },
+    { name: "Settings", path: "/dashboard/super-admin/settings", icon: <Settings {...iconStyle} /> },
+  ],
+
+  executive: [
+    { name: "Dashboard", path: "/dashboard/executive/home", icon: <LayoutDashboard {...iconStyle} /> },
+    { name: "Shops", path: "/dashboard/executive/shops", icon: <Store {...iconStyle} /> },
+    { name: "Sellers", path: "/dashboard/executive/sellers", icon: <UserCircle {...iconStyle} /> },
+    { name: "Services", path: "/dashboard/executive/services", icon: <Wrench {...iconStyle} /> },
+    { name: "NearBy Merchants", path: "/dashboard/executive/nearby", icon: <MapPin {...iconStyle} /> },
+  ],
+
+  shop: [
+    { name: "Dashboard", path: "/dashboard/shop/home", icon: <LayoutDashboard {...iconStyle} /> },
+    { name: "Customer QR", path: "/dashboard/shop/customer_qr", icon: <QrCode {...iconStyle} /> },
+    { name: "Purchase", path: "/dashboard/shop/purchase_history", icon: <ShoppingCart {...iconStyle} /> },
+    { name: "Wallet Management", path: "/dashboard/shop/wallet_management", icon: <Wallet {...iconStyle} /> },
+    { name: "Customer Purchase", path: "/dashboard/shop/customer_purchase", icon: <Wallet {...iconStyle} /> },
+  ],
+
+  seller: [
+    { name: "Dashboard", path: "/dashboard/sellers/home", icon: <LayoutDashboard {...iconStyle} /> },
+    { name: "Customer QR", path: "/dashboard/sellers/customer_qr", icon: <QrCode {...iconStyle} /> },
+    { name: "Purchase", path: "/dashboard/sellers/purchase_history", icon: <ShoppingCart {...iconStyle} /> },
+    { name: "Wallet Management", path: "/dashboard/sellers/wallet_management", icon: <Wallet {...iconStyle} /> },
+    { name: "Customer Purchase", path: "/dashboard/sellers/customer_purchase", icon: <Wallet {...iconStyle} /> },
+  ],
+
+  service: [
+    { name: "Dashboard", path: "/dashboard/service/home", icon: <LayoutDashboard {...iconStyle} /> },
+    { name: "Customer QR", path: "/dashboard/service/customer_qr", icon: <QrCode {...iconStyle} /> },
+    { name: "Purchase", path: "/dashboard/service/purchase_history", icon: <ShoppingCart {...iconStyle} /> },
+    { name: "Wallet Management", path: "/dashboard/service/wallet_management", icon: <Wallet {...iconStyle} /> },
+    { name: "Customer Purchase", path: "/dashboard/service/customer_purchase", icon: <Wallet {...iconStyle} /> },
+  ],
+};
+useEffect(() => {
+  if (!user) return;
+  getPurchasePendingCount(user.id)
+    .then(res => {
+      // console.log("ress",res.data[0]['total_count']);
+      if (res.status === "success") {
+        setPendingCount(res.data[0]['total_count']);
+      }
+    })
+    .catch(() => {});
+}, [user]);
+
 
   const menuItems = menus[user?.role] || [];
 
@@ -83,26 +120,34 @@ function DashboardLayout({ user, setUser }) {
       {/* SIDEBAR */}
       <aside className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
         <div className="text-center mb-4">
-          <img src={logo} alt="Company Logo" className="sidebar-logo" />
-          <h6 className="mt-2 text-white">
+          <img src={logo || FALLBACK_IMAGE} alt="Company Logo" className="sidebar-logo" />
+          <h6 className="mt-2 text-black">
             {user?.name?.toUpperCase()}
           </h6>
         </div>
 
-        <nav className="menu">
-          {menuItems.map((item) => (
-            <NavLink
-              key={item.name}
-              to={item.path}
-              className={({ isActive }) =>
-                `menu-item ${isActive ? "active" : ""}`
-              }
-              onClick={closeSidebarOnMobile}
-            >
-              {item.name}
-            </NavLink>
-          ))}
-        </nav>
+     <nav className="menu">
+  {menuItems.map((item) => (
+    <NavLink
+      key={item.name}
+      to={item.path}
+      className={({ isActive }) =>
+        `menu-item ${isActive ? "active" : ""}`
+      }
+      onClick={closeSidebarOnMobile}
+    >
+      <span className="menu-icon">{item.icon}</span>
+      <span className="menu-text">{item.name}
+         {item.name === "Customer Purchase" && pendingCount > 0 && (
+          <span className="pending-badge">
+            {pendingCount}
+          </span>
+        )}
+      </span>
+    </NavLink>
+  ))}
+</nav>
+
 
         <div className="logout-section">
           <Button

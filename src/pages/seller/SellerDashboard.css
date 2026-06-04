@@ -1,0 +1,386 @@
+.seller-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #fff;
+  padding: 2rem;
+}
+
+.seller-header {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.seller-header-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.seller-avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid #f0f0f0;
+}
+
+.seller-info {
+  flex: 1;
+}
+
+.seller-name {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 0.25rem 0;
+}
+
+.seller-store {
+  font-size: 1.25rem;
+  color: #f5576c;
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+}
+
+.seller-bio {
+  font-size: 1rem;
+  color: #718096;
+  margin: 0 0 1rem 0;
+  line-height: 1.6;
+}
+
+.seller-meta {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.seller-rating,
+.seller-joined {
+  font-size: 0.95rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.seller-content {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 2rem;
+}
+
+.seller-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.seller-wallet-section,
+.products-section,
+.store-images-section,
+.seller-qr-section,
+.seller-contact-section {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.seller-wallet-card {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border-radius: 12px;
+  padding: 2rem;
+  color: white;
+}
+
+.seller-wallet-balance {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.balance-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.balance-label {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.balance-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.balance-currency {
+  font-size: 1.25rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.balance-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.withdraw-button {
+  background: white;
+  color: #f5576c;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.withdraw-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.seller-wallet-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.wallet-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.wallet-stat-label {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.wallet-stat-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.product-card {
+  background: #f7fafc;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.product-details {
+  padding: 1rem;
+}
+.download-qr-btn {
+  margin-top: 10px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #3355ff;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.download-qr-btn:hover {
+  background: #2744e8;
+}
+.product-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 0.5rem 0;
+}
+
+.product-price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f5576c;
+  margin: 0 0 0.75rem 0;
+}
+
+.product-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+.product-stock,
+.product-sold {
+  font-weight: 500;
+}
+
+.store-images-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.store-image-card {
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 3/2;
+}
+
+.store-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.store-image:hover {
+  transform: scale(1.05);
+}
+
+.seller-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.seller-qr-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.seller-qr-code {
+  width: 200px;
+  height: 200px;
+  border-radius: 8px;
+}
+
+.seller-qr-description {
+  font-size: 0.9rem;
+  color: #718096;
+  margin: 0;
+}
+
+.seller-contact-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.seller-contact-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: #f7fafc;
+  border-radius: 8px;
+}
+
+.seller-contact-label {
+  font-size: 0.8rem;
+  color: #a0aec0;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.seller-contact-value {
+  font-size: 0.95rem;
+  color: #2d3748;
+  font-weight: 500;
+}
+
+@media (max-width: 1024px) {
+  .seller-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .seller-sidebar {
+    order: -1;
+  }
+  
+  .seller-wallet-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .seller-page {
+    padding: 1rem;
+  }
+  
+  .seller-header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .seller-meta {
+    justify-content: center;
+  }
+  
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .store-images-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .seller-wallet-balance {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .withdraw-button {
+    width: 100%;
+  }
+}
+/* GALLERY */
+.gallery-section {
+  margin-top: 24px;
+}
+
+.shop-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+}
+
+.gallery-item {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f9f9f9;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.gallery-item img:hover {
+  transform: scale(1.05);
+}

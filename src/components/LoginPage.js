@@ -3,13 +3,32 @@ import { Container, Row, Col, Card, Form, Button, Alert } from "react-bootstrap"
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../service/apiService";
 import logo from "../assets/logo.png";
-
+import ChangePasswordModal from "./ChangePasswordModal";
+import { checkEmailExists } from "../service/apiService";
+import { FALLBACK_IMAGE } from "../config/config";
+import { Link } from "react-router-dom";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 function LoginPage({ setUser }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+   const [showPassword, setShowPassword] = useState(false);
+  const [loggedUser, setLoggedUser] = useState(null);
+const [firstLogin, setFirstLogin] = useState(false);
+
   const navigate = useNavigate();
+const handleEmailBlur = async () => {
+  if (!username) return;
+
+  const res = await checkEmailExists(username);
+  if (res.exists && res.force_password_change === 1) {
+    setFirstLogin(true);
+  } else {
+    setFirstLogin(false);
+  }
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,8 +37,15 @@ function LoginPage({ setUser }) {
     try {
       const res = await loginUser(username, password);
       if (res.status === "success") {
+        setLoggedUser(res.user);
+      //   if (res.user.force_password_change === 1) {
+      //   setShowChangePassword(true);
+      //   return;
+      // }
         localStorage.setItem("user", JSON.stringify(res.user));
         setUser(res.user);
+        console.log("userssss",res.user);
+        
       } else {
         setError(res.message || "Invalid credentials");
       }
@@ -39,7 +65,7 @@ function LoginPage({ setUser }) {
                 {/* Logo */}
                 <div className="text-center mb-4">
                   <img
-                    src={logo}
+                    src={logo || FALLBACK_IMAGE}
                     alt="Company Logo"
                     height="55"
                     className="mb-3"
@@ -60,20 +86,37 @@ function LoginPage({ setUser }) {
                       placeholder="Enter username"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
+                      onBlur={handleEmailBlur}
                       required
                     />
                   </Form.Group>
 
                   <Form.Group className="mb-3">
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control
-                      type="password"
-                      placeholder="Enter password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                  </Form.Group>
+  <Form.Label>Password</Form.Label>
+  <div style={{ position: "relative" }}>
+    <Form.Control
+      type={showPassword ? "text" : "password"}
+      placeholder="Enter password"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      required
+    />
+
+    <span
+      onClick={() => setShowPassword(!showPassword)}
+      style={{
+        position: "absolute",
+        right: "10px",
+        top: "50%",
+        transform: "translateY(-50%)",
+        cursor: "pointer"
+      }}
+    >
+      {showPassword ? "👁‍🗨" : "👁"}
+    </span>
+  </div>
+</Form.Group>
+
 
                   <div className="d-flex justify-content-between align-items-center mb-3">
                     <Form.Check
@@ -84,13 +127,12 @@ function LoginPage({ setUser }) {
                       onChange={(e) => setRememberMe(e.target.checked)}
                     />
 
-                    <Button
-                      variant="link"
-                      className="p-0 text-decoration-none"
-                      onClick={() => navigate("/forgot-password")}
-                    >
-                      Forgot password?
-                    </Button>
+                   <Link
+  to="/forgot-password"
+  className="p-0 text-decoration-none"
+>
+  Forgot password?
+</Link>
                   </div>
 
                   <Button
@@ -124,7 +166,27 @@ function LoginPage({ setUser }) {
           </Col>
         </Row>
       </Container>
+          {/* {showChangePassword && loggedUser && (
+  <ChangePasswordModal
+    show={showChangePassword}
+    userId={loggedUser.id}
+    onSuccess={() => {
+      setShowChangePassword(false);
+
+      // Update local user flag
+      const updatedUser = {
+        ...loggedUser,
+        force_password_change: 0,
+      };
+
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      //  navigate("/dashboard");
+    }}
+  />
+)} */}
     </div>
+
   );
 }
 

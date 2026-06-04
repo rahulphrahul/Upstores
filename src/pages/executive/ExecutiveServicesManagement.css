@@ -1,9 +1,11 @@
-/* =========================
+ound/* =========================
    PAGE WRAPPER
 ========================= */
 .exec-page {
   width: 100%;
+  padding-top: 190px; /* adjust to your header height */
 }
+
 
 /* =========================
    PAGE TITLE
@@ -132,6 +134,28 @@ select.form-control {
   height: 40px;
   cursor: pointer;
 }
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #fff;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+/* remove ugly default arrow styling issues */
+.form-input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
 /* =========================
    RESPONSIVE
 ========================= */
@@ -143,4 +167,207 @@ select.form-control {
   .page-title {
     font-size: 20px;
   }
+}
+/* modal popup */
+.clickable-row {
+  cursor: pointer;
+}
+
+.shop-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.65);
+  z-index: 9999;
+}
+
+.shop-modal-container {
+  background: #fff;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 24px;
+  position: relative;
+}
+
+.shop-modal-close {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  background: #111;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.modal-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.modal-gallery img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.shop-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.shop-modal-container {
+  background: #fff;
+  width: 92%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+}
+
+.shop-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: none;
+  background: #eee;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+}
+
+.modal-header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.modal-shop-logo {
+  width: 70px;
+  height: 70px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid #ddd;
+}
+
+.modal-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  background: #f9fafb;
+  padding: 12px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.modal-section {
+  background: #f9fafb;
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+
+.modal-section.center {
+  text-align: center;
+}
+
+.modal-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+}
+
+.modal-gallery img {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+/* Mobile card only visible on small screens */
+.mobile-service-list {
+  display: none;
+  gap: 12px;
+  flex-direction: column;
+}
+
+.service-mobile-card {
+  border: 1px solid #ddd;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.service-mobile-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.service-mobile-sub {
+  margin: 2px 0;
+}
+
+.service-mobile-meta a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+/* Responsive rules */
+@media screen and (max-width: 768px) {
+  .data-table {
+    display: none; /* hide desktop table */
+  }
+  .mobile-service-list {
+    display: flex;
+  }
+}
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.page-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: #001ae3;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #0013b8;
+  transform: scale(1.05);
+}
+
+.page-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-weight: 500;
 }

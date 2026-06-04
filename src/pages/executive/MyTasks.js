@@ -121,11 +121,11 @@ function MyTasks({ user }) {
         await loadTasks();
         if (detailTaskId) await openDetail(detailTaskId);
       } else {
-        alert(res.message || "Error updating progress");
+        toaster.error(res.message || "Error updating progress");
       }
     } catch (err) {
       console.error("Error updating progress:", err);
-      alert("Error updating progress");
+      toaster.error("Error updating progress");
     }
     setUpdatingProgress(false);
   };
@@ -139,11 +139,11 @@ function MyTasks({ user }) {
         await loadTasks();
         if (detailTaskId) await openDetail(detailTaskId);
       } else {
-        alert(res.message || "Error updating status");
+        toast.error(res.message || "Error updating status");
       }
     } catch (err) {
       console.error("Error updating status:", err);
-      alert("Error updating status");
+      toast.error("Error updating status");
     }
     setUpdatingStatus(false);
   };
@@ -163,11 +163,11 @@ function MyTasks({ user }) {
         if (refreshed.status === "success") setDetail(refreshed);
         setCommentText("");
       } else {
-        alert(res.message || "Error posting comment");
+        toast.error(res.message || "Error posting comment");
       }
     } catch (err) {
       console.error("Error posting comment:", err);
-      alert("Error posting comment");
+      toast.error("Error posting comment");
     }
   };
 

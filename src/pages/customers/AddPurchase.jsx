@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./AddPurchase.css";
+import { FALLBACK_IMAGE } from "../../config/config";
 
 function AddPurchase() {
   const [step, setStep] = useState(1);
@@ -62,7 +63,7 @@ function AddPurchase() {
 
           {billImage && (
             <img
-              src={billImage}
+              src={billImage || FALLBACK_IMAGE}
               alt="Bill Preview"
               className="bill-preview"
             />

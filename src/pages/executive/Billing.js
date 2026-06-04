@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Form, Button, Row, Col, Table } from 'react-bootstrap';
 import { getBills, addBill } from '../../service/apiService';
 import './Billing.css';
+import { toast, ToastContainer } from 'react-toastify';
 
 function Billing({ user }) {
     const [formData, setFormData] = useState({
@@ -61,7 +62,7 @@ function Billing({ user }) {
                 handlePrint();
                 setIsNewBill(false); // ✅ mark as saved after printing
             } else {
-                alert('Error saving bill.');
+                toast.error('Error saving bill.');
             }
         } catch (err) {
             console.error('Save bill error:', err);
