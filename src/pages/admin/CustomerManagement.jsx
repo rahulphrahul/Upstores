@@ -94,7 +94,7 @@ const saveWalletAdjustment = async () => {
               <th>Phone</th>
               <th>Wallet (₹)</th>
               <th>Referrals</th>
-              <th>Actions</th>
+              <th className="customer-page__actions-column">Actions</th>
             </tr>
           </thead>
 
@@ -115,32 +115,36 @@ const saveWalletAdjustment = async () => {
                     </button>
                   </td>
 
-                  <td>
-                    <button
-                      className="action-btn"
-                      onClick={() => openWalletModal(c)}
-                    >
-                      Wallet
-                    </button>
-                    <button
-                      className="action-btn"
-                      onClick={() => {
-                        setSelectedCustomer(c);
-                        setShowQrModal(true);
-                      }}
-                    >
-                      QR
-                    </button>
-                    <button
-  className="action-btn delete-btn"
-  onClick={() => {
-    if (window.confirm("Delete this customer?")) {
-      deleteCustomer(c.customer_id).then(() => loadCustomers());
-    }
-  }}
->
-  Delete
-</button>
+                  <td className="customer-page__actions-cell">
+                    <div className="customer-page__action-group">
+                      <button
+                        className="action-btn action-btn--wallet"
+                        onClick={() => openWalletModal(c)}
+                      >
+                        Wallet
+                      </button>
+                      <button
+                        className="action-btn action-btn--qr"
+                        onClick={() => {
+                          setSelectedCustomer(c);
+                          setShowQrModal(true);
+                        }}
+                      >
+                        QR
+                      </button>
+                      <button
+                        className="action-btn action-btn--delete"
+                        onClick={() => {
+                          if (window.confirm("Delete this customer?")) {
+                            deleteCustomer(c.customer_id).then(() =>
+                              loadCustomers()
+                            );
+                          }
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
 
@@ -166,17 +170,19 @@ const saveWalletAdjustment = async () => {
             )}
           </tbody>
         </table>
-      <div className="pagination">
-  {Array.from({ length: Math.ceil(total / limit) }, (_, i) => (
-    <button
-      key={i}
-      className={`page-btn ${page === i + 1 ? "active" : ""}`}
-      onClick={() => setPage(i + 1)}
-    >
-      {i + 1}
-    </button>
-  ))}
-</div>
+      {Math.ceil(total / limit) > 1 && (
+        <div className="pagination">
+          {Array.from({ length: Math.ceil(total / limit) }, (_, i) => (
+            <button
+              key={i}
+              className={`page-btn ${page === i + 1 ? "active" : ""}`}
+              onClick={() => setPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+      )}
       </div>
 </div>
       {/* WALLET MODAL */}

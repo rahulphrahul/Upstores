@@ -241,7 +241,8 @@ useEffect(() => {
             )}
           </tbody>
         </table>
-     <div className="pagination">
+     {Math.ceil(total / limit) > 1 && (
+  <div className="pagination">
   {Array.from({ length: Math.ceil(total / limit) }, (_, i) => (
     <button
       key={i}
@@ -252,6 +253,7 @@ useEffect(() => {
     </button>
   ))}
 </div>
+     )}
       </div>
 </div>
       {/* SERVICE MODAL */}

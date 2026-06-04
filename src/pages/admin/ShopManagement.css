@@ -1,304 +1,329 @@
-/* =========================
-   PAGE WRAPPER
-========================= */
-.shop-page {
+.admin-shop-management {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
 }
 
-.page-title {
+.admin-shop-management--loading {
+  gap: 20px;
+}
+
+.admin-shop-management__title {
+  margin: 0;
   font-size: 24px;
   font-weight: 600;
   color: #001ae3;
-  margin-bottom: 18px;
-  letter-spacing: 0.3px;
-}
-.search-input {
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    width: 250px;
 }
 
-.pagination {
-    margin-top: 15px;
-    display: flex;
-    gap: 6px;
-}
-
-.page-btn {
-    padding: 6px 12px;
-    border: 1px solid #ddd;
-    background: white;
-    cursor: pointer;
-}
-
-.page-btn.active {
-    background: #2563eb;
-    color: white;
-}
-
-/* =========================
-   CARD
-========================= */
-.card {
+.admin-shop-management__panel {
+  width: 100%;
   background: #ffffff;
   border-radius: 14px;
-  padding: 20px;
-  margin-bottom: 14px;
-  box-shadow: 0 8px 22px rgba(0, 26, 227, 0.10);
-  transition: all 0.25s ease;
+  padding: 28px;
+  box-shadow: 0 8px 20px rgba(0, 26, 227, 0.12);
+  min-width: 0;
 }
 
-.card:hover {
-  box-shadow: 0 14px 34px rgba(0, 26, 227, 0.15);
-  transform: translateY(-2px);
+.admin-shop-management__section-title {
+  margin: 0 0 20px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #001ae3;
 }
 
+.admin-shop-management__empty-text {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.95rem;
+}
 
-/* =========================
-   PENDING FUND REQUESTS
-========================= */
-.fund-list {
+.admin-shop-management__table-scroll {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+}
+
+.admin-shop-management__pending-table,
+.admin-shop-management__data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-shop-management__pending-table {
+  min-width: 520px;
+}
+
+.admin-shop-management__data-table {
+  min-width: 820px;
+}
+
+.admin-shop-management__pending-table thead,
+.admin-shop-management__data-table thead {
+  background: #eef2ff;
+}
+
+.admin-shop-management__pending-table th,
+.admin-shop-management__pending-table td,
+.admin-shop-management__data-table th,
+.admin-shop-management__data-table td {
+  padding: 14px 16px;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+.admin-shop-management__pending-table th,
+.admin-shop-management__data-table th {
+  color: #001ae3;
+  font-weight: 600;
+}
+
+.admin-shop-management__pending-table td,
+.admin-shop-management__data-table td {
+  color: #1f2937;
+}
+
+.admin-shop-management__data-table tbody tr:hover,
+.admin-shop-management__pending-table tbody tr:hover {
+  background: #f8faff;
+}
+
+.admin-shop-management__row--clickable {
+  cursor: pointer;
+}
+
+.admin-shop-management__empty-cell {
+  padding: 24px 16px;
+  text-align: center;
+  color: #64748b;
+}
+
+.admin-shop-management__toolbar {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  width: min(100%, 720px);
+  margin-bottom: 24px;
+}
+
+.admin-shop-management__search-input {
+  flex: 0 1 420px;
+  width: min(100%, 420px);
+  min-width: 220px;
+  padding: 14px 18px;
+  border: 1px solid #d6dbff;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-shop-management__search-input:focus {
+  border-color: #001ae3;
+  box-shadow: 0 0 0 4px rgba(0, 26, 227, 0.08);
+}
+
+.admin-shop-management__button {
+  min-height: 40px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.admin-shop-management__button:hover {
+  transform: translateY(-1px);
+}
+
+.admin-shop-management__button--search,
+.admin-shop-management__button--clear {
+  min-width: 124px;
+  background: #001ae3;
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(0, 26, 227, 0.18);
+}
+
+.admin-shop-management__button--search:hover,
+.admin-shop-management__button--clear:hover {
+  background: #0013b0;
+}
+
+.admin-shop-management__button--approve,
+.admin-shop-management__button--activate {
+  background: #16a34a;
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(22, 163, 74, 0.18);
+}
+
+.admin-shop-management__button--approve:hover,
+.admin-shop-management__button--activate:hover {
+  background: #15803d;
+}
+
+.admin-shop-management__button--suspend {
+  background: #facc15;
+  color: #713f12;
+  box-shadow: 0 8px 18px rgba(250, 204, 21, 0.22);
+}
+
+.admin-shop-management__button--suspend:hover {
+  background: #eab308;
+}
+
+.admin-shop-management__button--danger,
+.admin-shop-management__button--reject {
+  background: #dc2626;
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(220, 38, 38, 0.18);
+}
+
+.admin-shop-management__button--danger:hover,
+.admin-shop-management__button--reject:hover {
+  background: #b91c1c;
+}
+
+.admin-shop-management__action-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 10px;
 }
 
-.fund-row {
-  display: grid;
-  grid-template-columns: 2fr 1fr auto auto;
+.admin-shop-management__action-group--center {
+  justify-content: center;
+}
+
+.admin-shop-management__status {
+  display: inline-flex;
   align-items: center;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: #f4f6ff;
-  transition: all 0.2s ease;
-}
-
-.fund-row:hover {
-  background: #eef1ff;
-  transform: scale(1.01);
-}
-
-.fund-row span {
-  font-size: 14px;
-  color: #333;
-  font-weight: 500;
-}
-
-.fund-row .amount {
-  color: #001ae3;
-  font-weight: 600;
-}
-
-
-/* =========================
-   TABLE
-========================= */
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-
-.data-table thead {
-  background: #f4f6ff;
-}
-
-.data-table th {
-  text-align: left;
-  padding: 12px;
-  color: #001ae3;
-  font-weight: 600;
-  border-bottom: 1px solid #e0e5ff;
-}
-
-.data-table td {
-  padding: 12px;
-  border-bottom: 1px solid #f1f1f1;
-  color: #333;
-}
-
-.data-table tbody tr {
-  transition: background 0.2s ease;
-}
-
-.data-table tbody tr:hover {
-  background: #f4f5f9;
-}
-
-
-/* =========================
-   STATUS BADGES
-========================= */
-.status {
-  display: inline-block;
-  padding: 5px 12px;
-  border-radius: 14px;
-  font-size: 12px;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.875rem;
   font-weight: 600;
   text-transform: capitalize;
 }
 
-.status.active {
-  background: #e8ebff;
-  color: #001ae3;
+.admin-shop-management__status--active {
+  background: #dcfce7;
+  color: #15803d;
 }
 
-.status.suspended {
+.admin-shop-management__status--inactive,
+.admin-shop-management__status--suspended {
   background: #fdecea;
-  color: #e74c3c;
+  color: #dc2626;
 }
 
-
-/* =========================
-   BUTTONS
-========================= */
-.btn {
-  border: none;
-  padding: 7px 15px;
-  border-radius: 7px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.25s ease;
+.admin-shop-management__column--status,
+.admin-shop-management__column--action,
+.admin-shop-management__cell--status,
+.admin-shop-management__cell--action {
+  text-align: center !important;
 }
 
-.btn-primary {
-  background: #001ae3;
-  color: #ffffff;
+.admin-shop-management__cell--action .admin-shop-management__action-group {
+  justify-content: center;
 }
 
-.btn-primary:hover {
-  background: #0013b8;
+.admin-shop-management__pagination {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.btn-outline {
-  background: transparent;
-  color: #001ae3;
-  border: 1px solid #001ae3;
-}
-
-.btn-outline:hover {
-  background: #001ae3;
-  color: #ffffff;
-}
-
-.btn-danger {
-  background: #e74c3c;
-  color: #ffffff;
-}
-
-.btn-danger:hover {
-  background: #c0392b;
-}
-
-.btn-activate {
-  background: #e6f4ea;
-  color: #1e7e34;
-  border: 1px solid #1e7e34;
-}
-
-.btn-activate:hover {
-  background: #1e7e34;
-  color: white;
-}
-
-.btn-suspend {
-  background: #fdecea;
-  color: #e74c3c;
-  border: 1px solid #e74c3c;
-}
-
-.btn-suspend:hover {
-  background: #e74c3c;
-  color: white;
-}
-
-
-/* =========================
-   EMPTY STATE
-========================= */
-.empty {
-  text-align: center;
-  padding: 20px;
-  color: #777;
+.admin-shop-management__page-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #dbe3ff;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #334155;
   font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
+.admin-shop-management__page-btn:hover {
+  border-color: #001ae3;
+  color: #001ae3;
+}
 
-/* =========================
-   SKELETON LOADER
-========================= */
+.admin-shop-management__page-btn.active {
+  background: #001ae3;
+  color: #ffffff;
+  border-color: #001ae3;
+  box-shadow: 0 8px 18px rgba(0, 26, 227, 0.18);
+}
+
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    #e8ebff 25%,
-    #f4f6ff 37%,
-    #e8ebff 63%
-  );
+  background: linear-gradient(90deg, #e8ebff 25%, #f4f6ff 37%, #e8ebff 63%);
   background-size: 400% 100%;
   animation: shimmer 1.4s infinite ease;
-  border-radius: 14px;
 }
 
 @keyframes shimmer {
-  0% { background-position: 100% 0; }
-  100% { background-position: -100% 0; }
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
 }
 
-
-/* =========================
-   CLICKABLE ROW
-========================= */
-.clickable-row {
-  cursor: pointer;
-}
-
-
-/* =========================
-   MODAL OVERLAY
-========================= */
 .shop-modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 26, 227, 0.18);
   backdrop-filter: blur(8px);
-
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-
   z-index: 9999;
   animation: fadeIn 0.25s ease;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
-
-/* =========================
-   MODAL CONTAINER
-========================= */
 .shop-modal-container {
-  background: #ffffff;
+  position: relative;
   width: 100%;
   max-width: 760px;
   max-height: 90vh;
   overflow-y: auto;
-
-  border-radius: 18px;
   padding: 24px;
-  position: relative;
-
+  background: #ffffff;
   border-top: 6px solid #001ae3;
-
-  box-shadow:
-    0 14px 34px rgba(0, 26, 227, 0.15),
-    0 30px 70px rgba(0, 26, 227, 0.20);
-
+  border-radius: 18px;
+  box-shadow: 0 14px 34px rgba(0, 26, 227, 0.15), 0 30px 70px rgba(0, 26, 227, 0.2);
   animation: modalSlide 0.3s ease;
 }
 
@@ -307,241 +332,256 @@
     transform: translateY(30px) scale(0.96);
     opacity: 0;
   }
+
   to {
     transform: translateY(0) scale(1);
     opacity: 1;
   }
 }
 
-
-/* =========================
-   CLOSE BUTTON
-========================= */
 .shop-modal-close {
   position: absolute;
   top: 14px;
   right: 14px;
-
-  background: #eef1ff;
-  color: #001ae3;
-  border: none;
-
   width: 34px;
   height: 34px;
+  border: none;
   border-radius: 10px;
+  background: #eef1ff;
+  color: #001ae3;
   cursor: pointer;
   font-size: 14px;
-
   transition: all 0.2s ease;
 }
 
 .shop-modal-close:hover {
   background: #001ae3;
-  color: white;
+  color: #ffffff;
   transform: rotate(90deg);
 }
 
-
-/* =========================
-   MODAL SECTIONS
-========================= */
-.modal-section {
-  margin-bottom: 18px;
-  padding: 12px;
-  border-radius: 10px;
-  background: #f4f6ff;
+.shop-modal-container .modal-loading {
+  margin: 16px 0 0;
+  color: #64748b;
 }
 
-.modal-section h4 {
-  font-size: 14px;
+.shop-modal-container .shop-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.shop-modal-container .modal-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.shop-modal-container .modal-header h2 {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+  color: #0f172a;
+}
+
+.shop-modal-container .modal-header p {
+  margin: 0;
+  color: #64748b;
+}
+
+.shop-modal-container .modal-shop-logo {
+  width: 76px;
+  height: 76px;
+  border-radius: 16px;
+  object-fit: cover;
+  border: 1px solid #dbe3ff;
+  background: #f8fafc;
+}
+
+.shop-modal-container .modal-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.shop-modal-container .stat-card {
+  padding: 16px;
+  border: 1px solid #e0e7ff;
+  border-radius: 14px;
+  background: #f8faff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.shop-modal-container .stat-card strong {
+  font-size: 1.25rem;
+  color: #0f172a;
+}
+
+.shop-modal-container .stat-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #475569;
+}
+
+.shop-modal-container .modal-section {
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid #e0e7ff;
+  background: #f8faff;
+}
+
+.shop-modal-container .modal-section h4 {
+  margin: 0 0 12px;
+  font-size: 15px;
   font-weight: 600;
-  margin-bottom: 8px;
   color: #001ae3;
 }
 
-.modal-section p {
-  font-size: 14px;
-  color: #1e293b;
+.shop-modal-container .modal-section p {
+  margin: 0;
   line-height: 1.5;
+  color: #334155;
 }
 
+.shop-modal-container .modal-section.center {
+  text-align: center;
+}
 
-/* =========================
-/* =========================
-   IMAGE GALLERY
-========================= */
-.modal-gallery {
+.shop-modal-container .info-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  color: #334155;
+}
+
+.shop-modal-container .info-row:last-child {
+  margin-bottom: 0;
+}
+
+.shop-modal-container .section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shop-modal-container .modal-gallery {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 12px;
 }
 
-.modal-gallery img {
-  width: 100%;
-  height: 95px;
-  object-fit: cover;
+.shop-modal-container .gallery-item {
+  overflow: hidden;
   border-radius: 12px;
-  border: 1px solid #e0e5ff;
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
-  cursor: default;   /* normal cursor */
+  border: 1px solid #e0e7ff;
+  background: #ffffff;
 }
 
-.modal-gallery img:hover {
-  transform: scale(1.25);
-  z-index: 10;
-  position: relative;
-  box-shadow: 0 12px 26px rgba(0,26,227,0.30);
+.shop-modal-container .modal-gallery img {
+  display: block;
+  width: 100%;
+  height: 96px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
 }
 
-
-
-/* =========================
-   INFO ROWS
-========================= */
-.info-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-  color: #334155;
+.shop-modal-container .modal-gallery img:hover {
+  transform: scale(1.08);
 }
 
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+@media (max-width: 992px) {
+  .admin-shop-management__panel {
+    padding: 24px;
+  }
+
+  .admin-shop-management__data-table {
+    min-width: 760px;
+  }
 }
 
-.stat-title {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #475569;
-}
-
-
-/* =========================
-   RESPONSIVE
-========================= */
 @media (max-width: 768px) {
-
-  .fund-row {
-    grid-template-columns: 1fr;
-    gap: 8px;
+  .admin-shop-management {
+    gap: 20px;
   }
 
-  .data-table {
-    font-size: 13px;
-  }
-
-  .page-title {
+  .admin-shop-management__title {
     font-size: 20px;
   }
 
+  .admin-shop-management__panel {
+    padding: 20px;
+  }
+
+  .admin-shop-management__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .admin-shop-management__search-input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .admin-shop-management__button {
+    width: 100%;
+  }
+
+  .admin-shop-management__pending-table {
+    min-width: 460px;
+  }
+
+  .admin-shop-management__data-table {
+    min-width: 680px;
+  }
+
   .shop-modal-container {
-    padding: 18px;
+    padding: 20px;
     border-radius: 14px;
   }
-}
-/* =========================
-   MOBILE IMPROVEMENTS
-========================= */
-@media (max-width: 768px) {
 
-  /* Make tables scrollable */
-  .data-table {
-    display: block;
-    width: 100%;
-    overflow-x: auto;
-    white-space: nowrap;
+  .shop-modal-container .modal-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  /* Prevent table from shrinking */
-  .data-table table,
-  .data-table thead,
-  .data-table tbody,
-  .data-table th,
-  .data-table td,
-  .data-table tr {
-    white-space: nowrap;
-  }
-
-  /* Fund rows stack cleanly */
-  .fund-row {
+  .shop-modal-container .modal-stats {
     grid-template-columns: 1fr;
-    gap: 8px;
   }
 
-  /* Modal responsive spacing */
-  .shop-modal-container {
-    width: 100%;
-    max-width: 100%;
-    padding: 16px;
-    border-radius: 12px;
-  }
-
-  /* Modal gallery tighter grid */
-  .modal-gallery {
+  .shop-modal-container .modal-gallery {
     grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
   }
+}
 
-  /* Prevent buttons from breaking layout */
-  .btn {
-    width: auto;
-    white-space: nowrap;
+@media (max-width: 576px) {
+  .admin-shop-management__title {
+    font-size: 18px;
   }
 
-  /* Smaller title */
-  .page-title {
-    font-size: 20px;
-  }
-}
-/* ===============================
-   TABLE STABLE STRUCTURE FIX
-================================= */
-
-.card {
-  width: 100%;
-  overflow: hidden;
-}
-
-.table-scroll {
-  width: 100%;
-  overflow-x: auto;
-}
-
-/* Important */
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: auto;   /* DO NOT use fixed */
-}
-
-/* Prevent text collapsing */
-.data-table th,
-.data-table td {
-  padding: 14px 16px;
-  text-align: left;
-  white-space: nowrap;
-}
-
-/* Keep header clean */
-.data-table thead {
-  background: #f8fafc;
-}
-
-/* Prevent row breaking */
-.data-table tbody tr {
-  border-bottom: 1px solid #eee;
-}
-
-/* ===============================
-   MOBILE FIX ONLY
-================================= */
-@media (max-width: 992px) {
-
-  .data-table {
-    min-width: 750px; /* This is the key */
+  .admin-shop-management__panel {
+    padding: 16px;
   }
 
+  .admin-shop-management__toolbar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-shop-management__search-input {
+    grid-column: 1 / -1;
+  }
+
+  .admin-shop-management__pending-table {
+    min-width: 440px;
+  }
+
+  .admin-shop-management__data-table {
+    min-width: 640px;
+  }
 }

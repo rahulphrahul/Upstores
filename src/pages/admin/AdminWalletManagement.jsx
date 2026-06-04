@@ -1,62 +1,76 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   resetWallets,
   getResetHistory,
   exportHistory,
   getCustomerWithdrawals,
-  exportCustomerWithdrawals
+  exportCustomerWithdrawals,
 } from "../../service/apiService";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Form,
-  Button,
-  Table,
-  Badge,
-  Pagination
-} from "react-bootstrap";
+import { Form, Button, Table, Pagination } from "react-bootstrap";
 import { toast, ToastContainer } from "react-toastify";
+import "./AdminWalletManagement.css";
 
 const AdminWalletManagement = () => {
-
   const [reason, setReason] = useState("");
   const [history, setHistory] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
-
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [searchName, setSearchName] = useState("");
-
   const [loading, setLoading] = useState(false);
-
-  // PAGINATION
   const [historyPage, setHistoryPage] = useState(1);
   const [withdrawalPage, setWithdrawalPage] = useState(1);
 
   const recordsPerPage = 5;
 
-  // ================= LOAD HISTORY =================
-  const loadHistory = async () => {
+  const loadHistory = useCallback(async () => {
     const res = await getResetHistory(from, to);
-    if (res.status) setHistory(res.data);
-  };
 
-  // ================= LOAD WITHDRAWALS =================
-  const loadWithdrawals = async () => {
+    if (res.status) {
+      setHistory(res.data || []);
+      setHistoryPage(1);
+      return;
+    }
+
+    setHistory([]);
+  }, [from, to]);
+
+  const loadWithdrawals = useCallback(async () => {
     const res = await getCustomerWithdrawals(from, to, searchName);
-    if (res.status) setWithdrawals(res.data);
-  };
 
-  useEffect(() => {
-    loadHistory();
-    loadWithdrawals(); // ✅ NOW CALLS ON PAGE LOAD
+    if (res.status) {
+      setWithdrawals(res.data || []);
+      setWithdrawalPage(1);
+      return;
+    }
+
+    setWithdrawals([]);
+  }, [from, to, searchName]);
+
+  const loadInitialData = useCallback(async () => {
+    const [historyRes, withdrawalsRes] = await Promise.all([
+      getResetHistory("", ""),
+      getCustomerWithdrawals("", "", ""),
+    ]);
+
+    if (historyRes.status) {
+      setHistory(historyRes.data || []);
+    }
+
+    if (withdrawalsRes.status) {
+      setWithdrawals(withdrawalsRes.data || []);
+    }
   }, []);
 
-  // ================= RESET =================
+  useEffect(() => {
+    loadInitialData();
+  }, [loadInitialData]);
+
   const handleReset = async () => {
-    if (!reason) return toast.error("Enter reason");
+    if (!reason) {
+      toast.error("Enter reason");
+      return;
+    }
 
     if (!window.confirm("Confirm reset?")) return;
 
@@ -75,11 +89,21 @@ const AdminWalletManagement = () => {
     setLoading(false);
   };
 
-  // ================= PAGINATION LOGIC =================
   const paginate = (data, page) => {
     const indexOfLast = page * recordsPerPage;
     const indexOfFirst = indexOfLast - recordsPerPage;
     return data.slice(indexOfFirst, indexOfLast);
+  };
+
+  const getStatusClassName = (status) => {
+    if (status === "active") return "admin-wallet-management__status--success";
+    if (status === "rejected") return "admin-wallet-management__status--danger";
+    return "admin-wallet-management__status--warning";
+  };
+
+  const getStatusLabel = (status) => {
+    if (status === "active") return "Success";
+    return status || "Pending";
   };
 
   const renderPagination = (data, page, setPage) => {
@@ -87,7 +111,7 @@ const AdminWalletManagement = () => {
     if (totalPages <= 1) return null;
 
     return (
-      <Pagination className="justify-content-center">
+      <Pagination className="admin-wallet-management__pagination-list">
         {[...Array(totalPages)].map((_, i) => (
           <Pagination.Item
             key={i}
@@ -101,61 +125,106 @@ const AdminWalletManagement = () => {
     );
   };
 
+  const paginatedHistory = paginate(history, historyPage);
+  const paginatedWithdrawals = paginate(withdrawals, withdrawalPage);
+
   return (
-    <Container className="mt-4">
+    <div className="admin-wallet-management">
       <ToastContainer />
 
-      <h3>Admin Points Management</h3>
+      <h2 className="admin-wallet-management__title">
+        Admin Points Management
+      </h2>
 
-      {/* RESET */}
-      <Card className="mb-4">
-        <Card.Body>
-          <Row>
-            <Col md={8}>
-              <Form.Control
-                placeholder="Reason"
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-              />
-            </Col>
-            <Col md={4}>
-              <Button
-                variant="danger"
-                onClick={handleReset}
-                disabled={loading}
-              >
-                Reset Admin Points
-              </Button>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
+      <section className="admin-wallet-management__panel">
+        <div className="admin-wallet-management__toolbar">
+          <div className="admin-wallet-management__field">
+            <label
+              className="admin-wallet-management__label sr-only"
+              htmlFor="admin-wallet-reason"
+            >
+              Reason
+            </label>
+            <Form.Control
+              id="admin-wallet-reason"
+              className="admin-wallet-management__control"
+              placeholder="Reason"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+            />
+          </div>
 
-      {/* HISTORY */}
-      <Card className="mb-4">
-        <Card.Header>Reset History</Card.Header>
-        <Card.Body>
+          <div className="admin-wallet-management__button-wrap">
+            <Button
+              className="admin-wallet-management__button admin-wallet-management__button--wide"
+              onClick={handleReset}
+              disabled={loading}
+            >
+              Reset Admin Points
+            </Button>
+          </div>
+        </div>
+      </section>
 
-          <Row className="mb-3">
-            <Col md={3}>
-              <Form.Control type="date" value={from}
-                onChange={(e) => setFrom(e.target.value)} />
-            </Col>
-            <Col md={3}>
-              <Form.Control type="date" value={to}
-                onChange={(e) => setTo(e.target.value)} />
-            </Col>
-            <Col md={3}>
-              <Button onClick={loadHistory}>Search</Button>
-            </Col>
-            <Col md={3}>
-              <Button variant="success" onClick={exportHistory}>
-                Export CSV
-              </Button>
-            </Col>
-          </Row>
+      <section className="admin-wallet-management__panel">
+        <h3 className="admin-wallet-management__section-title">
+          Reset History
+        </h3>
 
-          <Table bordered>
+        <div className="admin-wallet-management__filters">
+          <div className="admin-wallet-management__field">
+            <label
+              className="admin-wallet-management__label sr-only"
+              htmlFor="admin-wallet-from"
+            >
+              From date
+            </label>
+            <Form.Control
+              id="admin-wallet-from"
+              className="admin-wallet-management__control"
+              type="date"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+            />
+          </div>
+
+          <div className="admin-wallet-management__field">
+            <label
+              className="admin-wallet-management__label sr-only"
+              htmlFor="admin-wallet-to"
+            >
+              To date
+            </label>
+            <Form.Control
+              id="admin-wallet-to"
+              className="admin-wallet-management__control"
+              type="date"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+            />
+          </div>
+
+          <div className="admin-wallet-management__button-wrap">
+            <Button
+              className="admin-wallet-management__button"
+              onClick={loadHistory}
+            >
+              Search
+            </Button>
+          </div>
+
+          <div className="admin-wallet-management__button-wrap">
+            <Button
+              className="admin-wallet-management__button"
+              onClick={exportHistory}
+            >
+              Export CSV
+            </Button>
+          </div>
+        </div>
+
+        <div className="admin-wallet-management__table-wrap">
+          <Table bordered className="admin-wallet-management__table">
             <thead>
               <tr>
                 <th>ID</th>
@@ -167,53 +236,79 @@ const AdminWalletManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {paginate(history, historyPage).map((h) => (
-                <tr key={h.id}>
-                  <td>{h.id}</td>
-                  <td>{h.old_wallet_amount}</td>
-                  <td>{h.old_pv_balance}</td>
-                  <td>{h.reset_reason}</td>
-                  <td>{h.reset_by_name}</td>
-                  <td>{h.reset_at}</td>
+              {paginatedHistory.length > 0 ? (
+                paginatedHistory.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.id}</td>
+                    <td>{item.old_wallet_amount}</td>
+                    <td>{item.old_pv_balance}</td>
+                    <td>{item.reset_reason}</td>
+                    <td>{item.reset_by_name}</td>
+                    <td>{item.reset_at}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="6"
+                    className="admin-wallet-management__empty-cell"
+                  >
+                    No reset history found
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </Table>
+        </div>
 
+        <div className="admin-wallet-management__pagination">
           {renderPagination(history, historyPage, setHistoryPage)}
+        </div>
+      </section>
 
-        </Card.Body>
-      </Card>
+      <section className="admin-wallet-management__panel">
+        <h3 className="admin-wallet-management__section-title">
+          Customer Withdrawals
+        </h3>
 
-      {/* WITHDRAWALS */}
-      <Card>
-        <Card.Header>Customer Withdrawals</Card.Header>
-        <Card.Body>
+        <div className="admin-wallet-management__filters admin-wallet-management__filters--withdrawals">
+          <div className="admin-wallet-management__field">
+            <label
+              className="admin-wallet-management__label sr-only"
+              htmlFor="admin-wallet-search-name"
+            >
+              Search name
+            </label>
+            <Form.Control
+              id="admin-wallet-search-name"
+              className="admin-wallet-management__control"
+              placeholder="Search Name"
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+            />
+          </div>
 
-          <Row className="mb-3">
-            <Col md={3}>
-              <Form.Control
-                placeholder="Search Name"
-                value={searchName}
-                onChange={(e) => setSearchName(e.target.value)}
-              />
-            </Col>
-            <Col md={3}>
-              <Button onClick={loadWithdrawals}>Search</Button>
-            </Col>
-            <Col md={3}>
-              <Button
-                variant="success"
-                onClick={() =>
-                  exportCustomerWithdrawals(from, to)
-                }
-              >
-                Export CSV
-              </Button>
-            </Col>
-          </Row>
+          <div className="admin-wallet-management__button-wrap">
+            <Button
+              className="admin-wallet-management__button"
+              onClick={loadWithdrawals}
+            >
+              Search
+            </Button>
+          </div>
 
-          <Table bordered>
+          <div className="admin-wallet-management__button-wrap">
+            <Button
+              className="admin-wallet-management__button"
+              onClick={() => exportCustomerWithdrawals(from, to)}
+            >
+              Export CSV
+            </Button>
+          </div>
+        </div>
+
+        <div className="admin-wallet-management__table-wrap">
+          <Table bordered className="admin-wallet-management__table">
             <thead>
               <tr>
                 <th>ID</th>
@@ -225,37 +320,48 @@ const AdminWalletManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {paginate(withdrawals, withdrawalPage).map((w) => (
-                <tr key={w.id}>
-                  <td>{w.id}</td>
-                  <td>{w.name}</td>
-                  <td>{w.email}</td>
-                  <td>₹ {w.amount}</td>
-              <Badge
-  bg={
-    w.status === "active"
-      ? "success"
-      : w.status === "rejected"
-      ? "danger"
-      : "warning"
-  }
->
-  {w.status === "active"
-    ? "Success"
-    : w.status || "Pending"}
-</Badge>
-                  <td>{w.created_at}</td>
+              {paginatedWithdrawals.length > 0 ? (
+                paginatedWithdrawals.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.id}</td>
+                    <td>{item.name}</td>
+                    <td>{item.email}</td>
+                    <td>Rs. {item.amount}</td>
+                    <td>
+                      <span
+                        className={`admin-wallet-management__status ${getStatusClassName(
+                          item.status
+                        )}`}
+                      >
+                        {getStatusLabel(item.status)}
+                      </span>
+                    </td>
+                    <td>{item.created_at}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="6"
+                    className="admin-wallet-management__empty-cell"
+                  >
+                    No withdrawals found
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </Table>
+        </div>
 
-          {renderPagination(withdrawals, withdrawalPage, setWithdrawalPage)}
-
-        </Card.Body>
-      </Card>
-
-    </Container>
+        <div className="admin-wallet-management__pagination">
+          {renderPagination(
+            withdrawals,
+            withdrawalPage,
+            setWithdrawalPage
+          )}
+        </div>
+      </section>
+    </div>
   );
 };
 
