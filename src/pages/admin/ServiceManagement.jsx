@@ -22,7 +22,12 @@ import {
   MapPin,
   EnvelopeSimple,
   QrCode,
-  ImageSquare
+  ImageSquare,
+  CheckCircle,
+  XCircle,
+  PauseCircle,
+  PlayCircle,
+  Trash
 } from "phosphor-react";
 
 function ServiceManagement() {
@@ -126,22 +131,28 @@ useEffect(() => {
               <tbody>
                 {pending.map((p) => (
                   <tr key={p.id} className="border-b hover:bg-gray-50 transition">
-                    <td className="p-3 font-medium text-gray-800">{p.shop}</td>
-                    <td className="p-3 text-gray-700 font-semibold">₹{p.amount}</td>
-                    <td className="p-3">
+                    <td className="p-3 font-medium text-gray-800" data-label="Shop">{p.shop}</td>
+                    <td className="p-3 text-gray-700 font-semibold" data-label="Amount">₹{p.amount}</td>
+                    <td className="p-3" data-label="Action">
                       <div className="flex justify-center gap-2">
                         <button
                           className="btn btn-success btn-sm px-3"
+                          title="Approve"
+                          aria-label="Approve"
                           onClick={() => onWalletAction(p, "approve")}
                         >
-                          Approve
+                          <CheckCircle className="admin-action-icon" size={18} weight="bold" />
+                          <span className="admin-action-label">Approve</span>
                         </button>
 
                         <button
                           className="btn btn-danger btn-sm px-3"
+                          title="Reject"
+                          aria-label="Reject"
                           onClick={() => onWalletAction(p, "rejected")}
                         >
-                          Reject
+                          <XCircle className="admin-action-icon" size={18} weight="bold" />
+                          <span className="admin-action-label">Reject</span>
                         </button>
                       </div>
                     </td>
@@ -203,24 +214,38 @@ useEffect(() => {
                 className="clickable-row"
                 onClick={() => openServiceModal(s.service_id)}
               >
-                <td>{s.name}</td>
-                <td>{s.owner_name || "-"}</td>
-                <td>{s.executive || "-"}</td>
-                <td>₹{s.wallet_balance}</td>
-                <td>
+                <td data-label="Service">{s.name}</td>
+                <td data-label="Owner">{s.owner_name || "-"}</td>
+                <td data-label="Executive">{s.executive || "-"}</td>
+                <td data-label="Wallet">₹{s.wallet_balance}</td>
+                <td data-label="Status">
                   <span className={`status ${s.status}`}>
                     {s.status}
                   </span>
                 </td>
-                <td>
+                <td data-label="Action">
                   <button
                     className={`btn ${s.status === "active" ? "btn-suspend" : "btn-activate"}`}
-                    onClick={() => toggleStatus(s)}
+                    title={s.status === "active" ? "Suspend" : "Activate"}
+                    aria-label={s.status === "active" ? "Suspend" : "Activate"}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleStatus(s);
+                    }}
                   >
-                    {s.status === "active" ? "Suspend" : "Activate"}
+                    {s.status === "active" ? (
+                      <PauseCircle className="admin-action-icon" size={18} weight="bold" />
+                    ) : (
+                      <PlayCircle className="admin-action-icon" size={18} weight="bold" />
+                    )}
+                    <span className="admin-action-label">
+                      {s.status === "active" ? "Suspend" : "Activate"}
+                    </span>
                   </button>
                   <button
   className="btn btn-danger"
+  title="Delete"
+  aria-label="Delete"
   onClick={(e) => {
     e.stopPropagation();
     if (window.confirm("Are you sure to delete?")) {
@@ -228,7 +253,8 @@ useEffect(() => {
     }
   }}
 >
-  Delete
+  <Trash className="admin-action-icon" size={18} weight="bold" />
+  <span className="admin-action-label">Delete</span>
 </button>
                 </td>
               </tr>
@@ -243,6 +269,15 @@ useEffect(() => {
         </table>
      {Math.ceil(total / limit) > 1 && (
   <div className="pagination">
+    <button
+      type="button"
+      className="page-btn page-btn--arrow"
+      onClick={() => setPage((current) => Math.max(1, current - 1))}
+      disabled={page === 1}
+      aria-label="Previous page"
+    >
+      &lsaquo;
+    </button>
   {Array.from({ length: Math.ceil(total / limit) }, (_, i) => (
     <button
       key={i}
@@ -252,6 +287,17 @@ useEffect(() => {
       {i + 1}
     </button>
   ))}
+    <button
+      type="button"
+      className="page-btn page-btn--arrow"
+      onClick={() =>
+        setPage((current) => Math.min(Math.ceil(total / limit), current + 1))
+      }
+      disabled={page === Math.ceil(total / limit)}
+      aria-label="Next page"
+    >
+      &rsaquo;
+    </button>
 </div>
      )}
       </div>

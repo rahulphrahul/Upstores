@@ -273,6 +273,10 @@
   flex-wrap: wrap;
 }
 
+.exec-page .admin-action-icon {
+  display: none;
+}
+
 .exec-page .exec-action-btn {
   min-width: 100px;
 }
@@ -281,17 +285,40 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   margin-top: 20px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .exec-page .exec-pagination-info {
   font-size: 14px;
   font-weight: 600;
   color: #475569;
-  min-width: 110px;
+  min-width: 58px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #dbe3ff;
+  border-radius: 10px;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
+}
+
+.exec-page .exec-pagination-arrow {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0 !important;
+  border-radius: 10px !important;
+  font-size: 22px !important;
+  line-height: 1;
+}
+
+.exec-page .exec-pagination-arrow:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
 }
 
 .exec-page .form-grid {
@@ -328,29 +355,6 @@
 
   .exec-page .exec-toolbar {
     width: 100%;
-  }
-}
-
-@media (max-width: 900px) {
-  .exec-page .data-table {
-    display: table !important;
-  }
-
-  .exec-page .data-table thead {
-    display: table-header-group !important;
-  }
-
-  .exec-page .data-table tbody {
-    display: table-row-group !important;
-  }
-
-  .exec-page .data-table tr {
-    display: table-row !important;
-  }
-
-  .exec-page .data-table th,
-  .exec-page .data-table td {
-    display: table-cell !important;
   }
 }
 
@@ -391,8 +395,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .exec-page .exec-toolbar-actions .btn,
-  .exec-page .exec-pagination .btn {
+  .exec-page .exec-toolbar-actions .btn {
     width: 100%;
   }
 
@@ -400,8 +403,110 @@
     width: auto;
   }
 
+  .exec-page .table-wrapper {
+    overflow-x: visible;
+  }
+
+  .exec-page .data-table,
+  .exec-page .data-table thead,
+  .exec-page .data-table tbody,
+  .exec-page .data-table tr,
+  .exec-page .data-table td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .exec-page .data-table thead {
+    display: none;
+  }
+
+  .exec-page .data-table tbody {
+    display: grid;
+    gap: 14px;
+  }
+
+  .exec-page .data-table tr {
+    padding: 14px;
+    border: 1px solid #e0e5ff;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 8px 18px rgba(0, 26, 227, 0.08);
+  }
+
+  .exec-page .data-table td {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eef2ff;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: right;
+  }
+
+  .exec-page .data-table td:last-child {
+    border-bottom: 0;
+  }
+
+  .exec-page .data-table td[data-label]::before {
+    content: attr(data-label);
+    flex: 0 0 42%;
+    color: #001ae3;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .exec-page .data-table td:not([data-label]) {
+    display: block;
+    text-align: center;
+  }
+
+  .exec-page .exec-table-actions {
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+  }
+
+  .exec-page .data-table td[data-label="Action"]::before {
+    flex: 1 1 auto;
+  }
+
+  .exec-page .exec-table-actions .btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    padding: 0;
+    border-radius: 10px;
+  }
+
+  .exec-page .exec-table-actions .btn:not(.exec-delete-btn) {
+    background: #facc15 !important;
+    border-color: #eab308 !important;
+    color: #713f12 !important;
+    box-shadow: 0 8px 18px rgba(250, 204, 21, 0.22);
+  }
+
+  .exec-page .admin-action-label {
+    display: none;
+  }
+
+  .exec-page .admin-action-icon {
+    display: block;
+    flex-shrink: 0;
+  }
+
   .exec-page .exec-pagination {
-    align-items: stretch;
+    width: fit-content;
+    max-width: 100%;
+    margin: 18px auto 0;
+    padding: 6px;
+    align-items: center;
+    border: 1px solid #dbe3ff;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 8px 18px rgba(0, 26, 227, 0.08);
   }
 
   .exec-page .form-grid {

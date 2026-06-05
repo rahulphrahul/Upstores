@@ -13,6 +13,14 @@
   color: #001ae3;
 }
 
+.admin-category-management__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .admin-category-management__panel {
   width: 100%;
   background: #ffffff;
@@ -127,6 +135,11 @@
   background: #0013b0;
 }
 
+.admin-category-management__add-toggle {
+  width: auto;
+  min-width: 150px;
+}
+
 .admin-category-management__button--secondary {
   background: #e2e8f0;
   color: #334155;
@@ -137,21 +150,23 @@
 }
 
 .admin-category-management__button--edit {
-  background: #f59e0b;
-  color: #ffffff;
+  background: #facc15 !important;
+  color: #713f12 !important;
+  box-shadow: 0 8px 18px rgba(250, 204, 21, 0.22);
 }
 
 .admin-category-management__button--edit:hover {
-  background: #d97706;
+  background: #eab308 !important;
 }
 
 .admin-category-management__button--danger {
-  background: #dc2626;
-  color: #ffffff;
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(220, 38, 38, 0.18);
 }
 
 .admin-category-management__button--danger:hover {
-  background: #b91c1c;
+  background: #b91c1c !important;
 }
 
 .admin-category-management__divider {
@@ -225,10 +240,14 @@
 
 .admin-category-management__action-group {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
   gap: 10px;
+}
+
+.admin-category-management .admin-action-icon {
+  display: none;
 }
 
 .admin-category-management__empty-cell {
@@ -240,8 +259,9 @@
 .admin-category-management__pagination {
   margin-top: 20px;
   display: flex;
+  align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
 }
 
@@ -268,6 +288,16 @@
   color: #ffffff;
   border-color: #001ae3;
   box-shadow: 0 8px 18px rgba(0, 26, 227, 0.18);
+}
+
+.admin-category-management__page-btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.admin-category-management__page-btn--arrow {
+  font-size: 22px;
+  line-height: 1;
 }
 
 @media (max-width: 1100px) {
@@ -297,8 +327,133 @@
     width: 100%;
   }
 
+  .admin-category-management__header {
+    align-items: stretch;
+  }
+
+  .admin-category-management__add-toggle {
+    width: 100%;
+  }
+
   .admin-category-management__action-group {
     flex-direction: column;
+  }
+
+  .admin-category-management__table-scroll {
+    overflow-x: visible;
+  }
+
+  .admin-category-management__table,
+  .admin-category-management__table thead,
+  .admin-category-management__table tbody,
+  .admin-category-management__table tr,
+  .admin-category-management__table td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .admin-category-management__table thead {
+    display: none;
+  }
+
+  .admin-category-management__table tbody {
+    display: grid;
+    gap: 14px;
+  }
+
+  .admin-category-management__table tr {
+    padding: 14px;
+    border: 1px solid #e0e5ff;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 8px 18px rgba(0, 26, 227, 0.08);
+  }
+
+  .admin-category-management__table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eef2ff;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: right;
+  }
+
+  .admin-category-management__table td:last-child {
+    border-bottom: 0;
+  }
+
+  .admin-category-management__table td[data-label]::before {
+    content: attr(data-label);
+    flex: 0 0 42%;
+    color: #001ae3;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .admin-category-management__table td:not([data-label]) {
+    display: block;
+    text-align: center;
+  }
+
+  .admin-category-management__table .admin-category-management__action-group {
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    width: auto;
+  }
+
+  .admin-category-management__table td[data-label="Action"]::before {
+    flex: 1 1 auto;
+  }
+
+  .admin-category-management__table .admin-category-management__button {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    padding: 0;
+    border-radius: 10px;
+  }
+
+  .admin-category-management__table .admin-action-label {
+    display: none;
+  }
+
+  .admin-category-management__table .admin-action-icon {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .admin-category-management__pagination {
+    width: fit-content;
+    max-width: 100%;
+    margin: 18px auto 0;
+    padding: 6px;
+    gap: 6px;
+    overflow-x: auto;
+    border: 1px solid #dbe3ff;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 8px 18px rgba(0, 26, 227, 0.08);
+    scrollbar-width: none;
+  }
+
+  .admin-category-management__pagination::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-category-management__page-btn {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border-radius: 10px;
+    font-size: 12px;
+    box-shadow: none;
   }
 }
 
@@ -312,6 +467,6 @@
   }
 
   .admin-category-management__table {
-    min-width: 560px;
+    min-width: 0;
   }
 }

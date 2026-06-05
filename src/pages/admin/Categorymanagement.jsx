@@ -8,6 +8,7 @@ import {
   getCategories,
   deleteCategory,
 } from "../../service/apiService";
+import { PencilSimple, Trash } from "phosphor-react";
 
 const Categorymanagement = () => {
   const [categories, setCategories] = useState([]);
@@ -15,6 +16,7 @@ const Categorymanagement = () => {
   const [mainType, setMainType] = useState("");
   const [icon, setIcon] = useState(null);
   const [editId, setEditId] = useState(null);
+  const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 5;
 
@@ -72,6 +74,7 @@ const Categorymanagement = () => {
       if (res.status === "success") {
         toast.success(res.message);
         resetForm();
+        setShowForm(false);
         fetchCategories();
       } else {
         toast.error(res.message);
@@ -103,6 +106,7 @@ const Categorymanagement = () => {
     setName(category.name);
     setMainType(category.main_type);
     setIcon(null);
+    setShowForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -121,8 +125,26 @@ const Categorymanagement = () => {
   return (
     <div className="admin-category-management">
       <ToastContainer position="top-right" autoClose={2000} />
-      <h2 className="admin-category-management__title">Category Management</h2>
+      <div className="admin-category-management__header">
+        <h2 className="admin-category-management__title">Category Management</h2>
+        <button
+          type="button"
+          className="admin-category-management__button admin-category-management__button--primary admin-category-management__add-toggle"
+          onClick={() => {
+            if (showForm && !editId) {
+              resetForm();
+              setShowForm(false);
+              return;
+            }
 
+            setShowForm(true);
+          }}
+        >
+          {showForm ? (editId ? "Editing Category" : "Close") : "Add Category"}
+        </button>
+      </div>
+
+      {showForm && (
       <div className="admin-category-management__panel">
         <h4 className="admin-category-management__section-title">
           {editId ? "Edit Category" : "Add Category"}
@@ -193,7 +215,10 @@ const Categorymanagement = () => {
               <button
                 type="button"
                 className="admin-category-management__button admin-category-management__button--secondary"
-                onClick={resetForm}
+                onClick={() => {
+                  resetForm();
+                  setShowForm(false);
+                }}
               >
                 Cancel Edit
               </button>
@@ -201,6 +226,7 @@ const Categorymanagement = () => {
           )}
         </form>
       </div>
+      )}
 
       <div className="admin-category-management__panel">
         <h4 className="admin-category-management__section-title">
@@ -221,13 +247,13 @@ const Categorymanagement = () => {
               {currentRecords.length > 0 ? (
                 currentRecords.map((category) => (
                   <tr key={category.id}>
-                    <td>{category.name}</td>
-                    <td>
+                    <td data-label="Name">{category.name}</td>
+                    <td data-label="Type">
                       <span className="admin-category-management__type-badge">
                         {category.main_type}
                       </span>
                     </td>
-                    <td>
+                    <td data-label="Icon">
                       <img
                         src={`${process.env.REACT_APP_BASE_URL}/categories/category-icons/${category.icon}`}
                         alt={`${category.name} icon`}
@@ -237,21 +263,27 @@ const Categorymanagement = () => {
                         }}
                       />
                     </td>
-                    <td>
+                    <td data-label="Action">
                       <div className="admin-category-management__action-group">
                         <button
                           type="button"
                           className="admin-category-management__button admin-category-management__button--edit"
+                          title="Edit"
+                          aria-label="Edit"
                           onClick={() => handleEdit(category)}
                         >
-                          Edit
+                          <PencilSimple className="admin-action-icon" size={18} weight="bold" />
+                          <span className="admin-action-label">Edit</span>
                         </button>
                         <button
                           type="button"
                           className="admin-category-management__button admin-category-management__button--danger"
+                          title="Delete"
+                          aria-label="Delete"
                           onClick={() => handleDelete(category.id)}
                         >
-                          Delete
+                          <Trash className="admin-action-icon" size={18} weight="bold" />
+                          <span className="admin-action-label">Delete</span>
                         </button>
                       </div>
                     </td>
@@ -273,6 +305,17 @@ const Categorymanagement = () => {
 
         {totalPages > 1 && (
           <div className="admin-category-management__pagination">
+            <button
+              type="button"
+              className="admin-category-management__page-btn admin-category-management__page-btn--arrow"
+              onClick={() =>
+                setCurrentPage((current) => Math.max(1, current - 1))
+              }
+              disabled={currentPage === 1}
+              aria-label="Previous page"
+            >
+              &lsaquo;
+            </button>
             {Array.from({ length: totalPages }, (_, index) => (
               <button
                 key={index}
@@ -285,6 +328,17 @@ const Categorymanagement = () => {
                 {index + 1}
               </button>
             ))}
+            <button
+              type="button"
+              className="admin-category-management__page-btn admin-category-management__page-btn--arrow"
+              onClick={() =>
+                setCurrentPage((current) => Math.min(totalPages, current + 1))
+              }
+              disabled={currentPage === totalPages}
+              aria-label="Next page"
+            >
+              &rsaquo;
+            </button>
           </div>
         )}
       </div>

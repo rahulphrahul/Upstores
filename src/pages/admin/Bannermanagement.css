@@ -13,6 +13,14 @@
   color: #001ae3;
 }
 
+.admin-banner-management__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .admin-banner-management__panel {
   width: 100%;
   background: #ffffff;
@@ -160,6 +168,18 @@
   background: #15803d;
 }
 
+.admin-banner-management__add-toggle {
+  width: auto;
+  min-width: 150px;
+  background: #001ae3;
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(0, 26, 227, 0.18);
+}
+
+.admin-banner-management__add-toggle:hover {
+  background: #0013b0;
+}
+
 .admin-banner-management__button--secondary {
   background: #e2e8f0;
   color: #334155;
@@ -276,6 +296,10 @@
   gap: 10px;
 }
 
+.admin-banner-management .admin-action-icon {
+  display: none;
+}
+
 .admin-banner-management__empty-cell {
   padding: 24px 16px;
   text-align: center;
@@ -286,15 +310,32 @@
   margin-top: 20px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 8px;
 }
 
 .admin-banner-management__page-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
+}
+
+.admin-banner-management__pagination .admin-banner-management__button {
+  width: 40px;
+  min-width: 40px;
+}
+
+.admin-banner-management__pagination .admin-banner-management__button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.admin-banner-management__button--arrow {
+  font-size: 22px;
+  line-height: 1;
 }
 
 @media (max-width: 768px) {
@@ -319,17 +360,140 @@
     width: 100%;
   }
 
+  .admin-banner-management__header {
+    align-items: stretch;
+  }
+
+  .admin-banner-management__add-toggle {
+    width: 100%;
+  }
+
   .admin-banner-management__action-group {
     flex-direction: column;
   }
 
+  .admin-banner-management__table-scroll {
+    overflow-x: visible;
+  }
+
+  .admin-banner-management__table,
+  .admin-banner-management__table thead,
+  .admin-banner-management__table tbody,
+  .admin-banner-management__table tr,
+  .admin-banner-management__table td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .admin-banner-management__table thead {
+    display: none;
+  }
+
+  .admin-banner-management__table tbody {
+    display: grid;
+    gap: 14px;
+  }
+
+  .admin-banner-management__table tr {
+    padding: 14px;
+    border: 1px solid #e0e5ff;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 8px 18px rgba(0, 26, 227, 0.08);
+  }
+
+  .admin-banner-management__table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eef2ff;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: right;
+  }
+
+  .admin-banner-management__table td:last-child {
+    border-bottom: 0;
+  }
+
+  .admin-banner-management__table td[data-label]::before {
+    content: attr(data-label);
+    flex: 0 0 42%;
+    color: #001ae3;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .admin-banner-management__table td:not([data-label]) {
+    display: block;
+    text-align: center;
+  }
+
+  .admin-banner-management__table .admin-banner-management__action-group {
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    width: auto;
+  }
+
+  .admin-banner-management__table td[data-label="Actions"]::before {
+    flex: 1 1 auto;
+  }
+
+  .admin-banner-management__table .admin-banner-management__button {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    padding: 0;
+    border-radius: 10px;
+  }
+
+  .admin-banner-management__table .admin-action-label {
+    display: none;
+  }
+
+  .admin-banner-management__table .admin-action-icon {
+    display: block;
+    flex-shrink: 0;
+  }
+
   .admin-banner-management__pagination {
-    flex-direction: column;
-    align-items: stretch;
+    width: fit-content;
+    max-width: 100%;
+    margin: 18px auto 0;
+    padding: 6px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    overflow-x: auto;
+    border: 1px solid #dbe3ff;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 8px 18px rgba(0, 26, 227, 0.08);
+    scrollbar-width: none;
   }
 
   .admin-banner-management__page-list {
+    flex-wrap: nowrap;
     justify-content: center;
+    gap: 6px;
+  }
+
+  .admin-banner-management__pagination::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-banner-management__pagination .admin-banner-management__button {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    padding: 0;
+    border-radius: 10px;
   }
 }
 
@@ -348,6 +512,6 @@
   }
 
   .admin-banner-management__table {
-    min-width: 620px;
+    min-width: 0;
   }
 }

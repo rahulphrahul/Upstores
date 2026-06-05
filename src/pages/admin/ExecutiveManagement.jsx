@@ -19,6 +19,7 @@ import {
 import { Modal, Button } from "react-bootstrap";
 import ExecutiveManagementSkeleton from "./skeletons/ExecutiveManagementSkeleton";
 import "./ExecutiveManagement.css";
+import { PauseCircle, PlayCircle, Trash } from "phosphor-react";
 
 const normalizeExecutiveRows = (payload) => {
   if (Array.isArray(payload)) return payload;
@@ -377,16 +378,16 @@ const confirmDelete = async () => {
           <tbody>
             {executives.map(e => (
               <tr key={e.id}>
-                <td>{e.name}</td>
-                <td>{e.phone}</td>
-                <td>{e.email || "-"}</td>
-                <td>{e.shops_count}</td>
-                <td>
+                <td data-label="Name">{e.name}</td>
+                <td data-label="Phone">{e.phone}</td>
+                <td data-label="Email">{e.email || "-"}</td>
+                <td data-label="Shops">{e.shops_count}</td>
+                <td data-label="Status">
                   <span className={`status exec-status ${e.status}`}>
                     {e.status}
                   </span>
                 </td>
-                <td>
+                <td data-label="Action">
                   <div className="exec-table-actions">
                     <button
                       type="button"
@@ -395,21 +396,31 @@ const confirmDelete = async () => {
                           ? "btn-suspend exec-suspend-btn"
                           : "btn-activate exec-activate-btn"
                       }`}
+                      title={e.status === "active" ? "Suspend" : "Activate"}
+                      aria-label={e.status === "active" ? "Suspend" : "Activate"}
                       onClick={() =>
                         handleToggleStatus(e.id, e.status)
                       }
                     >
-                      {e.status === "active"
-                        ? "Suspend"
-                        : "Activate"}
+                      {e.status === "active" ? (
+                        <PauseCircle className="admin-action-icon" size={18} weight="bold" />
+                      ) : (
+                        <PlayCircle className="admin-action-icon" size={18} weight="bold" />
+                      )}
+                      <span className="admin-action-label">
+                        {e.status === "active" ? "Suspend" : "Activate"}
+                      </span>
                     </button>
 
                     <button
                       type="button"
                       className="btn btn-danger exec-delete-btn"
+                      title="Delete"
+                      aria-label="Delete"
                       onClick={() => handleDelete(e.id)}
                     >
-                      Delete
+                      <Trash className="admin-action-icon" size={18} weight="bold" />
+                      <span className="admin-action-label">Delete</span>
                     </button>
                   </div>
                 </td>
@@ -432,24 +443,26 @@ const confirmDelete = async () => {
           <div className="exec-pagination">
             <button
               type="button"
-              className="btn btn-outline"
+              className="btn btn-outline exec-pagination-arrow"
               disabled={page === 1}
               onClick={() => setPage(prev => prev - 1)}
+              aria-label="Previous page"
             >
-              Previous
+              &lsaquo;
             </button>
 
             <span className="exec-pagination-info">
-              Page {page} of {totalPages}
+              {page} / {totalPages}
             </span>
 
             <button
               type="button"
-              className="btn btn-outline"
+              className="btn btn-outline exec-pagination-arrow"
               disabled={page === totalPages}
               onClick={() => setPage(prev => prev + 1)}
+              aria-label="Next page"
             >
-              Next
+              &rsaquo;
             </button>
           </div>
         )}

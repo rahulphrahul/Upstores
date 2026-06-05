@@ -3,6 +3,7 @@ import "./CustomerManagement.css";
 import { getCustomers,updateWallet,deleteCustomer } from "../../service/apiService";
 import { toast } from "react-toastify";
 import { BASE_CUSTM_IMG_URL,FALLBACK_IMAGE } from "../../config/config";
+import { QrCode, Trash, Wallet } from "phosphor-react";
 
 function CustomerManagement() {
   const [customers, setCustomers] = useState([]);
@@ -102,11 +103,11 @@ const saveWalletAdjustment = async () => {
             {customers.map((c) => (
               <React.Fragment key={c.id}>
                 <tr>
-                  <td>{c.name}</td>
-                  <td>{c.phone}</td>
-                  <td>{c.wallet ?? 0}</td>
+                  <td data-label="Name">{c.name}</td>
+                  <td data-label="Phone">{c.phone}</td>
+                  <td data-label="Wallet (₹)">{c.wallet ?? 0}</td>
 
-                  <td>
+                  <td data-label="Referrals">
                     <button
                       className="link-btn"
                       onClick={() => toggleReferrals(c.id)}
@@ -115,25 +116,33 @@ const saveWalletAdjustment = async () => {
                     </button>
                   </td>
 
-                  <td className="customer-page__actions-cell">
+                  <td className="customer-page__actions-cell" data-label="Actions">
                     <div className="customer-page__action-group">
                       <button
                         className="action-btn action-btn--wallet"
+                        title="Wallet"
+                        aria-label="Wallet"
                         onClick={() => openWalletModal(c)}
                       >
-                        Wallet
+                        <Wallet className="action-btn__icon" size={18} weight="bold" />
+                        <span className="action-btn__label">Wallet</span>
                       </button>
                       <button
                         className="action-btn action-btn--qr"
+                        title="QR"
+                        aria-label="QR"
                         onClick={() => {
                           setSelectedCustomer(c);
                           setShowQrModal(true);
                         }}
                       >
-                        QR
+                        <QrCode className="action-btn__icon" size={18} weight="bold" />
+                        <span className="action-btn__label">QR</span>
                       </button>
                       <button
                         className="action-btn action-btn--delete"
+                        title="Delete"
+                        aria-label="Delete"
                         onClick={() => {
                           if (window.confirm("Delete this customer?")) {
                             deleteCustomer(c.customer_id).then(() =>
@@ -142,7 +151,8 @@ const saveWalletAdjustment = async () => {
                           }
                         }}
                       >
-                        Delete
+                        <Trash className="action-btn__icon" size={18} weight="bold" />
+                        <span className="action-btn__label">Delete</span>
                       </button>
                     </div>
                   </td>
@@ -172,6 +182,15 @@ const saveWalletAdjustment = async () => {
         </table>
       {Math.ceil(total / limit) > 1 && (
         <div className="pagination">
+          <button
+            type="button"
+            className="page-btn page-btn--arrow"
+            onClick={() => setPage((current) => Math.max(1, current - 1))}
+            disabled={page === 1}
+            aria-label="Previous page"
+          >
+            &lsaquo;
+          </button>
           {Array.from({ length: Math.ceil(total / limit) }, (_, i) => (
             <button
               key={i}
@@ -181,6 +200,19 @@ const saveWalletAdjustment = async () => {
               {i + 1}
             </button>
           ))}
+          <button
+            type="button"
+            className="page-btn page-btn--arrow"
+            onClick={() =>
+              setPage((current) =>
+                Math.min(Math.ceil(total / limit), current + 1)
+              )
+            }
+            disabled={page === Math.ceil(total / limit)}
+            aria-label="Next page"
+          >
+            &rsaquo;
+          </button>
         </div>
       )}
       </div>
