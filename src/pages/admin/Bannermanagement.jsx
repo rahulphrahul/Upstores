@@ -4,11 +4,13 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BASEPATH } from "../../config/config";
 import "./Bannermanagement.css";
+import { PencilSimple, Trash } from "phosphor-react";
 
 function BannerManagement() {
   const [loading, setLoading] = useState(false);
   const [banners, setBanners] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [imagePreview, setImagePreview] = useState(null);
   const itemsPerPage = 5;
@@ -103,6 +105,7 @@ function BannerManagement() {
       if (res.status === "success") {
         toast.success(res.message);
         resetForm();
+        setShowForm(false);
         fetchBanners();
       } else {
         toast.error(res.message || "Failed to save banner");
@@ -128,6 +131,7 @@ function BannerManagement() {
     });
 
     setImagePreview(`${BASEPATH}/${banner.image}`);
+    setShowForm(true);
     toast.info("Editing banner...");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -161,8 +165,26 @@ function BannerManagement() {
         theme="colored"
       />
 
-      <h2 className="admin-banner-management__title">Banner Management</h2>
+      <div className="admin-banner-management__header">
+        <h2 className="admin-banner-management__title">Banner Management</h2>
+        <button
+          type="button"
+          className="admin-banner-management__button admin-banner-management__button--primary admin-banner-management__add-toggle"
+          onClick={() => {
+            if (showForm && !editingId) {
+              resetForm();
+              setShowForm(false);
+              return;
+            }
 
+            setShowForm(true);
+          }}
+        >
+          {showForm ? (editingId ? "Editing Banner" : "Close") : "Add Banner"}
+        </button>
+      </div>
+
+      {showForm && (
       <div className="admin-banner-management__panel">
         <h4 className="admin-banner-management__section-title">
           {editingId ? "Edit Banner" : "Create New Banner"}
@@ -267,7 +289,10 @@ function BannerManagement() {
               <button
                 type="button"
                 className="admin-banner-management__button admin-banner-management__button--secondary"
-                onClick={resetForm}
+                onClick={() => {
+                  resetForm();
+                  setShowForm(false);
+                }}
               >
                 Cancel Edit
               </button>
@@ -275,6 +300,7 @@ function BannerManagement() {
           </div>
         </form>
       </div>
+      )}
 
       <div className="admin-banner-management__panel">
         <h4 className="admin-banner-management__section-title">Banner List</h4>
@@ -293,34 +319,40 @@ function BannerManagement() {
               {banners.length > 0 ? (
                 currentItems.map((banner) => (
                   <tr key={banner.id}>
-                    <td>
+                    <td data-label="Image">
                       <img
                         src={`${BASEPATH}/${banner.image}`}
                         alt={`${banner.title} banner`}
                         className="admin-banner-management__table-image"
                       />
                     </td>
-                    <td>{banner.title}</td>
-                    <td>
+                    <td data-label="Title">{banner.title}</td>
+                    <td data-label="Position">
                       <span className="admin-banner-management__position">
                         {banner.position}
                       </span>
                     </td>
-                    <td>
+                    <td data-label="Actions">
                       <div className="admin-banner-management__action-group">
                         <button
                           type="button"
                           className="admin-banner-management__button admin-banner-management__button--edit"
+                          title="Edit"
+                          aria-label="Edit"
                           onClick={() => handleEdit(banner)}
                         >
-                          Edit
+                          <PencilSimple className="admin-action-icon" size={18} weight="bold" />
+                          <span className="admin-action-label">Edit</span>
                         </button>
                         <button
                           type="button"
                           className="admin-banner-management__button admin-banner-management__button--danger"
+                          title="Delete"
+                          aria-label="Delete"
                           onClick={() => handleDelete(banner.id)}
                         >
-                          Delete
+                          <Trash className="admin-action-icon" size={18} weight="bold" />
+                          <span className="admin-action-label">Delete</span>
                         </button>
                       </div>
                     </td>
@@ -341,11 +373,12 @@ function BannerManagement() {
           <div className="admin-banner-management__pagination">
             <button
               type="button"
-              className="admin-banner-management__button admin-banner-management__button--secondary"
+              className="admin-banner-management__button admin-banner-management__button--page admin-banner-management__button--arrow"
               onClick={goToPrevious}
               disabled={currentPage === 1}
+              aria-label="Previous page"
             >
-              Previous
+              &lsaquo;
             </button>
 
             <div className="admin-banner-management__page-list">
@@ -365,11 +398,12 @@ function BannerManagement() {
 
             <button
               type="button"
-              className="admin-banner-management__button admin-banner-management__button--secondary"
+              className="admin-banner-management__button admin-banner-management__button--page admin-banner-management__button--arrow"
               onClick={goToNext}
               disabled={currentPage === totalPages}
+              aria-label="Next page"
             >
-              Next
+              &rsaquo;
             </button>
           </div>
         )}

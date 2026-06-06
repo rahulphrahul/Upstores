@@ -23,6 +23,11 @@ import {
   EnvelopeSimple,
   QrCode,
   ImageSquare,
+  CheckCircle,
+  XCircle,
+  PauseCircle,
+  PlayCircle,
+  Trash,
 } from "phosphor-react";
 
 function SellerManagement() {
@@ -132,24 +137,30 @@ function SellerManagement() {
               <tbody>
                 {pending.map((item) => (
                   <tr key={item.id}>
-                    <td>{item.shop}</td>
-                    <td>&#8377;{item.amount}</td>
-                    <td className="admin-seller-management__cell--pending-action">
+                    <td data-label="Seller">{item.shop}</td>
+                    <td data-label="Amount">&#8377;{item.amount}</td>
+                    <td className="admin-seller-management__cell--pending-action" data-label="Action">
                       <div className="admin-seller-management__action-group admin-seller-management__action-group--center">
                         <button
                           type="button"
                           className="admin-seller-management__button admin-seller-management__button--approve"
+                          title="Approve"
+                          aria-label="Approve"
                           onClick={() => onWalletAction(item, "approve")}
                         >
-                          Approve
+                          <CheckCircle className="admin-action-icon" size={18} weight="bold" />
+                          <span className="admin-action-label">Approve</span>
                         </button>
 
                         <button
                           type="button"
                           className="admin-seller-management__button admin-seller-management__button--reject"
+                          title="Reject"
+                          aria-label="Reject"
                           onClick={() => onWalletAction(item, "rejected")}
                         >
-                          Reject
+                          <XCircle className="admin-action-icon" size={18} weight="bold" />
+                          <span className="admin-action-label">Reject</span>
                         </button>
                       </div>
                     </td>
@@ -216,11 +227,11 @@ function SellerManagement() {
                   className="admin-seller-management__row--clickable"
                   onClick={() => openSellerModal(seller.seller_id)}
                 >
-                  <td>{seller.name}</td>
-                  <td>{seller.owner_name}</td>
-                  <td>{seller.executive || "-"}</td>
-                  <td>&#8377;{seller.wallet_balance}</td>
-                  <td className="admin-seller-management__cell--status">
+                  <td data-label="Seller">{seller.name}</td>
+                  <td data-label="Owner">{seller.owner_name}</td>
+                  <td data-label="Executive">{seller.executive || "-"}</td>
+                  <td data-label="Wallet">&#8377;{seller.wallet_balance}</td>
+                  <td className="admin-seller-management__cell--status" data-label="Status">
                     <span
                       className={`admin-seller-management__status admin-seller-management__status--${String(
                         seller.status
@@ -229,7 +240,7 @@ function SellerManagement() {
                       {seller.status}
                     </span>
                   </td>
-                  <td className="admin-seller-management__cell--action">
+                  <td className="admin-seller-management__cell--action" data-label="Action">
                     <div className="admin-seller-management__action-group">
                       <button
                         type="button"
@@ -238,17 +249,28 @@ function SellerManagement() {
                             ? "admin-seller-management__button--suspend"
                             : "admin-seller-management__button--activate"
                         }`}
+                        title={seller.status === "active" ? "Suspend" : "Activate"}
+                        aria-label={seller.status === "active" ? "Suspend" : "Activate"}
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleStatus(seller);
                         }}
                       >
-                        {seller.status === "active" ? "Suspend" : "Activate"}
+                        {seller.status === "active" ? (
+                          <PauseCircle className="admin-action-icon" size={18} weight="bold" />
+                        ) : (
+                          <PlayCircle className="admin-action-icon" size={18} weight="bold" />
+                        )}
+                        <span className="admin-action-label">
+                          {seller.status === "active" ? "Suspend" : "Activate"}
+                        </span>
                       </button>
 
                       <button
                         type="button"
                         className="admin-seller-management__button admin-seller-management__button--danger"
+                        title="Delete"
+                        aria-label="Delete"
                         onClick={async (e) => {
                           e.stopPropagation();
                           if (window.confirm("Delete this seller?")) {
@@ -257,7 +279,8 @@ function SellerManagement() {
                           }
                         }}
                       >
-                        Delete
+                        <Trash className="admin-action-icon" size={18} weight="bold" />
+                        <span className="admin-action-label">Delete</span>
                       </button>
                     </div>
                   </td>
@@ -280,6 +303,15 @@ function SellerManagement() {
 
         {Math.ceil(total / limit) > 1 && (
           <div className="admin-seller-management__pagination">
+            <button
+              type="button"
+              className="admin-seller-management__page-btn admin-seller-management__page-btn--arrow"
+              onClick={() => setPage((current) => Math.max(1, current - 1))}
+              disabled={page === 1}
+              aria-label="Previous page"
+            >
+              &lsaquo;
+            </button>
             {Array.from({ length: Math.ceil(total / limit) }, (_, i) => (
               <button
                 key={i}
@@ -292,6 +324,19 @@ function SellerManagement() {
                 {i + 1}
               </button>
             ))}
+            <button
+              type="button"
+              className="admin-seller-management__page-btn admin-seller-management__page-btn--arrow"
+              onClick={() =>
+                setPage((current) =>
+                  Math.min(Math.ceil(total / limit), current + 1)
+                )
+              }
+              disabled={page === Math.ceil(total / limit)}
+              aria-label="Next page"
+            >
+              &rsaquo;
+            </button>
           </div>
         )}
       </div>

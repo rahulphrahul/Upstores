@@ -154,14 +154,14 @@
 .admin-shop-management__button--search,
 .admin-shop-management__button--clear {
   min-width: 124px;
-  background: #001ae3;
-  color: #ffffff;
+  background: #001ae3 !important;
+  color: #ffffff !important;
   box-shadow: 0 8px 18px rgba(0, 26, 227, 0.18);
 }
 
 .admin-shop-management__button--search:hover,
 .admin-shop-management__button--clear:hover {
-  background: #0013b0;
+  background: #0013b0 !important;
 }
 
 .admin-shop-management__button--approve,
@@ -177,32 +177,36 @@
 }
 
 .admin-shop-management__button--suspend {
-  background: #facc15;
-  color: #713f12;
+  background: #facc15 !important;
+  color: #713f12 !important;
   box-shadow: 0 8px 18px rgba(250, 204, 21, 0.22);
 }
 
 .admin-shop-management__button--suspend:hover {
-  background: #eab308;
+  background: #eab308 !important;
 }
 
 .admin-shop-management__button--danger,
 .admin-shop-management__button--reject {
-  background: #dc2626;
-  color: #ffffff;
+  background: #dc2626 !important;
+  color: #ffffff !important;
   box-shadow: 0 8px 18px rgba(220, 38, 38, 0.18);
 }
 
 .admin-shop-management__button--danger:hover,
 .admin-shop-management__button--reject:hover {
-  background: #b91c1c;
+  background: #b91c1c !important;
 }
 
 .admin-shop-management__action-group {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 10px;
+}
+
+.admin-shop-management .admin-action-icon {
+  display: none;
 }
 
 .admin-shop-management__action-group--center {
@@ -245,7 +249,9 @@
 .admin-shop-management__pagination {
   margin-top: 20px;
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
   gap: 8px;
 }
 
@@ -272,6 +278,16 @@
   color: #ffffff;
   border-color: #001ae3;
   box-shadow: 0 8px 18px rgba(0, 26, 227, 0.18);
+}
+
+.admin-shop-management__page-btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.admin-shop-management__page-btn--arrow {
+  font-size: 22px;
+  line-height: 1;
 }
 
 .skeleton {
@@ -533,11 +549,154 @@
   }
 
   .admin-shop-management__pending-table {
-    min-width: 460px;
+    min-width: 0;
   }
 
   .admin-shop-management__data-table {
-    min-width: 680px;
+    min-width: 0;
+  }
+
+  .admin-shop-management__table-scroll {
+    overflow-x: visible;
+  }
+
+  .admin-shop-management__pending-table,
+  .admin-shop-management__pending-table thead,
+  .admin-shop-management__pending-table tbody,
+  .admin-shop-management__pending-table tr,
+  .admin-shop-management__pending-table td,
+  .admin-shop-management__data-table,
+  .admin-shop-management__data-table thead,
+  .admin-shop-management__data-table tbody,
+  .admin-shop-management__data-table tr,
+  .admin-shop-management__data-table td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .admin-shop-management__pending-table thead,
+  .admin-shop-management__data-table thead {
+    display: none;
+  }
+
+  .admin-shop-management__pending-table tbody,
+  .admin-shop-management__data-table tbody {
+    display: grid;
+    gap: 14px;
+  }
+
+  .admin-shop-management__pending-table tr,
+  .admin-shop-management__data-table tr {
+    padding: 14px;
+    border: 1px solid #e0e5ff;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 8px 18px rgba(0, 26, 227, 0.08);
+  }
+
+  .admin-shop-management__pending-table td,
+  .admin-shop-management__data-table td {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eef2ff;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: right !important;
+  }
+
+  .admin-shop-management__pending-table td:last-child,
+  .admin-shop-management__data-table td:last-child {
+    border-bottom: 0;
+  }
+
+  .admin-shop-management__pending-table td[data-label]::before,
+  .admin-shop-management__data-table td[data-label]::before {
+    content: attr(data-label);
+    flex: 0 0 42%;
+    color: #001ae3;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .admin-shop-management__pending-table td:not([data-label]),
+  .admin-shop-management__data-table td:not([data-label]) {
+    display: block;
+    text-align: center !important;
+  }
+
+  .admin-shop-management__cell--action .admin-shop-management__action-group,
+  .admin-shop-management__action-group--center {
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+  }
+
+  .admin-shop-management__pending-table td[data-label="Action"]::before,
+  .admin-shop-management__data-table td[data-label="Action"]::before {
+    flex: 1 1 auto;
+  }
+
+  .admin-shop-management__pending-table td[data-label="Action"] .admin-shop-management__button,
+  .admin-shop-management__data-table td[data-label="Action"] .admin-shop-management__button {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    padding: 0;
+    border-radius: 10px;
+  }
+
+  .admin-shop-management__pending-table td[data-label="Action"] .admin-shop-management__button:not(.admin-shop-management__button--danger):not(.admin-shop-management__button--reject),
+  .admin-shop-management__data-table td[data-label="Action"] .admin-shop-management__button:not(.admin-shop-management__button--danger):not(.admin-shop-management__button--reject) {
+    background: #facc15 !important;
+    color: #713f12 !important;
+    box-shadow: 0 8px 18px rgba(250, 204, 21, 0.22);
+  }
+
+  .admin-shop-management__pending-table td[data-label="Action"] .admin-shop-management__button--approve,
+  .admin-shop-management__data-table td[data-label="Action"] .admin-shop-management__button--activate {
+    background: #16a34a !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 18px rgba(22, 163, 74, 0.18);
+  }
+
+  .admin-shop-management .admin-action-label {
+    display: none;
+  }
+
+  .admin-shop-management .admin-action-icon {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .admin-shop-management__pagination {
+    width: fit-content;
+    max-width: 100%;
+    margin: 18px auto 0;
+    padding: 6px;
+    gap: 6px;
+    overflow-x: auto;
+    border: 1px solid #dbe3ff;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 8px 18px rgba(0, 26, 227, 0.08);
+    scrollbar-width: none;
+  }
+
+  .admin-shop-management__pagination::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-shop-management__page-btn {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border-radius: 10px;
+    font-size: 12px;
+    box-shadow: none;
   }
 
   .shop-modal-container {
@@ -578,10 +737,10 @@
   }
 
   .admin-shop-management__pending-table {
-    min-width: 440px;
+    min-width: 0;
   }
 
   .admin-shop-management__data-table {
-    min-width: 640px;
+    min-width: 0;
   }
 }

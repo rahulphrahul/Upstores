@@ -112,6 +112,13 @@ const AdminWalletManagement = () => {
 
     return (
       <Pagination className="admin-wallet-management__pagination-list">
+        <Pagination.Prev
+          onClick={() => setPage((current) => Math.max(1, current - 1))}
+          disabled={page === 1}
+          aria-label="Previous page"
+        >
+          &lsaquo;
+        </Pagination.Prev>
         {[...Array(totalPages)].map((_, i) => (
           <Pagination.Item
             key={i}
@@ -121,6 +128,15 @@ const AdminWalletManagement = () => {
             {i + 1}
           </Pagination.Item>
         ))}
+        <Pagination.Next
+          onClick={() =>
+            setPage((current) => Math.min(totalPages, current + 1))
+          }
+          disabled={page === totalPages}
+          aria-label="Next page"
+        >
+          &rsaquo;
+        </Pagination.Next>
       </Pagination>
     );
   };
@@ -239,12 +255,12 @@ const AdminWalletManagement = () => {
               {paginatedHistory.length > 0 ? (
                 paginatedHistory.map((item) => (
                   <tr key={item.id}>
-                    <td>{item.id}</td>
-                    <td>{item.old_wallet_amount}</td>
-                    <td>{item.old_pv_balance}</td>
-                    <td>{item.reset_reason}</td>
-                    <td>{item.reset_by_name}</td>
-                    <td>{item.reset_at}</td>
+                    <td data-label="ID">{item.id}</td>
+                    <td data-label="Old Points">{item.old_wallet_amount}</td>
+                    <td data-label="Old PV">{item.old_pv_balance}</td>
+                    <td data-label="Reason">{item.reset_reason}</td>
+                    <td data-label="Reset By">{item.reset_by_name}</td>
+                    <td data-label="Date">{item.reset_at}</td>
                   </tr>
                 ))
               ) : (
@@ -323,11 +339,11 @@ const AdminWalletManagement = () => {
               {paginatedWithdrawals.length > 0 ? (
                 paginatedWithdrawals.map((item) => (
                   <tr key={item.id}>
-                    <td>{item.id}</td>
-                    <td>{item.name}</td>
-                    <td>{item.email}</td>
-                    <td>Rs. {item.amount}</td>
-                    <td>
+                    <td data-label="ID">{item.id}</td>
+                    <td data-label="Name">{item.name}</td>
+                    <td data-label="Email">{item.email}</td>
+                    <td data-label="Amount">Rs. {item.amount}</td>
+                    <td data-label="Status">
                       <span
                         className={`admin-wallet-management__status ${getStatusClassName(
                           item.status
@@ -336,7 +352,7 @@ const AdminWalletManagement = () => {
                         {getStatusLabel(item.status)}
                       </span>
                     </td>
-                    <td>{item.created_at}</td>
+                    <td data-label="Date">{item.created_at}</td>
                   </tr>
                 ))
               ) : (
