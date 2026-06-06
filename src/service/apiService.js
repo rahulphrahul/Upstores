@@ -199,17 +199,17 @@ export const deleteCategory = async (id) =>
     body: JSON.stringify({ id }),
   }).then(res => res.json());
 
-export const addPurchase = async (formData) => {
-  const res = await fetch(
-    `${BASE_URL}/customer/add_purchase.php`,
-    {
-      method: "POST",
-      body: formData,
-    }
-  );
+// export const addPurchase = async (formData) => {
+//   const res = await fetch(
+//     `${BASE_URL}/customer/add_purchase.php`,
+//     {
+//       method: "POST",
+//       body: formData,
+//     }
+//   );
 
-  return res.json();
-};
+//   return res.json();
+// };
 
 /* ============================
    ADD EXECUTIVE SELLER
