@@ -114,6 +114,86 @@
   height: 260px;
 }
 
+.reports-card {
+  margin-bottom: 2rem;
+}
+
+.reports-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.reports-header h4 {
+  margin: 0 0 4px;
+  color: #1c1c1c;
+}
+
+.reports-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.reports-header strong {
+  color: #001ae3;
+  font-size: 20px;
+  white-space: nowrap;
+}
+
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.report-chip {
+  border: 1px solid #e0e5ff;
+  border-radius: 10px;
+  padding: 12px;
+  background: #f8faff;
+}
+
+.report-chip span {
+  display: block;
+  color: #64748b;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.report-chip strong {
+  color: #0f172a;
+  font-size: 18px;
+}
+
+.reports-table td:first-child {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.report-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.report-dot.shops {
+  background: #001ae3;
+}
+
+.report-dot.sellers {
+  background: #16a34a;
+}
+
+.report-dot.services {
+  background: #facc15;
+}
+
 .approve-btn {
   background: #001ae3;
   color: #fff;
@@ -270,6 +350,11 @@
   .reject-btn {
     padding: 5px 8px;
     font-size: 12px;
+  }
+
+  .reports-header {
+    flex-direction: column;
+    gap: 8px;
   }
 }
 @media (max-width: 480px) {

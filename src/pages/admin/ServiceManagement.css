@@ -224,12 +224,14 @@
 
 .service-page .btn-suspend {
   background: #facc15 !important;
+  border: 1px solid #facc15 !important;
   color: #713f12 !important;
-  box-shadow: 0 8px 18px rgba(250, 204, 21, 0.22);
+  box-shadow: 0 8px 18px rgba(240, 198, 33, 0.22);
 }
 
 .service-page .btn-suspend:hover {
   background: #eab308 !important;
+  border-color: #eab308 !important;
 }
 
 @media (min-width: 769px) {
@@ -582,6 +584,7 @@
     padding: 0;
     border-radius: 9px;
     background: #facc15 !important;
+    border-color: #facc15 !important;
     color: #713f12 !important;
   }
 
@@ -589,6 +592,7 @@
   .service-page .overflow-x-auto table td[data-label="Action"] .btn-activate,
   .service-page .overflow-x-auto table td[data-label="Action"] .btn-success {
     background: #16a34a !important;
+    border-color: #16a34a !important;
     color: #ffffff !important;
   }
 
@@ -600,6 +604,7 @@
     padding: 0;
     border-radius: 9px;
     background: #dc2626 !important;
+    border-color: #dc2626 !important;
     color: #ffffff !important;
   }
 

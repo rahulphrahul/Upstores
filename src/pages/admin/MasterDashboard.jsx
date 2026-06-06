@@ -50,6 +50,21 @@ function MasterDashboard() {
   const monthlyRootRef = useRef(null);
   const shop_type = "all";
   const rupeeSymbol = "\u20B9";
+  const dashboardData = stats?.data || {};
+
+  const normalizeList = (value) => {
+    if (Array.isArray(value)) return value;
+    if (Array.isArray(value?.data)) return value.data;
+    return [];
+  };
+
+  const toNumber = (value) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
+  const formatNumber = (value) => toNumber(value).toLocaleString();
+  const formatCurrency = (value) => `${rupeeSymbol} ${formatNumber(value)}`;
 
   /* =========================
      LOAD DATA
@@ -65,10 +80,10 @@ function MasterDashboard() {
         getWalletRequests(shop_type),
       ]);
 
-      setStats(statsRes);
-      setDailyData(dailyRes);
-      setMonthlyData(monthlyRes);
-      setPending(pendingRes?.data || []);
+      setStats(statsRes || {});
+      setDailyData(normalizeList(dailyRes));
+      setMonthlyData(normalizeList(monthlyRes));
+      setPending(normalizeList(pendingRes));
     } finally {
       setLoading(false);
     }
@@ -107,12 +122,12 @@ function MasterDashboard() {
     ========================= */
     const parsedDailyData = dailyData.map((d) => ({
       day: d.day,
-      total: Number(d.total),
+      total: toNumber(d.total),
     }));
 
     const parsedMonthlyData = monthlyData.map((m) => ({
       month: m.month,
-      total: Number(m.total),
+      total: toNumber(m.total),
     }));
 
     /* =========================
@@ -285,6 +300,25 @@ function MasterDashboard() {
     return <MasterDashboardSkeleton />;
   }
 
+  const reportRows = [
+    { name: "Shops", data: dashboardData.shops, className: "shops" },
+    { name: "Sellers", data: dashboardData.sellers, className: "sellers" },
+    { name: "Services", data: dashboardData.services, className: "services" },
+  ];
+
+  const reportTotals = reportRows.reduce(
+    (total, report) => ({
+      activeAccounts: total.activeAccounts + toNumber(report.data?.total),
+      wallet: total.wallet + toNumber(report.data?.wallet),
+      transactions: total.transactions + toNumber(report.data?.transactions),
+      pending: total.pending + toNumber(report.data?.pending),
+    }),
+    { activeAccounts: 0, wallet: 0, transactions: 0, pending: 0 }
+  );
+
+  const latestDailyReport = dailyData[dailyData.length - 1];
+  const latestMonthlyReport = monthlyData[monthlyData.length - 1];
+
   /* =========================
      MAIN UI
   ========================= */
@@ -300,7 +334,7 @@ function MasterDashboard() {
             </div>
             <div>
               <p className="stat-title">Shops</p>
-              <h3>{stats?.data.shops?.total || 0}</h3>
+              <h3>{dashboardData.shops?.total || 0}</h3>
             </div>
           </div>
 
@@ -308,19 +342,19 @@ function MasterDashboard() {
             <div className="metric">
               <FaWallet />
               <span>Wallet</span>
-              <strong>{rupeeSymbol} {stats?.data.shops?.wallet || 0}</strong>
+              <strong>{formatCurrency(dashboardData.shops?.wallet)}</strong>
             </div>
             <div className="metric">
               <FaExchangeAlt />
               <span>Transactions</span>
               <strong>
-                {rupeeSymbol} {stats?.data.shops?.transactions || 0}
+                {formatCurrency(dashboardData.shops?.transactions)}
               </strong>
             </div>
             <div className="metric">
               <FaClock />
               <span>Pending</span>
-              <strong>{stats?.data.shops?.pending || 0}</strong>
+              <strong>{dashboardData.shops?.pending || 0}</strong>
             </div>
           </div>
         </div>
@@ -332,7 +366,7 @@ function MasterDashboard() {
             </div>
             <div>
               <p className="stat-title">Sellers</p>
-              <h3>{stats?.data.sellers?.total || 0}</h3>
+              <h3>{dashboardData.sellers?.total || 0}</h3>
             </div>
           </div>
 
@@ -340,19 +374,19 @@ function MasterDashboard() {
             <div className="metric">
               <FaWallet />
               <span>Wallet</span>
-              <strong>{rupeeSymbol} {stats?.data.sellers?.wallet || 0}</strong>
+              <strong>{formatCurrency(dashboardData.sellers?.wallet)}</strong>
             </div>
             <div className="metric">
               <FaExchangeAlt />
               <span>Transactions</span>
               <strong>
-                {rupeeSymbol} {stats?.data.sellers?.transactions || 0}
+                {formatCurrency(dashboardData.sellers?.transactions)}
               </strong>
             </div>
             <div className="metric">
               <FaClock />
               <span>Pending</span>
-              <strong>{stats?.data.sellers?.pending || 0}</strong>
+              <strong>{dashboardData.sellers?.pending || 0}</strong>
             </div>
           </div>
         </div>
@@ -364,7 +398,7 @@ function MasterDashboard() {
             </div>
             <div>
               <p className="stat-title">Services</p>
-              <h3>{stats?.data.services?.total || 0}</h3>
+              <h3>{dashboardData.services?.total || 0}</h3>
             </div>
           </div>
 
@@ -372,19 +406,19 @@ function MasterDashboard() {
             <div className="metric">
               <FaWallet />
               <span className="card-span-text">Wallet</span>
-              <strong>{rupeeSymbol} {stats?.data.services?.wallet || 0}</strong>
+              <strong>{formatCurrency(dashboardData.services?.wallet)}</strong>
             </div>
             <div className="metric">
               <FaExchangeAlt />
               <span className="card-span-text">Transactions</span>
               <strong>
-                {rupeeSymbol} {stats?.data.services?.transactions || 0}
+                {formatCurrency(dashboardData.services?.transactions)}
               </strong>
             </div>
             <div className="metric">
               <FaClock />
               <span className="card-span-text">Pending</span>
-              <strong>{stats?.data.services?.pending || 0}</strong>
+              <strong>{dashboardData.services?.pending || 0}</strong>
             </div>
           </div>
         </div>
@@ -398,7 +432,7 @@ function MasterDashboard() {
             <div>
               <p className="stat-title">Admin Points</p>
               <h3>
-                {Number(stats?.data?.admin_points?.points || 0).toLocaleString()}
+                {formatNumber(dashboardData.admin_points?.points)}
               </h3>
             </div>
           </div>
@@ -410,7 +444,7 @@ function MasterDashboard() {
               <FaLayerGroup />
               <span className="card-span-text">Total PV</span>
               <strong>
-                {Number(stats?.data?.admin_points?.pv || 0).toLocaleString()}
+                {formatNumber(dashboardData.admin_points?.pv)}
               </strong>
             </div>
 
@@ -420,6 +454,75 @@ function MasterDashboard() {
               <strong className="positive">Active</strong>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="card reports-card">
+        <div className="reports-header">
+          <div>
+            <h4>Reports</h4>
+            <p>Live dashboard summary</p>
+          </div>
+          <strong>{formatCurrency(reportTotals.transactions)}</strong>
+        </div>
+
+        <div className="reports-grid">
+          <div className="report-chip">
+            <span>Accounts</span>
+            <strong>{formatNumber(reportTotals.activeAccounts)}</strong>
+          </div>
+          <div className="report-chip">
+            <span>Wallet Balance</span>
+            <strong>{formatCurrency(reportTotals.wallet)}</strong>
+          </div>
+          <div className="report-chip">
+            <span>Pending Funds</span>
+            <strong>{formatNumber(reportTotals.pending)}</strong>
+          </div>
+          <div className="report-chip">
+            <span>Open Approvals</span>
+            <strong>{formatNumber(pending.length)}</strong>
+          </div>
+        </div>
+
+        <div className="table-responsive">
+          <table className="data-table reports-table">
+            <thead>
+              <tr>
+                <th>Report</th>
+                <th>Total</th>
+                <th>Wallet</th>
+                <th>Transactions</th>
+                <th>Pending</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reportRows.map((report) => (
+                <tr key={report.name}>
+                  <td>
+                    <span className={`report-dot ${report.className}`} />
+                    {report.name}
+                  </td>
+                  <td>{formatNumber(report.data?.total)}</td>
+                  <td>{formatCurrency(report.data?.wallet)}</td>
+                  <td>{formatCurrency(report.data?.transactions)}</td>
+                  <td>{formatNumber(report.data?.pending)}</td>
+                </tr>
+              ))}
+              <tr>
+                <td>Latest Daily</td>
+                <td colSpan="2">{latestDailyReport?.day || "-"}</td>
+                <td>{formatCurrency(latestDailyReport?.total)}</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td>Latest Monthly</td>
+                <td colSpan="2">{latestMonthlyReport?.month || "-"}</td>
+                <td>{formatCurrency(latestMonthlyReport?.total)}</td>
+                <td>-</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
