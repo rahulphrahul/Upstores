@@ -3,6 +3,7 @@ import React, {
   useState,
   useRef,
   useLayoutEffect,
+  useMemo,
 } from "react";
 import { toast } from "react-toastify";
 import * as am5 from "@amcharts/amcharts5";
@@ -24,8 +25,10 @@ import {
   getDailyTransactions,
   getMonthlyTransactions,
   getWalletRequests,
+  getFundRequestReports,
   handleWalletRequest,
 } from "../../service/apiService";
+import { Bill_IMG_URL,Bill_WALLET_IMG_URL } from "../../config/config";
 
 import MasterDashboardSkeleton from "./skeletons/MasterDashboardSkeleton";
 import "./MasterDashboard.css";
@@ -39,7 +42,10 @@ function MasterDashboard() {
   const [dailyData, setDailyData] = useState([]);
   const [monthlyData, setMonthlyData] = useState([]);
   const [pending, setPending] = useState([]);
-
+  const [fundReports, setFundReports] = useState([]);
+  const [reportFrom, setReportFrom] = useState("");
+  const [reportTo, setReportTo] = useState("");
+  const [reportSearch, setReportSearch] = useState("");
   /* =========================
      CHART DOM REFS
   ========================= */
@@ -73,17 +79,22 @@ function MasterDashboard() {
     try {
       setLoading(true);
 
-      const [statsRes, dailyRes, monthlyRes, pendingRes] = await Promise.all([
+      const [statsRes, dailyRes, monthlyRes, pendingRes,fundReportRes] = await Promise.all([
         getDashboardStats(),
         getDailyTransactions(),
         getMonthlyTransactions(),
         getWalletRequests(shop_type),
+        getFundRequestReports({
+    page: 1,
+    limit: 50
+  })
       ]);
 
       setStats(statsRes || {});
       setDailyData(normalizeList(dailyRes));
       setMonthlyData(normalizeList(monthlyRes));
       setPending(normalizeList(pendingRes));
+      setFundReports(fundReportRes?.data || []);
     } finally {
       setLoading(false);
     }
@@ -92,7 +103,22 @@ function MasterDashboard() {
   useEffect(() => {
     loadAll();
   }, []);
+const loadFundReports = async () => {
+  try {
+    const res = await getFundRequestReports({
+      page: 1,
+      limit: 50,
+      from: reportFrom,
+      to: reportTo,
+      search: reportSearch,
+    });
 
+    setFundReports(res?.data || []);
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to load fund reports");
+  }
+};
   /* =========================
      CREATE CHARTS (amCharts 5 SAFE)
   ========================= */
@@ -292,7 +318,22 @@ function MasterDashboard() {
       toast.error("Failed to update wallet request ");
     }
   };
+const getRequestTitle = (record) =>
+  record.account || record.user_type;
 
+const getRequestStatus = (record) =>
+  record.status || "Pending";
+
+const getRecordDisplayDate = (record) =>
+  record.created_at;
+
+const getRequestDetails = (record) =>
+  record.admin_remark || "-";
+
+const resolveRequestImageUrl = (record) =>
+  record.proof
+    ? `${Bill_WALLET_IMG_URL}/${record.proof}`
+    : null;
   /* =========================
      SKELETON
   ========================= */
@@ -318,7 +359,7 @@ function MasterDashboard() {
 
   const latestDailyReport = dailyData[dailyData.length - 1];
   const latestMonthlyReport = monthlyData[monthlyData.length - 1];
-
+  const filteredFundReports = fundReports;
   /* =========================
      MAIN UI
   ========================= */
@@ -577,6 +618,136 @@ function MasterDashboard() {
               {pending.length === 0 && (
                 <tr>
                   <td colSpan="3">No pending approvals</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="card reports-card fund-report-card">
+        <div className="reports-header">
+          <div>
+            <h4>Fund Request Report</h4>
+            <p>Approved, rejected, and pending wallet actions with uploaded bill evidence.</p>
+          </div>
+          <strong>{formatNumber(filteredFundReports.length)}</strong>
+        </div>
+
+        <div className="report-filters">
+          <div className="report-filter">
+            <label htmlFor="fund-report-from">From Date</label>
+            <input
+              id="fund-report-from"
+              type="date"
+              value={reportFrom}
+              onChange={(e) => setReportFrom(e.target.value)}
+            />
+          </div>
+
+          <div className="report-filter">
+            <label htmlFor="fund-report-to">To Date</label>
+            <input
+              id="fund-report-to"
+              type="date"
+              value={reportTo}
+              onChange={(e) => setReportTo(e.target.value)}
+            />
+          </div>
+
+          <div className="report-filter report-filter--search">
+            <label htmlFor="fund-report-search">Search</label>
+            <input
+              id="fund-report-search"
+              type="text"
+              placeholder="Search shop, amount, status, notes, bill..."
+              value={reportSearch}
+              onChange={(e) => setReportSearch(e.target.value)}
+            />
+          </div>
+
+          <div className="report-actions">
+  <button
+    type="button"
+    className="btn approve-btn"
+    onClick={loadFundReports}
+  >
+    Submit
+  </button>
+
+  <button
+    type="button"
+    className="btn report-clear-btn"
+    onClick={async () => {
+      setReportFrom("");
+      setReportTo("");
+      setReportSearch("");
+
+      const res = await getFundRequestReports();
+      setFundReports(res?.data || []);
+    }}
+  >
+    Clear
+  </button>
+</div>
+        </div>
+
+        <div className="table-responsive">
+          <table className="data-table reports-table fund-report-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Account</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Bill / Proof</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredFundReports.length > 0 ? (
+                filteredFundReports.map((record, index) => {
+                  const imageUrl = resolveRequestImageUrl(record);
+                  const statusLabel = getRequestStatus(record);
+                  const statusClass = `report-status report-status--${String(
+                    statusLabel
+                  )
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")}`;
+
+                  return (
+                    <tr key={record.id || record.request_id || index}>
+                      <td data-label="Date">{getRecordDisplayDate(record)}</td>
+                      <td data-label="Account">{getRequestTitle(record)}</td>
+                      <td data-label="Amount">
+                        {rupeeSymbol} {formatNumber(record.amount)}
+                      </td>
+                      <td data-label="Status">
+                        <span className={statusClass}>{statusLabel}</span>
+                      </td>
+                      <td data-label="Bill / Proof">
+                        {imageUrl ? (
+                          <a
+                            href={imageUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="report-proof-link"
+                          >
+                            View Bill
+                          </a>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                      <td data-label="Details">{getRequestDetails(record)}</td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="6" className="empty-text">
+                    No fund request report found
+                  </td>
                 </tr>
               )}
             </tbody>

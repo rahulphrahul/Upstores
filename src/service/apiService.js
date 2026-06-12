@@ -900,7 +900,20 @@ export const getWalletRequests = async (shop_type) => {
   return res.json();
 };
 
+export const getFundRequestReports = async ({
+  page = 1,
+  limit = 10,
+  from = "",
+  to = "",
+  search = "",
+} = {}) => {
 
+  const res = await fetch(
+    `${BASE_URL}/admin/get_fund_request_reports.php?page=${page}&limit=${limit}&from=${from}&to=${to}&search=${search}`
+  );
+
+  return res.json();
+};
 
 /*==================================
   service
