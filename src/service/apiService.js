@@ -608,12 +608,12 @@ export const getBanners = async () => {
 ========================= */
 
 export const getUpdateNotice = async () => {
-  const res = await fetch(`${BASE_URL}/update_notice.php`);
+  const res = await fetch(`${BASE_URL}/auth/update_notice.php`);
   return res.json();
 };
 
 export const saveUpdateNotice = async (data) => {
-  const res = await fetch(`${BASE_URL}/update_notice.php`, {
+  const res = await fetch(`${BASE_URL}/auth/update_notice.php`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
