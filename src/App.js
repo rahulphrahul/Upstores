@@ -46,6 +46,7 @@ import WalletService from './pages/service/WalletService';
 import ScanCustomerServiceQR from './pages/service/ScanCustomerServiceQR';
 import PurchaseServiceHistory from './pages/service/PurchaseServiceHistory';
 import BannerManagement from './pages/admin/Bannermanagement';
+import UpdateNoticeManagement from './pages/admin/UpdateNoticeManagement';
 import CustomerPurchase from './pages/shop/CustomerPurchase';
 import CustomerSellerPurchase from './pages/seller/CustomerSellerPurchase';
 import CustomerServicePurchase from './pages/service/CustomerServicePurchase';
@@ -193,11 +194,19 @@ function App() {
               </RoleProtectedRoute>
             }
           />
-           <Route
+          <Route
             path="super-admin/banners"
             element={
               <RoleProtectedRoute user={user} allowedRoles={['admin']}>
                 <BannerManagement />
+              </RoleProtectedRoute>
+            }
+          />
+          <Route
+            path="super-admin/update-notice"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['admin']}>
+                <UpdateNoticeManagement />
               </RoleProtectedRoute>
             }
           />

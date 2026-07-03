@@ -602,6 +602,24 @@ export const getBanners = async () => {
   const res = await fetch(`${BASE_URL}/banners/list.php`);
   return res.json();
 };
+
+/* =========================
+   ADMIN: UPDATE NOTICE
+========================= */
+
+export const getUpdateNotice = async () => {
+  const res = await fetch(`${BASE_URL}/update_notice.php`);
+  return res.json();
+};
+
+export const saveUpdateNotice = async (data) => {
+  const res = await fetch(`${BASE_URL}/update_notice.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+};
 // shop
 
 export const getShopDashboard = async (shopId) => {
