@@ -18,6 +18,8 @@ import {
   FaWallet,
   FaExchangeAlt,
   FaClock,
+    FaUsers,
+  FaUserFriends,
 } from "react-icons/fa";
 
 import {
@@ -345,6 +347,7 @@ const resolveRequestImageUrl = (record) =>
     { name: "Shops", data: dashboardData.shops, className: "shops" },
     { name: "Sellers", data: dashboardData.sellers, className: "sellers" },
     { name: "Services", data: dashboardData.services, className: "services" },
+    
   ];
 
   const reportTotals = reportRows.reduce(
@@ -463,7 +466,50 @@ const resolveRequestImageUrl = (record) =>
             </div>
           </div>
         </div>
+<div className="stat-card customers">
+  <div className="stat-top">
+    <div className="stat-icon-box customers">
+      <FaUsers />
+    </div>
 
+    <div>
+      <p className="stat-title">Customers</p>
+      <h3>{dashboardData.customers?.total || 0}</h3>
+    </div>
+  </div>
+
+  <div className="stat-divider"></div>
+
+  <div className="stat-metrics">
+    <div className="metric">
+      <FaUsers />
+      <span>Total Customers</span>
+      <strong>{dashboardData.customers?.total || 0}</strong>
+    </div>
+  </div>
+</div>
+<div className="stat-card executives">
+  <div className="stat-top">
+    <div className="stat-icon-box executives">
+      <FaUserFriends />
+    </div>
+
+    <div>
+      <p className="stat-title">Executives</p>
+      <h3>{dashboardData.executives?.total || 0}</h3>
+    </div>
+  </div>
+
+  <div className="stat-divider"></div>
+
+  <div className="stat-metrics">
+    <div className="metric">
+      <FaUserFriends />
+      <span>Total Executives</span>
+      <strong>{dashboardData.executives?.total || 0}</strong>
+    </div>
+  </div>
+</div>
         <div className="stat-card earnings">
           <div className="stat-top">
             <div className="stat-icon-box earnings">

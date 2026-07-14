@@ -9,7 +9,23 @@
   margin-bottom: 1.5rem;
   color: #001ae3;
 }
+.customers .stat-icon-box{
+    background:#0ea5e9;
+    color:#fff;
+}
 
+.executives .stat-icon-box{
+    background:#7c3aed;
+    color:#fff;
+}
+
+.report-dot.customers{
+    background:#0ea5e9;
+}
+
+.report-dot.executives{
+    background:#7c3aed;
+}
 /* STATS */
 .stats-grid {
   display: grid;
