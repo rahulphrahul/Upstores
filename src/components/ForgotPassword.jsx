@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Container, Card, Form, Button, Alert } from "react-bootstrap";
 import { sendPasswordResetEmail } from "../service/apiService";
-import { FALLBACK_IMAGE } from "../config/config";
-import logo from "../assets/logo.png";
+import { APP_LOGO_URL, FALLBACK_IMAGE } from "../config/config";
 function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [msg, setMsg] = useState("");
@@ -36,7 +35,7 @@ function ForgotPassword() {
       <Card className="p-4 shadow" style={{ maxWidth: 420, width: "100%" }}>
          <div className="d-flex justify-content-center mb-3">
           <img
-             src={logo || FALLBACK_IMAGE}
+             src={APP_LOGO_URL || FALLBACK_IMAGE}
             alt="Company logo"
             style={{ height: 56, width: "auto", objectFit: "contain" }}
           />

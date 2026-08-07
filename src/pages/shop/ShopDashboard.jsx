@@ -5,7 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { shopIcon } from "../../utils/leafletIcon";
 import { QRCodeCanvas } from "qrcode.react";
 import { BASE_IMAGE_URL, FALLBACK_IMAGE } from "../../config/config";
-import companyLogo from "../../assets/logo.png";
+import { APP_LOGO_URL } from "../../config/config";
 import { jsPDF } from "jspdf";
 import QRCode from "qrcode";
 
@@ -287,7 +287,7 @@ onClick={async () => {
     const qrSize = 650; // QR display size
 
     const logoImg = new Image();
-    logoImg.src = companyLogo;
+    logoImg.src = APP_LOGO_URL;
 
     logoImg.onload = () => {
 

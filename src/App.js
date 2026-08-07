@@ -47,6 +47,7 @@ import ScanCustomerServiceQR from './pages/service/ScanCustomerServiceQR';
 import PurchaseServiceHistory from './pages/service/PurchaseServiceHistory';
 import BannerManagement from './pages/admin/Bannermanagement';
 import UpdateNoticeManagement from './pages/admin/UpdateNoticeManagement';
+import PanCardManagement from './pages/admin/PanCardManagement';
 import CustomerPurchase from './pages/shop/CustomerPurchase';
 import CustomerSellerPurchase from './pages/seller/CustomerSellerPurchase';
 import CustomerServicePurchase from './pages/service/CustomerServicePurchase';
@@ -208,6 +209,20 @@ function App() {
               <RoleProtectedRoute user={user} allowedRoles={['admin']}>
                 <UpdateNoticeManagement />
               </RoleProtectedRoute>
+            }
+          />
+          <Route
+            path="super-admin/company-bank-details"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['admin']}>
+                <PanCardManagement />
+              </RoleProtectedRoute>
+            }
+          />
+          <Route
+            path="super-admin/pan-card"
+            element={
+              <Navigate to="/dashboard/super-admin/company-bank-details" replace />
             }
           />
           <Route

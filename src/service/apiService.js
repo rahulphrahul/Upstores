@@ -1,5 +1,8 @@
+import { API_ROOT_URL, API_BASE_URL, API_COMPANY_URL } from "../config/config";
 
-const BASE_URL = 'https://semicoloninnovations.in/upstores/api';
+const BASE_URL = API_ROOT_URL;
+const CUSTOMERS_URL = API_BASE_URL;
+const COMPANY_URL = API_COMPANY_URL;
 
 export const loginUser = async (username, password) => {
   const res = await fetch(`${BASE_URL}/auth/login.php`, {
@@ -477,7 +480,7 @@ export const sendPasswordResetEmail = async (email) => {
 };
 export const getCustomers = async (page = 1, search = "") => {
   const res = await fetch(
-    `${BASE_URL}/customers/list.php?page=${page}&search=${search}`
+    `${CUSTOMERS_URL}/list.php?page=${page}&search=${search}`
   );
   return res.json();
 };
@@ -486,7 +489,7 @@ export const deleteCustomer = async (id) => {
   const formData = new FormData();
   formData.append("id", id);
 
-  const res = await fetch(`${BASE_URL}/customers/delete.php`, {
+  const res = await fetch(`${CUSTOMERS_URL}/delete.php`, {
     method: "POST",
     body: formData,
   });
@@ -495,7 +498,7 @@ export const deleteCustomer = async (id) => {
 };
 
 export const updateWallet = async (userId, amount) => {
-  const res = await fetch(`${BASE_URL}/customers/update-wallet.php`, {
+  const res = await fetch(`${CUSTOMERS_URL}/update-wallet.php`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -503,6 +506,31 @@ export const updateWallet = async (userId, amount) => {
       amount
     }),
   });
+  return res.json();
+};
+
+export const getCompanyBankDetails = async () => {
+  const res = await fetch(`${COMPANY_URL}/get-company-bank-details.php`);
+  return res.json();
+};
+
+export const saveCompanyBankDetails = async (data) => {
+  const res = await fetch(`${COMPANY_URL}/save-company-bank-details.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+};
+
+// Backward-compatible aliases if any page still imports the old names.
+export const getPanCardDetails = getCompanyBankDetails;
+export const savePanCardDetails = saveCompanyBankDetails;
+
+export const getCustomerBankDetailsByUserId = async (userId) => {
+  const res = await fetch(
+    `${CUSTOMERS_URL}/get-bank-details.php?user_id=${encodeURIComponent(userId)}`
+  );
   return res.json();
 };
 // shop purchase transaction

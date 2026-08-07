@@ -5,7 +5,8 @@ import {
   handleWalletRequest,
   getWalletRequests,
   deleteService,
-  getServiceLoginDetails
+  getServiceLoginDetails,
+  getCustomerBankDetailsByUserId
 } from "../../service/apiService";
 import "./ServiceManagement.css";
 import { BASE_IMAGE_URL,FALLBACK_IMAGE } from "../../config/config";
@@ -37,6 +38,7 @@ function ServiceManagement() {
   const [showServiceModal, setShowServiceModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const [serviceLoading, setServiceLoading] = useState(false);
+  const [panByServiceId, setPanByServiceId] = useState({});
   const [page, setPage] = useState(1);
 const [total, setTotal] = useState(0);
 const [searchInput, setSearchInput] = useState("");
@@ -52,10 +54,38 @@ const loadServices = async () => {
       getServices(page, search),
       getWalletRequests(shop_type),
     ]);
+    const servicesList = serviceRes?.data || [];
 
-    setServices(serviceRes?.data || []);
+    setServices(servicesList);
     setTotal(serviceRes?.total || 0);
     setPending(pendingRes?.data || pendingRes || []);
+
+    const panEntries = await Promise.all(
+      servicesList.map(async (service) => {
+        try {
+          const detailRes = await getServiceLoginDetails(service.service_id);
+          const userId =
+            detailRes?.data?.user?.[0]?.id ??
+            detailRes?.data?.user_id ??
+            detailRes?.data?.service?.user_id ??
+            null;
+
+          if (!userId) return [service.service_id, "-"];
+
+          const bankRes = await getCustomerBankDetailsByUserId(userId);
+          return [
+            service.service_id,
+            bankRes?.success && bankRes?.data?.pan_card_number
+              ? bankRes.data.pan_card_number
+              : "-",
+          ];
+        } catch {
+          return [service.service_id, "-"];
+        }
+      })
+    );
+
+    setPanByServiceId(Object.fromEntries(panEntries));
   } catch (err) {
     console.error("Load error", err);
     setServices([]);
@@ -200,6 +230,7 @@ useEffect(() => {
             <tr>
               <th>Service</th>
               <th>Owner</th>
+              <th>PAN Card</th>
               <th>Executive</th>
               <th>Wallet</th>
               <th>Status</th>
@@ -216,6 +247,7 @@ useEffect(() => {
               >
                 <td data-label="Service">{s.name}</td>
                 <td data-label="Owner">{s.owner_name || "-"}</td>
+                <td data-label="PAN Card">{panByServiceId[s.service_id] || "-"}</td>
                 <td data-label="Executive">{s.executive || "-"}</td>
                 <td data-label="Wallet">₹{s.wallet_balance}</td>
                 <td data-label="Status">

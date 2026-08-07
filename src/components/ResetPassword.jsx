@@ -3,8 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { Container, Card, Form, Button, Alert, InputGroup } from "react-bootstrap";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { resetPassword } from "../service/apiService";
-import { FALLBACK_IMAGE } from "../config/config";
-import logo from "../assets/logo.png";
+import { APP_LOGO_URL, FALLBACK_IMAGE } from "../config/config";
 function ResetPassword() {
   const [params] = useSearchParams();
   const token = params.get("token");
@@ -44,7 +43,7 @@ const handleSubmit = async (e) => {
       <Card className="p-4 shadow" style={{ maxWidth: 440, width: "100%" }}>
         <div className="d-flex justify-content-center mb-3">
           <img
-             src={logo || FALLBACK_IMAGE}
+             src={APP_LOGO_URL || FALLBACK_IMAGE}
             alt="Company logo"
             style={{ height: 56, width: "auto", objectFit: "contain" }}
           />

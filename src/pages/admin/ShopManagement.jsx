@@ -6,6 +6,7 @@ import {
   deleteShop,
   getShopLoginDetails,
   toggleShopStatus,
+  getCustomerBankDetailsByUserId,
 } from "../../service/apiService";
 import { BASE_IMAGE_URL, FALLBACK_IMAGE } from "../../config/config";
 import { QRCodeCanvas } from "qrcode.react";
@@ -37,6 +38,7 @@ function ShopManagement() {
   const [showShopModal, setShowShopModal] = useState(false);
   const [selectedShop, setSelectedShop] = useState(null);
   const [shopLoading, setShopLoading] = useState(false);
+  const [panByShopId, setPanByShopId] = useState({});
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
@@ -45,15 +47,44 @@ function ShopManagement() {
 
   const loadAll = useCallback(async () => {
     setLoading(true);
+    try {
+      const shopsRes = await getShops(page, search);
+      const shopsList = shopsRes?.data || [];
+      setShops(shopsList);
+      setTotal(shopsRes?.total || 0);
 
-    const shopsRes = await getShops(page, search);
-    setShops(shopsRes?.data || []);
-    setTotal(shopsRes?.total || 0);
+      const pendingRes = await getPendingShopFunds();
+      setPending(pendingRes || []);
 
-    const pendingRes = await getPendingShopFunds();
-    setPending(pendingRes || []);
+      const panEntries = await Promise.all(
+        shopsList.map(async (shop) => {
+          try {
+            const detailRes = await getShopLoginDetails(shop.shop_id);
+            const userId =
+              detailRes?.data?.user?.[0]?.id ??
+              detailRes?.data?.user_id ??
+              detailRes?.data?.shop?.user_id ??
+              null;
 
-    setLoading(false);
+            if (!userId) return [shop.shop_id, "-"];
+
+            const bankRes = await getCustomerBankDetailsByUserId(userId);
+            return [
+              shop.shop_id,
+              bankRes?.success && bankRes?.data?.pan_card_number
+                ? bankRes.data.pan_card_number
+                : "-",
+            ];
+          } catch {
+            return [shop.shop_id, "-"];
+          }
+        })
+      );
+
+      setPanByShopId(Object.fromEntries(panEntries));
+    } finally {
+      setLoading(false);
+    }
   }, [page, search]);
 
   useEffect(() => {
@@ -193,6 +224,7 @@ function ShopManagement() {
               <tr>
                 <th>Shop</th>
                 <th>Owner</th>
+                <th>PAN Card</th>
                 <th>Executive</th>
                 <th>Wallet</th>
                 <th className="admin-shop-management__column--status">
@@ -212,6 +244,7 @@ function ShopManagement() {
                 >
                   <td data-label="Shop">{shop.name}</td>
                   <td data-label="Owner">{shop.owner_name}</td>
+                  <td data-label="PAN Card">{panByShopId[shop.shop_id] || "-"}</td>
                   <td data-label="Executive">{shop.executive || "-"}</td>
                   <td data-label="Wallet">&#8377;{shop.wallet_balance}</td>
                   <td className="admin-shop-management__cell--status" data-label="Status">
@@ -275,7 +308,7 @@ function ShopManagement() {
 
               {shops.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="admin-shop-management__empty-cell">
+                  <td colSpan="7" className="admin-shop-management__empty-cell">
                     No shops found
                   </td>
                 </tr>

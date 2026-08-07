@@ -2,10 +2,9 @@ import React, { useState } from "react";
 import { Container, Row, Col, Card, Form, Button, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../service/apiService";
-import logo from "../assets/logo.png";
 import ChangePasswordModal from "./ChangePasswordModal";
 import { checkEmailExists } from "../service/apiService";
-import { FALLBACK_IMAGE } from "../config/config";
+import { APP_LOGO_URL, FALLBACK_IMAGE } from "../config/config";
 import { Link } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 function LoginPage({ setUser }) {
@@ -65,7 +64,7 @@ const handleEmailBlur = async () => {
                 {/* Logo */}
                 <div className="text-center mb-4">
                   <img
-                    src={logo || FALLBACK_IMAGE}
+                    src={APP_LOGO_URL || FALLBACK_IMAGE}
                     alt="Company Logo"
                     height="55"
                     className="mb-3"

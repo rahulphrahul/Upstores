@@ -6,6 +6,7 @@ import {
   handleWalletRequest,
   deleteSeller,
   getSellerLoginDetails,
+  getCustomerBankDetailsByUserId,
 } from "../../service/apiService";
 import "./SellerManagement.css";
 import { BASE_IMAGE_URL, FALLBACK_IMAGE } from "../../config/config";
@@ -37,6 +38,7 @@ function SellerManagement() {
   const [showSellerModal, setShowSellerModal] = useState(false);
   const [selectedSeller, setSelectedSeller] = useState(null);
   const [sellerLoading, setSellerLoading] = useState(false);
+  const [panBySellerId, setPanBySellerId] = useState({});
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
@@ -50,10 +52,38 @@ function SellerManagement() {
     try {
       const sellersRes = await getSellers(page, search);
       const pendingRes = await getWalletRequests(shopType);
+      const sellersList = sellersRes?.data || [];
 
-      setSellers(sellersRes?.data || []);
+      setSellers(sellersList);
       setTotal(sellersRes?.total || 0);
       setPending(pendingRes?.data || pendingRes || []);
+
+      const panEntries = await Promise.all(
+        sellersList.map(async (seller) => {
+          try {
+            const detailRes = await getSellerLoginDetails(seller.seller_id);
+            const userId =
+              detailRes?.data?.user?.[0]?.id ??
+              detailRes?.data?.user_id ??
+              detailRes?.data?.seller?.user_id ??
+              null;
+
+            if (!userId) return [seller.seller_id, "-"];
+
+            const bankRes = await getCustomerBankDetailsByUserId(userId);
+            return [
+              seller.seller_id,
+              bankRes?.success && bankRes?.data?.pan_card_number
+                ? bankRes.data.pan_card_number
+                : "-",
+            ];
+          } catch {
+            return [seller.seller_id, "-"];
+          }
+        })
+      );
+
+      setPanBySellerId(Object.fromEntries(panEntries));
     } catch (err) {
       console.error("Load error", err);
       setSellers([]);
@@ -209,6 +239,7 @@ function SellerManagement() {
               <tr>
                 <th>Seller</th>
                 <th>Owner</th>
+                <th>PAN Card</th>
                 <th>Executive</th>
                 <th>Wallet</th>
                 <th className="admin-seller-management__column--status">
@@ -229,6 +260,7 @@ function SellerManagement() {
                 >
                   <td data-label="Seller">{seller.name}</td>
                   <td data-label="Owner">{seller.owner_name}</td>
+                  <td data-label="PAN Card">{panBySellerId[seller.seller_id] || "-"}</td>
                   <td data-label="Executive">{seller.executive || "-"}</td>
                   <td data-label="Wallet">&#8377;{seller.wallet_balance}</td>
                   <td className="admin-seller-management__cell--status" data-label="Status">
@@ -290,7 +322,7 @@ function SellerManagement() {
               {sellers.length === 0 && (
                 <tr>
                   <td
-                    colSpan="6"
+                    colSpan="7"
                     className="admin-seller-management__empty-cell"
                   >
                     No sellers found

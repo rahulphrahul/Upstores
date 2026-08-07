@@ -2,11 +2,9 @@ import React, { useState,useEffect } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { getPurchasePendingCount } from "../service/apiService";
 import { Button } from "react-bootstrap";
-import { FiMenu, FiX } from "react-icons/fi";
 import "./DashboardLayout.css";
-import logo from "../assets/logo.png";
 import Header from "./Header";
-import { FALLBACK_IMAGE } from "../config/config";
+import { APP_LOGO_URL, FALLBACK_IMAGE } from "../config/config";
 import {
   LayoutDashboard,
   Users,
@@ -20,7 +18,8 @@ import {
   Megaphone,
   QrCode,
   ShoppingCart,
-  Wallet
+  Wallet,
+  CreditCard
 } from "lucide-react";
 
 
@@ -58,6 +57,7 @@ const menus = {
     { name: "Category", path: "/dashboard/super-admin/categories", icon: <Tags {...iconStyle} /> },
     { name: "Banners", path: "/dashboard/super-admin/banners", icon: <Image {...iconStyle} /> },
     { name: "Update Notice", path: "/dashboard/super-admin/update-notice", icon: <Megaphone {...iconStyle} /> },
+    { name: "Bank Details", path: "/dashboard/super-admin/company-bank-details", icon: <CreditCard {...iconStyle} /> },
     { name: "Wallet Management", path: "/dashboard/super-admin/wallet-management", icon: <Wallet  {...iconStyle} /> },
     { name: "Settings", path: "/dashboard/super-admin/settings", icon: <Settings {...iconStyle} /> },
   ],
@@ -112,7 +112,7 @@ useEffect(() => {
   return (
     <div className="layout-wrapper">
       {/* TOP BAR (MOBILE) */}
-      <Header toggleSidebar ={toggleSidebar} isSidebarOpen = {isSidebarOpen} user={user} logo={logo} />
+      <Header toggleSidebar ={toggleSidebar} isSidebarOpen = {isSidebarOpen} user={user} logo={APP_LOGO_URL} />
       
       {/* OVERLAY */}
       {isSidebarOpen && (
@@ -122,7 +122,7 @@ useEffect(() => {
       {/* SIDEBAR */}
       <aside className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
         <div className="text-center mb-4">
-          <img src={logo || FALLBACK_IMAGE} alt="Company Logo" className="sidebar-logo" />
+          <img src={APP_LOGO_URL || FALLBACK_IMAGE} alt="Company Logo" className="sidebar-logo" />
           <h6 className="mt-2 text-black">
             {user?.name?.toUpperCase()}
           </h6>
