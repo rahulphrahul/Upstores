@@ -2,7 +2,7 @@
   "name": "billing-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/upstores",
+  "homepage": "/",
   "dependencies": {
     "@amcharts/amcharts5": "^5.14.4",
     "@phosphor-icons/react": "^2.1.10",
