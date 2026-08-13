@@ -100,8 +100,12 @@ export const getExecutivePerformance = async () => {
 };
 /* ================= SHOPS ================= */
 
-export const getShops = async (page = 1, search = "") =>
-  fetch(`${BASE_URL}/shops/list.php?page=${page}&limit=10&search=${search}`)
+export const getShops = async (page = 1, search = "", limit = 10) =>
+  fetch(`${BASE_URL}/shops/list.php?page=${page}&limit=${limit}&search=${search}`)
+    .then(res => res.json());
+
+export const getBannerMerchants = async (page = 1, search = "", limit = 200) =>
+  fetch(`${BASE_URL}/banners/list_merchants.php?page=${page}&limit=${limit}&search=${search}`)
     .then(res => res.json());
 
 export const deleteShop = async (id) =>
