@@ -38,6 +38,11 @@ function normalize_pan(?string $value): string
     return strtoupper(preg_replace('/\s+/', '', normalize_text($value)));
 }
 
+function normalize_gst(?string $value): string
+{
+    return strtoupper(preg_replace('/\s+/', '', normalize_text($value)));
+}
+
 try {
     $input = read_input();
 
@@ -45,6 +50,7 @@ try {
     $accountNumber = preg_replace('/\D+/', '', normalize_text($input["account_number"] ?? ""));
     $ifsc = strtoupper(preg_replace('/\s+/', '', normalize_text($input["ifsc"] ?? "")));
     $panCardNumber = normalize_pan($input["pan_card_number"] ?? "");
+    $gst = normalize_gst($input["gst"] ?? "");
     $bankName = normalize_text($input["bank_name"] ?? "");
     $branchName = normalize_text($input["branch_name"] ?? "");
     $upiId = normalize_text($input["upi_id"] ?? "");
@@ -60,6 +66,9 @@ try {
     }
     if ($panCardNumber !== "" && !preg_match('/^[A-Z]{5}[0-9]{4}[A-Z]$/', $panCardNumber)) {
         respond(400, ["success" => false, "message" => "valid pan_card_number required"]);
+    }
+    if ($gst !== "" && !preg_match('/^[0-9A-Z]{15}$/', $gst)) {
+        respond(400, ["success" => false, "message" => "valid gst required"]);
     }
 
     $stmt = $pdo->prepare("
@@ -80,6 +89,7 @@ try {
                 account_number = ?,
                 ifsc = ?,
                 pan_card_number = ?,
+                gst = ?,
                 bank_name = ?,
                 branch_name = ?,
                 upi_id = ?,
@@ -92,6 +102,7 @@ try {
             $accountNumber,
             $ifsc,
             $panCardNumber !== "" ? $panCardNumber : null,
+            $gst !== "" ? $gst : null,
             $bankName !== "" ? $bankName : null,
             $branchName !== "" ? $branchName : null,
             $upiId !== "" ? $upiId : null,
@@ -106,6 +117,7 @@ try {
                 account_number,
                 ifsc,
                 pan_card_number,
+                gst,
                 bank_name,
                 branch_name,
                 upi_id,
@@ -113,13 +125,14 @@ try {
                 created_at,
                 updated_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'active', NOW(), NOW())
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW(), NOW())
         ");
         $insert->execute([
             $accountHolderName,
             $accountNumber,
             $ifsc,
             $panCardNumber !== "" ? $panCardNumber : null,
+            $gst !== "" ? $gst : null,
             $bankName !== "" ? $bankName : null,
             $branchName !== "" ? $branchName : null,
             $upiId !== "" ? $upiId : null,

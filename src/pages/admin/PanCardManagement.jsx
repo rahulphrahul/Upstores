@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { RefreshCw, Building2, CreditCard, UserRound, Hash, MapPinned, Send } from "lucide-react";
+import { RefreshCw, Building2, CreditCard, UserRound, Hash, MapPinned, Send, BadgeIndianRupee } from "lucide-react";
 import { getCompanyBankDetails, saveCompanyBankDetails } from "../../service/apiService";
 import "./PanCardManagement.css";
 
@@ -9,6 +9,7 @@ const defaultForm = {
   account_number: "",
   ifsc: "",
   pan_card_number: "",
+  gst: "",
   bank_name: "",
   branch_name: "",
   upi_id: "",
@@ -38,6 +39,7 @@ function CompanyBankDetailsManagement() {
           account_number: data?.account_number || "",
           ifsc: data?.ifsc || "",
           pan_card_number: data?.pan_card_number || "",
+          gst: data?.gst || "",
           bank_name: data?.bank_name || "",
           branch_name: data?.branch_name || "",
           upi_id: data?.upi_id || "",
@@ -95,6 +97,11 @@ function CompanyBankDetailsManagement() {
       return;
     }
 
+    if (form.gst.trim() && !/^[0-9A-Z]{15}$/.test(form.gst.trim())) {
+      toast.error("Valid GST number is required");
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -103,6 +110,7 @@ function CompanyBankDetailsManagement() {
         account_number: form.account_number.trim(),
         ifsc: form.ifsc.trim(),
         pan_card_number: form.pan_card_number.trim(),
+        gst: form.gst.trim(),
         bank_name: form.bank_name.trim(),
         branch_name: form.branch_name.trim(),
         upi_id: form.upi_id.trim(),
@@ -217,6 +225,20 @@ function CompanyBankDetailsManagement() {
               </label>
 
               <label className="admin-pan-card-management__field">
+                <span><BadgeIndianRupee size={14} /> GST Number</span>
+                <div className="admin-pan-card-management__input-wrap">
+                  <input
+                    type="text"
+                    name="gst"
+                    value={form.gst}
+                    onChange={handleChange}
+                    placeholder="22AAAAA0000A1Z5"
+                    maxLength={15}
+                  />
+                </div>
+              </label>
+
+              <label className="admin-pan-card-management__field">
                 <span><Building2 size={14} /> Bank Name</span>
                 <div className="admin-pan-card-management__input-wrap">
                   <input
@@ -229,7 +251,7 @@ function CompanyBankDetailsManagement() {
                 </div>
               </label>
 
-              <label className="admin-pan-card-management__field">
+              <label className="admin-pan-card-management__field admin-pan-card-management__field--full">
                 <span><MapPinned size={14} /> Branch Name</span>
                 <div className="admin-pan-card-management__input-wrap">
                   <input
@@ -241,23 +263,23 @@ function CompanyBankDetailsManagement() {
                   />
                 </div>
               </label>
+
+              <label className="admin-pan-card-management__field admin-pan-card-management__field--full">
+                <span><Send size={14} /> UPI ID</span>
+                <div className="admin-pan-card-management__input-wrap">
+                  <input
+                    type="text"
+                    name="upi_id"
+                    value={form.upi_id}
+                    onChange={handleChange}
+                    placeholder="Enter UPI ID"
+                  />
+                </div>
+              </label>
             </div>
 
-            <label className="admin-pan-card-management__field">
-              <span><Send size={14} /> UPI ID</span>
-              <div className="admin-pan-card-management__input-wrap">
-                <input
-                  type="text"
-                  name="upi_id"
-                  value={form.upi_id}
-                  onChange={handleChange}
-                  placeholder="Enter UPI ID"
-                />
-              </div>
-            </label>
-
             <p className="admin-pan-card-management__hint">
-              PAN is optional, but if provided it must follow the standard format: ABCDE1234F.
+              PAN is optional, but if provided it must follow the standard format: ABCDE1234F. GST is optional, but if provided it must be 15 alphanumeric characters.
             </p>
 
             <div className="admin-pan-card-management__actions">

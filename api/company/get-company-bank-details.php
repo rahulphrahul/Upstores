@@ -26,6 +26,7 @@ try {
             account_number,
             ifsc,
             pan_card_number,
+            gst,
             bank_name,
             branch_name,
             upi_id,
