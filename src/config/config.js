@@ -17,7 +17,7 @@ export const BASE_IMAGE_URL =
 export const BASE_BANNER_URL =
   env.REACT_APP_BASE_BANNER_URL || `${UPSTORES_BASE_URL}/api/images/banners`;
 export const BASE_CATEGORY_URL =
-  env.REACT_APP_BASE_CATEGORY_URL || `${UPSTORES_BASE_URL}/category-icons`;
+  env.REACT_APP_BASE_CATEGORY_URL || `${UPSTORES_BASE_URL}/api/categories/category-icons/`;
 export const BASE_CUSTM_IMG_URL =
   env.REACT_APP_BASE_CUSTM_IMG_URL || `${UPSTORES_BASE_URL}/api/`;
 export const Bill_IMG_URL =

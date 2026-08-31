@@ -8,6 +8,7 @@ import {
   getCategories,
   deleteCategory,
 } from "../../service/apiService";
+import { BASE_CATEGORY_URL } from "../../config/config";
 import { PencilSimple, Trash } from "phosphor-react";
 
 const Categorymanagement = () => {
@@ -121,6 +122,7 @@ const Categorymanagement = () => {
   const indexOfFirst = indexOfLast - recordsPerPage;
   const currentRecords = categories.slice(indexOfFirst, indexOfLast);
   const totalPages = Math.ceil(categories.length / recordsPerPage);
+  const categoryIconBaseUrl = BASE_CATEGORY_URL?.replace(/\/$/, "");
 
   return (
     <div className="admin-category-management">
@@ -255,7 +257,7 @@ const Categorymanagement = () => {
                     </td>
                     <td data-label="Icon">
                       <img
-                        src={`${process.env.REACT_APP_BASE_URL}/categories/category-icons/${category.icon}`}
+                        src={`${categoryIconBaseUrl}/${category.icon}`}
                         alt={`${category.name} icon`}
                         className="admin-category-management__icon"
                         onError={(e) => {
