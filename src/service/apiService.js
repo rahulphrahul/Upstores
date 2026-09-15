@@ -636,6 +636,19 @@ export const getBanners = async () => {
 };
 
 /* =========================
+   ADMIN: ENQUIRIES
+========================= */
+export const getEnquiries = async () => {
+  const res = await fetch(`${BASE_URL}/admin/get_enquiries.php`);
+
+  if (!res.ok) {
+    throw new Error("Unable to fetch enquiries");
+  }
+
+  return res.json();
+};
+
+/* =========================
    ADMIN: UPDATE NOTICE
 ========================= */
 

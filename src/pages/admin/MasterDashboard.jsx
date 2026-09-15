@@ -349,7 +349,7 @@ const resolveRequestImageUrl = (record) =>
     { name: "Services", data: dashboardData.services, className: "services" },
     
   ];
-
+console.log("dashbiard data",dashboardData);
   const reportTotals = reportRows.reduce(
     (total, report) => ({
       activeAccounts: total.activeAccounts + toNumber(report.data?.total),

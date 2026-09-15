@@ -48,6 +48,7 @@ import PurchaseServiceHistory from './pages/service/PurchaseServiceHistory';
 import BannerManagement from './pages/admin/Bannermanagement';
 import UpdateNoticeManagement from './pages/admin/UpdateNoticeManagement';
 import PanCardManagement from './pages/admin/PanCardManagement';
+import EnquiriesManagement from './pages/admin/EnquiriesManagement';
 import CustomerPurchase from './pages/shop/CustomerPurchase';
 import CustomerSellerPurchase from './pages/seller/CustomerSellerPurchase';
 import CustomerServicePurchase from './pages/service/CustomerServicePurchase';
@@ -208,6 +209,14 @@ function App() {
             element={
               <RoleProtectedRoute user={user} allowedRoles={['admin']}>
                 <UpdateNoticeManagement />
+              </RoleProtectedRoute>
+            }
+          />
+          <Route
+            path="super-admin/enquiries"
+            element={
+              <RoleProtectedRoute user={user} allowedRoles={['admin']}>
+                <EnquiriesManagement />
               </RoleProtectedRoute>
             }
           />

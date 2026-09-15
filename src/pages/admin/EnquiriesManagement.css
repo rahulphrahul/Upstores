@@ -1,0 +1,23 @@
+.admin-enquiries { color: #1f2937; }
+.admin-enquiries__header { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 22px; }
+.admin-enquiries__title { margin: 0; font-size: 26px; font-weight: 700; }
+.admin-enquiries__subtitle { margin: 5px 0 0; color: #6b7280; }
+.admin-enquiries__panel { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 2px 8px rgba(15, 23, 42, .05); overflow: hidden; }
+.admin-enquiries__toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px; border-bottom: 1px solid #e5e7eb; }
+.admin-enquiries__search { width: min(360px, 100%); padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 7px; outline: none; }
+.admin-enquiries__search:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, .12); }
+.admin-enquiries__count { color: #6b7280; white-space: nowrap; }
+.admin-enquiries__refresh, .admin-enquiries__state--error button, .admin-enquiries__pagination button { border: 0; background: #2563eb; color: #fff; border-radius: 7px; padding: 9px 14px; cursor: pointer; font-weight: 600; }
+.admin-enquiries__refresh:disabled, .admin-enquiries__pagination button:disabled { opacity: .55; cursor: not-allowed; }
+.admin-enquiries__table-scroll { overflow-x: auto; }
+.admin-enquiries__table { width: 100%; min-width: 720px; border-collapse: collapse; }
+.admin-enquiries__table th, .admin-enquiries__table td { padding: 13px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid #e5e7eb; }
+.admin-enquiries__table th { background: #f8fafc; font-size: 13px; color: #475569; white-space: nowrap; }
+.admin-enquiries__table td { font-size: 14px; line-height: 1.45; max-width: 320px; overflow-wrap: anywhere; }
+.admin-enquiries__table tbody tr:hover { background: #f8fbff; }
+.admin-enquiries__state { margin: 0; padding: 36px 16px; text-align: center; color: #6b7280; }
+.admin-enquiries__state--error { color: #b91c1c; }
+.admin-enquiries__state--error p { margin: 0 0 12px; }
+.admin-enquiries__pagination { display: flex; justify-content: center; align-items: center; gap: 12px; padding: 16px; }
+.admin-enquiries__pagination span { color: #6b7280; font-size: 14px; }
+@media (max-width: 600px) { .admin-enquiries__header, .admin-enquiries__toolbar { align-items: stretch; flex-direction: column; } .admin-enquiries__refresh { width: 100%; } .admin-enquiries__count { white-space: normal; } }
