@@ -334,7 +334,7 @@ const getRequestDetails = (record) =>
 
 const resolveRequestImageUrl = (record) =>
   record.proof
-    ? `${Bill_WALLET_IMG_URL}/${record.proof}`
+    ? `${Bill_WALLET_IMG_URL}?file=${encodeURIComponent(record.proof)}`
     : null;
   /* =========================
      SKELETON
@@ -627,179 +627,255 @@ console.log("dashbiard data",dashboardData);
         </div>
       </div>
 
-      <div className="card">
-        <h4>Pending Fund Approvals</h4>
+   <div className="card reports-card fund-report-card">
+  <div className="reports-header">
+    <div>
+      <h4>Fund Requests</h4>
+      <p>
+        Pending, approved, and rejected fund requests
+      </p>
+    </div>
 
-        <div className="table-responsive">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Shop</th>
-                <th>Amount</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pending.map((p) => (
-                <tr key={p.id}>
-                  <td>{p.shop}</td>
-                  <td>{rupeeSymbol} {p.amount}</td>
-                  <td>
-                    <button
-                      className="approve-btn"
-                      onClick={() => onWalletAction(p, "approve", p.user_type)}
-                    >
-                      Approve
-                    </button>
-                    <button
-                      className="reject-btn"
-                      onClick={() => onWalletAction(p, "rejected", p.user_type)}
-                    >
-                      Reject
-                    </button>
-                  </td>
-                </tr>
-              ))}
+    <strong>
+      {pending.length + filteredFundReports.length}
+    </strong>
+  </div>
 
-              {pending.length === 0 && (
-                <tr>
-                  <td colSpan="3">No pending approvals</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+  {/* Filters */}
+  <div className="report-filters">
+    <div className="report-filter">
+      <label htmlFor="fund-report-from">From Date</label>
+      <input
+        id="fund-report-from"
+        type="date"
+        value={reportFrom}
+        onChange={(e) => setReportFrom(e.target.value)}
+      />
+    </div>
 
-      <div className="card reports-card fund-report-card">
-        <div className="reports-header">
-          <div>
-            <h4>Fund Request Report</h4>
-            <p>Approved, rejected, and pending wallet actions with uploaded bill evidence.</p>
-          </div>
-          <strong>{formatNumber(filteredFundReports.length)}</strong>
-        </div>
+    <div className="report-filter">
+      <label htmlFor="fund-report-to">To Date</label>
+      <input
+        id="fund-report-to"
+        type="date"
+        value={reportTo}
+        onChange={(e) => setReportTo(e.target.value)}
+      />
+    </div>
 
-        <div className="report-filters">
-          <div className="report-filter">
-            <label htmlFor="fund-report-from">From Date</label>
-            <input
-              id="fund-report-from"
-              type="date"
-              value={reportFrom}
-              onChange={(e) => setReportFrom(e.target.value)}
-            />
-          </div>
+    <div className="report-filter report-filter--search">
+      <label htmlFor="fund-report-search">Search</label>
+      <input
+        id="fund-report-search"
+        type="text"
+        placeholder="Search shop, amount, status, notes, bill..."
+        value={reportSearch}
+        onChange={(e) => setReportSearch(e.target.value)}
+      />
+    </div>
 
-          <div className="report-filter">
-            <label htmlFor="fund-report-to">To Date</label>
-            <input
-              id="fund-report-to"
-              type="date"
-              value={reportTo}
-              onChange={(e) => setReportTo(e.target.value)}
-            />
-          </div>
+    <div className="report-actions">
+      <button
+        type="button"
+        className="btn approve-btn"
+        onClick={loadFundReports}
+      >
+        Submit
+      </button>
 
-          <div className="report-filter report-filter--search">
-            <label htmlFor="fund-report-search">Search</label>
-            <input
-              id="fund-report-search"
-              type="text"
-              placeholder="Search shop, amount, status, notes, bill..."
-              value={reportSearch}
-              onChange={(e) => setReportSearch(e.target.value)}
-            />
-          </div>
+      <button
+        type="button"
+        className="btn report-clear-btn"
+        onClick={async () => {
+          setReportFrom("");
+          setReportTo("");
+          setReportSearch("");
 
-          <div className="report-actions">
-  <button
-    type="button"
-    className="btn approve-btn"
-    onClick={loadFundReports}
-  >
-    Submit
-  </button>
+          const res = await getFundRequestReports();
+          setFundReports(res?.data || []);
+        }}
+      >
+        Clear
+      </button>
+    </div>
+  </div>
 
-  <button
-    type="button"
-    className="btn report-clear-btn"
-    onClick={async () => {
-      setReportFrom("");
-      setReportTo("");
-      setReportSearch("");
+  {/* SINGLE FUND REQUEST TABLE */}
+  <div className="table-responsive">
+    <table className="data-table reports-table fund-report-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Account / Shop</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Bill / Proof</th>
+          <th>Details</th>
+          <th>Action</th>
+        </tr>
+      </thead>
 
-      const res = await getFundRequestReports();
-      setFundReports(res?.data || []);
-    }}
-  >
-    Clear
-  </button>
+      <tbody>
+        {/* Pending Requests */}
+        {pending.map((p, index) => {
+          const pendingDate =
+            p.created_at || p.date || "-";
+
+          const pendingAccount =
+            p.shop || p.account || p.user_type || "-";
+
+          return (
+            <tr key={`pending-${p.id || index}`}>
+              <td data-label="Date">
+                {pendingDate}
+              </td>
+
+              <td data-label="Account / Shop">
+                {pendingAccount}
+              </td>
+
+              <td data-label="Amount">
+                {rupeeSymbol} {formatNumber(p.amount)}
+              </td>
+
+              <td data-label="Status">
+                <span className="report-status report-status--pending">
+                  Pending
+                </span>
+              </td>
+
+              <td data-label="Bill / Proof">
+                {p.proof ? (
+                  <a
+                    href={`${Bill_WALLET_IMG_URL}/${p.proof}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="report-proof-link"
+                  >
+                    View Bill
+                  </a>
+                ) : (
+                  "-"
+                )}
+              </td>
+
+              <td data-label="Details">
+                {p.admin_remark || "-"}
+              </td>
+
+              <td data-label="Action">
+                <button
+                  className="approve-btn"
+                  onClick={() =>
+                    onWalletAction(
+                      p,
+                      "approve",
+                      p.user_type
+                    )
+                  }
+                >
+                  Approve
+                </button>
+
+                <button
+                  className="reject-btn"
+                  onClick={() =>
+                    onWalletAction(
+                      p,
+                      "rejected",
+                      p.user_type
+                    )
+                  }
+                >
+                  Reject
+                </button>
+              </td>
+            </tr>
+          );
+        })}
+
+        {/* Fund Request Reports */}
+        {filteredFundReports.map((record, index) => {
+          const imageUrl =
+            resolveRequestImageUrl(record);
+
+          const statusLabel =
+            getRequestStatus(record);
+
+          const statusClass =
+            `report-status report-status--${String(
+              statusLabel
+            )
+              .toLowerCase()
+              .replace(/\s+/g, "-")}`;
+
+          return (
+            <tr
+              key={
+                `report-${record.id || record.request_id || index}`
+              }
+            >
+              <td data-label="Date">
+                {getRecordDisplayDate(record)}
+              </td>
+
+              <td data-label="Account / Shop">
+                {getRequestTitle(record)}
+              </td>
+
+              <td data-label="Amount">
+                {rupeeSymbol}{" "}
+                {formatNumber(record.amount)}
+              </td>
+
+              <td data-label="Status">
+                <span className={statusClass}>
+                  {statusLabel}
+                </span>
+              </td>
+
+              <td data-label="Bill / Proof">
+                {imageUrl ? (
+                  <a
+                    href={imageUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="report-proof-link"
+                  >
+                    View Bill
+                  </a>
+                ) : (
+                  "-"
+                )}
+              </td>
+
+              <td data-label="Details">
+                {getRequestDetails(record)}
+              </td>
+
+              <td data-label="Action">
+                -
+              </td>
+            </tr>
+          );
+        })}
+
+        {/* Empty */}
+        {pending.length === 0 &&
+          filteredFundReports.length === 0 && (
+            <tr>
+              <td
+                colSpan="7"
+                className="empty-text"
+              >
+                No fund requests found
+              </td>
+            </tr>
+          )}
+      </tbody>
+    </table>
+  </div>
 </div>
-        </div>
-
-        <div className="table-responsive">
-          <table className="data-table reports-table fund-report-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Account</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Bill / Proof</th>
-                <th>Details</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredFundReports.length > 0 ? (
-                filteredFundReports.map((record, index) => {
-                  const imageUrl = resolveRequestImageUrl(record);
-                  const statusLabel = getRequestStatus(record);
-                  const statusClass = `report-status report-status--${String(
-                    statusLabel
-                  )
-                    .toLowerCase()
-                    .replace(/\s+/g, "-")}`;
-
-                  return (
-                    <tr key={record.id || record.request_id || index}>
-                      <td data-label="Date">{getRecordDisplayDate(record)}</td>
-                      <td data-label="Account">{getRequestTitle(record)}</td>
-                      <td data-label="Amount">
-                        {rupeeSymbol} {formatNumber(record.amount)}
-                      </td>
-                      <td data-label="Status">
-                        <span className={statusClass}>{statusLabel}</span>
-                      </td>
-                      <td data-label="Bill / Proof">
-                        {imageUrl ? (
-                          <a
-                            href={imageUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="report-proof-link"
-                          >
-                            View Bill
-                          </a>
-                        ) : (
-                          "-"
-                        )}
-                      </td>
-                      <td data-label="Details">{getRequestDetails(record)}</td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan="6" className="empty-text">
-                    No fund request report found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   );
 }

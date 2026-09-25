@@ -23,7 +23,7 @@ export const BASE_CUSTM_IMG_URL =
 export const Bill_IMG_URL =
   env.REACT_APP_BILL_IMG_URL || `${UPSTORES_BASE_URL}/bills`;
 export const Bill_WALLET_IMG_URL =
-  env.REACT_APP_BILL_WALLET_IMG_URL || `${UPSTORES_BASE_URL}/uploads/wallet`;
+  env.REACT_APP_BILL_WALLET_IMG_URL || `https://upstores.in/api/wallet-proof.php`;
 
 export const BASE_URL = API_ROOT_URL;
 
