@@ -1,0 +1,323 @@
+/* Shared visual foundation for screens rendered in the admin workspace. */
+.admin-layout {
+  --admin-accent: #4056c7;
+  --admin-accent-hover: #3348b6;
+  --admin-ink: #202b3d;
+  --admin-muted: #647084;
+  --admin-border: #e3e8ef;
+  --admin-surface: #ffffff;
+  --admin-canvas: #f5f7fa;
+  --admin-focus: rgba(64, 86, 199, 0.13);
+  background: var(--admin-canvas);
+  color: var(--admin-ink);
+}
+
+.admin-layout .content {
+  background: var(--admin-canvas);
+}
+
+.admin-layout .content-inner {
+  color: var(--admin-ink);
+}
+
+.admin-layout .content-inner :is(
+  .page-title,
+  .admin-banner-management__title,
+  .admin-category-management__title,
+  .admin-wallet-management__title,
+  .admin-banner-management__section-title,
+  .admin-category-management__section-title,
+  .admin-seller-management__section-title,
+  .admin-shop-management__section-title,
+  .admin-pan-card-management__title,
+  .admin-seller-management__title,
+  .admin-shop-management__title,
+  .admin-enquiries__title,
+  .update-notice-management__title
+) {
+  color: #172033;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.admin-layout .content-inner :is(
+  .card,
+  .admin-wallet-management__panel,
+  .admin-banner-management__panel,
+  .admin-category-management__panel,
+  .admin-pan-card-management__panel,
+  .admin-seller-management__panel,
+  .admin-shop-management__panel,
+  .admin-enquiries__panel,
+  .update-notice-management__panel
+) {
+  border: 1px solid var(--admin-border);
+  border-radius: 15px;
+  background: var(--admin-surface);
+  box-shadow: 0 3px 12px rgba(20, 32, 52, 0.045);
+}
+
+.admin-layout .content-inner input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="color"]):not([type="hidden"]):not([type="submit"]):not([type="button"]):not(.exec-search-input):not(.admin-search__input):not(.admin-pan-card-management__control),
+.admin-layout .content-inner select,
+.admin-layout .content-inner textarea {
+  min-height: 42px;
+  border: 1px solid #dce2eb;
+  border-radius: 10px;
+  background-color: #fff;
+  color: #263449;
+  font: inherit;
+  font-weight: 500;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.admin-layout .content-inner textarea {
+  min-height: 96px;
+}
+
+.admin-layout .content-inner input::placeholder,
+.admin-layout .content-inner textarea::placeholder {
+  color: #818b9b;
+  opacity: 1;
+}
+
+.admin-layout .content-inner input:not(.exec-search-input):not(.admin-search__input):not(.admin-pan-card-management__control):focus,
+.admin-layout .content-inner select:focus,
+.admin-layout .content-inner textarea:focus {
+  border-color: #7183dc;
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--admin-focus);
+}
+
+.admin-layout .content-inner button:not(.admin-search__clear):not(.admin-search__clear-filter):not(.admin-category-management__tile) {
+  min-height: 38px;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  transition: background-color 160ms ease, border-color 160ms ease,
+    color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.admin-layout .content-inner button:focus-visible {
+  outline: 3px solid var(--admin-focus);
+  outline-offset: 2px;
+}
+
+.admin-layout .content-inner button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+  transform: none;
+}
+
+/* Shared primary and search actions. */
+.admin-layout .content-inner :is(
+  .btn-primary,
+  .primary-btn,
+  .approve-btn,
+  .exec-add-btn,
+  .exec-search-btn,
+  .admin-banner-management__add-toggle,
+  .admin-category-management__add-toggle,
+  .admin-banner-management__button--primary,
+  .admin-category-management__button--primary,
+  .admin-pan-card-management__button--primary,
+  .admin-seller-management__button--search,
+  .admin-seller-management__button--clear,
+  .admin-shop-management__button--search,
+  .admin-shop-management__button--clear,
+  .admin-enquiries__refresh,
+  .admin-enquiries__state--error button,
+  .admin-wallet-management__button,
+  .update-notice-management__button--primary
+) {
+  border-color: var(--admin-accent) !important;
+  background: var(--admin-accent) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.admin-layout .content-inner :is(
+  .admin-seller-management__toolbar,
+  .admin-shop-management__toolbar,
+  .customer-page .search-bar,
+  .service-page .search-bar,
+  .exec-page .exec-toolbar,
+  .admin-search-area
+) {
+  display: block;
+  width: min(100%, 760px);
+  max-width: 100%;
+  margin-bottom: 20px;
+}
+
+.admin-layout .content-inner :is(
+  .btn-primary,
+  .primary-btn,
+  .approve-btn,
+  .exec-add-btn,
+  .exec-search-btn,
+  .admin-banner-management__add-toggle,
+  .admin-category-management__add-toggle,
+  .admin-banner-management__button--primary,
+  .admin-category-management__button--primary,
+  .admin-pan-card-management__button--primary,
+  .admin-seller-management__button--search,
+  .admin-seller-management__button--clear,
+  .admin-shop-management__button--search,
+  .admin-shop-management__button--clear,
+  .admin-enquiries__refresh,
+  .admin-enquiries__state--error button,
+  .admin-wallet-management__button,
+  .update-notice-management__button--primary
+):hover:not(:disabled) {
+  border-color: var(--admin-accent-hover) !important;
+  background: var(--admin-accent-hover) !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+
+/* Quiet actions retain a neutral surface; success and destructive actions
+   use their semantic colors without turning the whole admin UI green. */
+.admin-layout .content-inner :is(
+  .btn-outline,
+  .btn-secondary,
+  .admin-banner-management__button--secondary,
+  .admin-banner-management__button--page,
+  .admin-banner-management__button--edit,
+  .admin-category-management__button--secondary,
+  .admin-category-management__button--edit,
+  .admin-category-management__page-btn,
+  .admin-seller-management__page-btn,
+  .admin-shop-management__page-btn,
+  .admin-enquiries__pagination button,
+  .admin-pan-card-management__button--secondary,
+  .admin-pan-card-management__button--ghost,
+  .admin-pan-card-management__button--list,
+  .update-notice-management__button--secondary
+) {
+  border: 1px solid #d7dde7;
+  background: #fff;
+  color: #39465a;
+  box-shadow: none;
+}
+
+.admin-layout .content-inner :is(
+  .btn-outline,
+  .btn-secondary,
+  .admin-banner-management__button--secondary,
+  .admin-banner-management__button--page,
+  .admin-banner-management__button--edit,
+  .admin-category-management__button--secondary,
+  .admin-category-management__button--edit,
+  .admin-category-management__page-btn,
+  .admin-seller-management__page-btn,
+  .admin-shop-management__page-btn,
+  .admin-enquiries__pagination button,
+  .admin-pan-card-management__button--secondary,
+  .admin-pan-card-management__button--ghost,
+  .admin-pan-card-management__button--list,
+  .update-notice-management__button--secondary
+):hover:not(:disabled) {
+  border-color: #c5ceda;
+  background: #f5f7fa;
+  color: #202b3d;
+}
+
+.admin-layout .content-inner :is(
+  .btn-danger,
+  .admin-banner-management__button--danger,
+  .admin-category-management__button--danger,
+  .admin-seller-management__button--danger,
+  .admin-seller-management__button--reject,
+  .admin-shop-management__button--danger,
+  .admin-shop-management__button--reject,
+  .exec-delete-btn
+) {
+  border-color: #f1d5d2 !important;
+  background: #fff1f0 !important;
+  color: #a33d37 !important;
+  box-shadow: none !important;
+}
+
+.admin-layout .content-inner :is(
+  .admin-banner-management__button--page.active,
+  .admin-category-management__page-btn.active,
+  .admin-seller-management__page-btn.active,
+  .admin-shop-management__page-btn.active
+) {
+  border-color: var(--admin-accent) !important;
+  background: var(--admin-accent) !important;
+  color: #fff !important;
+}
+
+.admin-layout .content-inner :is(
+  .btn-success,
+  .btn-activate,
+  .exec-activate-btn,
+  .admin-seller-management__button--approve,
+  .admin-seller-management__button--activate,
+  .admin-shop-management__button--approve,
+  .admin-shop-management__button--activate
+) {
+  border-color: #d6eadc !important;
+  background: #edf6f0 !important;
+  color: #286343 !important;
+  box-shadow: none !important;
+}
+
+.admin-layout .content-inner :is(
+  .btn-suspend,
+  .exec-suspend-btn,
+  .admin-seller-management__button--suspend,
+  .admin-shop-management__button--suspend
+) {
+  border-color: #f1e2c6 !important;
+  background: #fff6e8 !important;
+  color: #80591d !important;
+  box-shadow: none !important;
+}
+
+.admin-layout .content-inner table th {
+  background: #f7f8fa;
+  border-bottom-color: #e5e9ef;
+  color: #596579;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-layout .content-inner table td {
+  border-bottom-color: #edf0f4;
+  color: #354155;
+  font-weight: 500;
+}
+
+.admin-layout .content-inner :is(
+  .admin-wallet-management__section-title,
+  .admin-banner-management__section-title,
+  .admin-category-management__section-title,
+  .admin-seller-management__section-title,
+  .admin-shop-management__section-title
+) {
+  color: #263449;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .admin-layout .content-inner :is(
+    .card,
+    .admin-wallet-management__panel,
+    .admin-banner-management__panel,
+    .admin-category-management__panel,
+    .admin-pan-card-management__panel,
+    .admin-seller-management__panel,
+    .admin-shop-management__panel,
+    .admin-enquiries__panel,
+    .update-notice-management__panel
+  ) {
+    border-radius: 14px;
+  }
+
+  .admin-layout .content-inner button:not(.admin-search__clear):not(.admin-search__clear-filter):not(.admin-category-management__tile) {
+    min-height: 40px;
+  }
+}

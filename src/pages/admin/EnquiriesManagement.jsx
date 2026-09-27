@@ -23,6 +23,22 @@ const displayValue = (value) => {
   return String(value);
 };
 
+const getPrimaryKey = (enquiry, columns) => {
+  const preferredKeys = [
+    "name",
+    "full_name",
+    "customer_name",
+    "contact_name",
+    "sender_name",
+    "subject",
+    "title",
+    "email",
+  ];
+  return preferredKeys.find(
+    (key) => enquiry?.[key] !== null && enquiry?.[key] !== undefined && enquiry?.[key] !== ""
+  ) || columns.find((key) => !["id", "enquiry_id", "created_at", "updated_at"].includes(key));
+};
+
 function EnquiriesManagement() {
   const [enquiries, setEnquiries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -135,26 +151,80 @@ function EnquiriesManagement() {
           <p className="admin-enquiries__state">No enquiries found.</p>
         ) : (
           <>
-            <div className="admin-enquiries__table-scroll">
-              <table className="admin-enquiries__table">
-                <thead>
-                  <tr>
-                    {columns.map((column) => <th key={column}>{labelFor(column)}</th>)}
-                  </tr>
-                </thead>
-                <tbody>
-                  {visibleEnquiries.length ? visibleEnquiries.map((enquiry, rowIndex) => (
-                    <tr key={enquiry?.id || enquiry?.enquiry_id || rowIndex}>
-                      {columns.map((column) => (
-                        <td key={column} data-label={labelFor(column)}>{displayValue(enquiry?.[column])}</td>
+            {visibleEnquiries.length ? (
+              <>
+                <div className="admin-enquiries__table-scroll">
+                  <table className="admin-enquiries__table">
+                    <thead>
+                      <tr>
+                        {columns.map((column) => <th key={column}>{labelFor(column)}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {visibleEnquiries.map((enquiry, rowIndex) => (
+                        <tr key={enquiry?.id || enquiry?.enquiry_id || rowIndex}>
+                          {columns.map((column) => (
+                            <td key={column} data-label={labelFor(column)}>{displayValue(enquiry?.[column])}</td>
+                          ))}
+                        </tr>
                       ))}
-                    </tr>
-                  )) : (
-                    <tr><td colSpan={columns.length}>No matching enquiries found.</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="admin-enquiries__cards" aria-label="Enquiry list">
+                  {visibleEnquiries.map((enquiry, rowIndex) => {
+                    const primaryKey = getPrimaryKey(enquiry, columns);
+                    const reference = enquiry?.enquiry_id ?? enquiry?.id;
+
+                    return (
+                      <article
+                        className="admin-enquiry-card"
+                        key={reference || rowIndex}
+                      >
+                        <header className="admin-enquiry-card__header">
+                          <div className="admin-enquiry-card__identity">
+                            <span className="admin-enquiry-card__eyebrow">Enquiry</span>
+                            <h3>
+                              {primaryKey
+                                ? displayValue(enquiry?.[primaryKey])
+                                : `Enquiry ${rowIndex + 1}`}
+                            </h3>
+                          </div>
+                          {reference !== undefined && reference !== null && reference !== "" && (
+                            <span className="admin-enquiry-card__reference">#{reference}</span>
+                          )}
+                        </header>
+                        <dl className="admin-enquiry-card__details">
+                          {columns
+                            .filter((column) => {
+                              const normalizedKey = String(column).toLowerCase();
+                              const isReference = ["id", "enquiry_id"].includes(normalizedKey);
+                              return (
+                                column !== primaryKey &&
+                                !(isReference && reference !== undefined && reference !== null && reference !== "") &&
+                                enquiry?.[column] !== null &&
+                                enquiry?.[column] !== undefined &&
+                                enquiry?.[column] !== ""
+                              );
+                            })
+                            .map((column) => (
+                              <div className="admin-enquiry-card__field" key={column}>
+                                <dt>{labelFor(column)}</dt>
+                                <dd>{displayValue(enquiry?.[column])}</dd>
+                              </div>
+                            ))}
+                        </dl>
+                      </article>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <p className="admin-enquiries__state admin-enquiries__state--empty-search">
+                No matching enquiries found.
+              </p>
+            )}
 
             {totalPages > 1 && (
               <div className="admin-enquiries__pagination">

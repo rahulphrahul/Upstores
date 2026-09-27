@@ -1,10 +1,11 @@
-import React, { useState,useEffect } from "react";
-import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { getPurchasePendingCount } from "../service/apiService";
 import { Button } from "react-bootstrap";
 import "./DashboardLayout.css";
+import "../pages/admin/AdminUI.css";
 import Header from "./Header";
-import { APP_LOGO_URL, FALLBACK_IMAGE } from "../config/config";
+import { APP_LOGO_URL } from "../config/config";
 import {
   LayoutDashboard,
   Users,
@@ -21,12 +22,18 @@ import {
   Wallet,
   CreditCard,
   MessageSquare,
+  LogOut,
 } from "lucide-react";
 
 
 function DashboardLayout({ user, setUser }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
@@ -112,9 +119,9 @@ useEffect(() => {
   const menuItems = menus[user?.role] || [];
 
   return (
-    <div className="layout-wrapper">
+    <div className={`layout-wrapper ${user?.role === "admin" ? "admin-layout" : ""}`}>
       {/* TOP BAR (MOBILE) */}
-      <Header toggleSidebar ={toggleSidebar} isSidebarOpen = {isSidebarOpen} user={user} logo={APP_LOGO_URL} />
+      <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} logo={APP_LOGO_URL} onLogout={handleLogout} />
       
       {/* OVERLAY */}
       {isSidebarOpen && (
@@ -123,14 +130,30 @@ useEffect(() => {
 
       {/* SIDEBAR */}
       <aside className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
-        <div className="text-center mb-4">
-          <img src={APP_LOGO_URL || FALLBACK_IMAGE} alt="Company Logo" className="sidebar-logo" />
-          <h6 className="mt-2 text-black">
-            {user?.name?.toUpperCase()}
-          </h6>
+        <div className="sidebar-brand">
+          <img
+            src={`${process.env.PUBLIC_URL}/favicon.ico`}
+            alt="Upstores"
+            className="sidebar-logo"
+          />
+          <span>Upstores</span>
         </div>
 
-     <nav className="menu">
+        <div className="sidebar-account">
+          <div className="sidebar-avatar" aria-hidden="true">
+            {(user?.name || user?.username || "U").trim().charAt(0).toUpperCase()}
+          </div>
+          <div className="sidebar-account-copy">
+            <span className="sidebar-account-label">Signed in as</span>
+            <strong title={user?.name || user?.username || "Upstores user"}>
+              {user?.name || user?.username || "Upstores user"}
+            </strong>
+          </div>
+          <span className="sidebar-online" aria-label="Online" />
+        </div>
+
+     <nav className="menu" aria-label="Main navigation">
+  <div className="sidebar-section-label">Workspace</div>
   {menuItems.map((item) => (
     <NavLink
       key={item.name}
@@ -159,7 +182,8 @@ useEffect(() => {
             className="logout-btn"
             onClick={handleLogout}
           >
-            Logout
+            <LogOut size={17} aria-hidden="true" />
+            <span>Sign out</span>
           </Button>
         </div>
       </aside>

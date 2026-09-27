@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./CustomerManagement.css";
+import AdminSearch from "./AdminSearch";
 import { getCustomers,updateWallet,deleteCustomer } from "../../service/apiService";
 import { toast } from "react-toastify";
 import { BASE_CUSTM_IMG_URL,FALLBACK_IMAGE } from "../../config/config";
@@ -12,6 +13,7 @@ function CustomerManagement() {
   const [showQrModal, setShowQrModal] = useState(false);
   const [expandedRow, setExpandedRow] = useState(null);
   const [amount, setAmount] = useState("");
+  const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
 const [total, setTotal] = useState(0);
 const [searchInput, setSearchInput] = useState("");
@@ -22,12 +24,22 @@ useEffect(() => {
 }, [page, search]);
 
 const loadCustomers = async () => {
-  const res = await getCustomers(page, search);
+  setLoading(true);
+  try {
+    const res = await getCustomers(page, search);
 
-  if (res.status) {
-    setCustomers(res.data);
-    setTotal(res.total);
+    if (res.status) {
+      setCustomers(res.data);
+      setTotal(res.total);
+    }
+  } finally {
+    setLoading(false);
   }
+};
+
+const handleSearch = (term) => {
+  setPage(1);
+  setSearch(term);
 };
 
   const toggleReferrals = (id) => {
@@ -60,33 +72,17 @@ const saveWalletAdjustment = async () => {
 
       <div className="card">
   <div className="table-scroll">
-    <div className="search-bar">
-  <input
-    type="text"
-    placeholder="Search customers..."
-    value={searchInput}
-    onChange={(e) => setSearchInput(e.target.value)}
-  />
-
-  <button className="btn btn-primary"
-    onClick={() => {
-      setPage(1);
-      setSearch(searchInput);
-    }}
-  >
-    Search
-  </button>
-
-  <button className="btn btn-secondary"
-    onClick={() => {
-      setSearchInput("");
-      setSearch("");
-      setPage(1);
-    }}
-  >
-    Clear
-  </button>
-</div>
+    <div className="admin-search-area">
+      <AdminSearch
+        value={searchInput}
+        appliedValue={search}
+        onChange={setSearchInput}
+        onSearch={handleSearch}
+        placeholder="Search customers by name or phone"
+        label="Search customers"
+        loading={loading}
+      />
+    </div>
     <table className="data-table">
 
           <thead>

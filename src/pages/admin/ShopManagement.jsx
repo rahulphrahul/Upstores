@@ -13,6 +13,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { shopIcon } from "../../utils/leafletIcon";
 import ShopManagementSkeleton from "./skeletons/ShopManagementSkeleton";
+import AdminSearch from "./AdminSearch";
 import "./ShopManagement.css";
 
 import {
@@ -33,6 +34,7 @@ import { toast, ToastContainer } from "react-toastify";
 
 function ShopManagement() {
   const [loading, setLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [shops, setShops] = useState([]);
   const [pending, setPending] = useState([]);
   const [showShopModal, setShowShopModal] = useState(false);
@@ -84,6 +86,7 @@ function ShopManagement() {
       setPanByShopId(Object.fromEntries(panEntries));
     } finally {
       setLoading(false);
+      setHasLoaded(true);
     }
   }, [page, search]);
 
@@ -91,9 +94,9 @@ function ShopManagement() {
     loadAll();
   }, [loadAll]);
 
-  const handleSearch = () => {
+  const handleSearch = (term) => {
     setPage(1);
-    setSearch(searchInput);
+    setSearch(term);
   };
 
   const onWalletAction = async (req, action) => {
@@ -123,7 +126,7 @@ function ShopManagement() {
     }
   };
 
-  if (loading) return <ShopManagementSkeleton />;
+  if (loading && !hasLoaded) return <ShopManagementSkeleton />;
 
   return (
     <div className="admin-shop-management">
@@ -189,33 +192,15 @@ function ShopManagement() {
 
       <div className="admin-shop-management__panel">
         <div className="admin-shop-management__toolbar">
-          <input
-            type="text"
-            placeholder="Search shop..."
+          <AdminSearch
             value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="admin-shop-management__search-input"
+            appliedValue={search}
+            onChange={setSearchInput}
+            onSearch={handleSearch}
+            placeholder="Search shops by name or phone"
+            label="Search shops"
+            loading={loading}
           />
-
-          <button
-            type="button"
-            className="admin-shop-management__button admin-shop-management__button--search"
-            onClick={handleSearch}
-          >
-            Search
-          </button>
-
-          <button
-            type="button"
-            className="admin-shop-management__button admin-shop-management__button--clear"
-            onClick={() => {
-              setSearchInput("");
-              setSearch("");
-              setPage(1);
-            }}
-          >
-            Clear
-          </button>
         </div>
 
         <div className="admin-shop-management__table-scroll">

@@ -76,10 +76,13 @@
 .admin-pan-card-management__list,
 .admin-pan-card-management__form {
   min-width: 0;
-  padding: 18px;
-  border-radius: 14px;
-  background: #f8faff;
-  border: 1px solid #e2e8ff;
+}
+
+.admin-pan-card-management__form {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .admin-pan-card-management__section-head {
@@ -147,22 +150,29 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 12px;
-  border-radius: 12px;
-  background: #ffffff;
-  border: 1px solid #dbe3ff;
+  min-width: 0;
+  padding: 4px 12px;
+  border: 0;
+  border-left: 1px solid #e5e9f0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.admin-pan-card-management__summary div:first-child {
+  padding-left: 0;
+  border-left: 0;
 }
 
 .admin-pan-card-management__summary span,
 .admin-pan-card-management__field > span,
 .admin-pan-card-management__hint,
 .admin-pan-card-management__loading {
-  color: #64748b;
+  color: #667286;
   font-size: 13px;
 }
 
 .admin-pan-card-management__summary strong {
-  color: #111827;
+  color: #263449;
   font-size: 14px;
   word-break: break-word;
 }
@@ -181,47 +191,74 @@
 .admin-pan-card-management__field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 7px;
+  margin: 0;
 }
 
 .admin-pan-card-management__field > span {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
+  color: #354155;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.admin-pan-card-management__field > span svg {
+  color: #68758b;
 }
 
 .admin-pan-card-management__input-wrap {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 48px;
-  padding: 0 14px;
-  border: 1px solid #d6dbff;
-  border-radius: 12px;
+  min-height: 50px;
+  padding: 0 13px;
+  border: 1px solid #dce2eb;
+  border-radius: 10px;
   background: #ffffff;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.admin-pan-card-management__input-wrap:focus-within {
+  border-color: #7183dc;
+  box-shadow: 0 0 0 3px rgba(64, 86, 199, 0.11);
 }
 
 .admin-pan-card-management__input-wrap input {
   width: 100%;
   min-width: 0;
-  min-height: 46px;
+  min-height: 48px;
+  padding: 0;
   border: 0;
   outline: none;
   background: transparent;
-  color: #111827;
-  font-size: 15px;
-  letter-spacing: 0.02em;
+  color: #263449;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: none;
+}
+
+.admin-pan-card-management__input-wrap input::placeholder {
+  color: #8791a1;
+  opacity: 1;
+}
+
+.admin-pan-card-management__input-wrap input:focus {
+  border: 0;
+  outline: none;
+  box-shadow: none;
 }
 
 .admin-pan-card-management__input-wrap input[name="ifsc"],
 .admin-pan-card-management__input-wrap input[name="pan_card_number"] {
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.055em;
 }
 
 .admin-pan-card-management__hint {
-  margin: 0 0 14px;
+  margin: 4px 0 18px;
+  max-width: 760px;
+  line-height: 1.55;
 }
 
 .admin-pan-card-management__loading {
@@ -326,13 +363,26 @@
 }
 
 @media (max-width: 992px) {
-  .admin-pan-card-management__grid,
   .admin-pan-card-management__content {
     grid-template-columns: 1fr;
   }
 
   .admin-pan-card-management__summary {
     grid-template-columns: 1fr;
+  }
+
+  .admin-pan-card-management__summary div {
+    padding: 9px 0;
+    border-left: 0;
+    border-bottom: 1px solid #e8ecf2;
+  }
+
+  .admin-pan-card-management__summary div:first-child {
+    padding-top: 0;
+  }
+
+  .admin-pan-card-management__summary div:last-child {
+    border-bottom: 0;
   }
 }
 
@@ -351,6 +401,7 @@
 
   .admin-pan-card-management__grid {
     grid-template-columns: 1fr;
+    gap: 14px;
   }
 
   .admin-pan-card-management__button {

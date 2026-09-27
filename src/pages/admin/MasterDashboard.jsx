@@ -10,6 +10,8 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { FaCrown, FaLayerGroup, FaChartLine } from "react-icons/fa";
+import { X } from "lucide-react";
+import { createPortal } from "react-dom";
 
 import {
   FaStore,
@@ -30,7 +32,7 @@ import {
   getFundRequestReports,
   handleWalletRequest,
 } from "../../service/apiService";
-import { Bill_IMG_URL,Bill_WALLET_IMG_URL } from "../../config/config";
+import { Bill_WALLET_IMG_URL } from "../../config/config";
 
 import MasterDashboardSkeleton from "./skeletons/MasterDashboardSkeleton";
 import "./MasterDashboard.css";
@@ -48,6 +50,9 @@ function MasterDashboard() {
   const [reportFrom, setReportFrom] = useState("");
   const [reportTo, setReportTo] = useState("");
   const [reportSearch, setReportSearch] = useState("");
+  const [billImage, setBillImage] = useState(null);
+  const [isBillImageLoading, setIsBillImageLoading] = useState(false);
+  const [billImageError, setBillImageError] = useState(false);
   /* =========================
      CHART DOM REFS
   ========================= */
@@ -73,6 +78,28 @@ function MasterDashboard() {
 
   const formatNumber = (value) => toNumber(value).toLocaleString();
   const formatCurrency = (value) => `${rupeeSymbol} ${formatNumber(value)}`;
+
+  const openBillImage = (src) => {
+    setIsBillImageLoading(true);
+    setBillImageError(false);
+    setBillImage(src);
+  };
+
+  useEffect(() => {
+    if (!billImage) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setBillImage(null);
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [billImage]);
 
   /* =========================
      LOAD DATA
@@ -214,7 +241,7 @@ const loadFundReports = async () => {
 
     dailySeries.strokes.template.setAll({
       strokeWidth: 3,
-      stroke: am5.color(0x001ae3),
+      stroke: am5.color(0x5366c8),
     });
 
     dailyXAxis.data.setAll(parsedDailyData);
@@ -279,7 +306,7 @@ const loadFundReports = async () => {
 
     monthlySeries.columns.template.setAll({
       width: am5.percent(60),
-      fill: am5.color(0x001ae3),
+      fill: am5.color(0x5366c8),
       strokeOpacity: 0,
     });
     if (window.innerWidth < 768) {
@@ -368,7 +395,13 @@ console.log("dashbiard data",dashboardData);
   ========================= */
   return (
     <div className="master-dashboard">
-      <h2 className="page-title">Master Dashboard</h2>
+      <div className="dashboard-heading">
+        <div>
+          <span className="dashboard-eyebrow">UPSTORES ADMIN</span>
+          <h2 className="page-title">Dashboard overview</h2>
+          <p>Track your merchants, customers, team, and transactions.</p>
+        </div>
+      </div>
 
       <div className="stats-grid">
         <div className="stat-card shops">
@@ -746,14 +779,13 @@ console.log("dashbiard data",dashboardData);
 
               <td data-label="Bill / Proof">
                 {p.proof ? (
-                  <a
-                    href={`${Bill_WALLET_IMG_URL}/${p.proof}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="report-proof-link"
+                  <button
+                    type="button"
+                    className="bill-viewer-trigger"
+                    onClick={() => openBillImage(`${Bill_WALLET_IMG_URL}/${p.proof}`)}
                   >
                     View Bill
-                  </a>
+                  </button>
                 ) : (
                   "-"
                 )}
@@ -836,14 +868,13 @@ console.log("dashbiard data",dashboardData);
 
               <td data-label="Bill / Proof">
                 {imageUrl ? (
-                  <a
-                    href={imageUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="report-proof-link"
+                  <button
+                    type="button"
+                    className="bill-viewer-trigger"
+                    onClick={() => openBillImage(imageUrl)}
                   >
                     View Bill
-                  </a>
+                  </button>
                 ) : (
                   "-"
                 )}
@@ -876,6 +907,52 @@ console.log("dashbiard data",dashboardData);
     </table>
   </div>
 </div>
+      {billImage && createPortal(
+        <div
+          className="fund-image-viewer-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setBillImage(null);
+          }}
+        >
+          <div className="fund-image-viewer" role="dialog" aria-modal="true" aria-label="Bill image viewer">
+            <button
+              type="button"
+              className="fund-image-viewer-close"
+              onClick={() => setBillImage(null)}
+              aria-label="Close image viewer"
+              autoFocus
+            >
+              <X size={21} aria-hidden="true" />
+            </button>
+            <div className={`fund-image-frame${isBillImageLoading ? " is-loading" : " is-loaded"}`}>
+              {isBillImageLoading && (
+                <div className="fund-image-loader" role="status">
+                  <span className="fund-image-loader-spinner" />
+                  <span>Loading bill…</span>
+                </div>
+              )}
+              {!billImageError ? (
+                <img
+                  src={billImage}
+                  alt="Fund request bill or proof"
+                  className={`fund-image-preview${isBillImageLoading ? " is-blurred" : ""}`}
+                  decoding="async"
+                  onLoad={() => setIsBillImageLoading(false)}
+                  onError={() => {
+                    setIsBillImageLoading(false);
+                    setBillImageError(true);
+                  }}
+                />
+              ) : (
+                <div className="fund-image-error" role="alert">
+                  This image couldn’t be loaded. Close the viewer and try again.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

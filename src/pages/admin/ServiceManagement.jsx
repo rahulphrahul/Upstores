@@ -14,6 +14,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { shopIcon } from "../../utils/leafletIcon";
 import ShopManagementSkeleton from "./skeletons/ShopManagementSkeleton";
+import AdminSearch from "./AdminSearch";
 import { toast, ToastContainer } from "react-toastify";
 /* PHOSPHOR ICONS */
 import {
@@ -33,6 +34,7 @@ import {
 
 function ServiceManagement() {
   const [loading, setLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [services, setServices] = useState([]);
   const [pending, setPending] = useState([]);
   const [showServiceModal, setShowServiceModal] = useState(false);
@@ -92,6 +94,7 @@ const loadServices = async () => {
     setPending([]);
   } finally {
     setLoading(false);
+    setHasLoaded(true);
   }
 };
 
@@ -108,6 +111,11 @@ const loadServices = async () => {
 useEffect(() => {
   loadServices();
 }, [page, search]);
+
+const handleSearch = (term) => {
+  setPage(1);
+  setSearch(term);
+};
 
   const toggleStatus = async (service) => {
     const newStatus = service.status === "active" ? "inactive" : "active";
@@ -132,7 +140,7 @@ useEffect(() => {
     }
   };
 
-  if (loading) return <ShopManagementSkeleton />;
+  if (loading && !hasLoaded) return <ShopManagementSkeleton />;
 
   return (
     <div className="service-page">
@@ -140,33 +148,34 @@ useEffect(() => {
       <h2 className="page-title">Service Management</h2>
 
       {/* Pending Approvals */}
-      <div className="card shadow-sm p-4 bg-white rounded-lg">
-        <h4 className="mb-4 font-semibold text-lg">
+      <div className="card service-pending-panel">
+        <h4 className="service-pending-title">
           Pending Fund Requests
         </h4>
 
         {pending.length === 0 ? (
-          <p className="text-gray-500 text-sm">No pending requests</p>
+          <p className="service-pending-empty">No pending requests</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
+          <div className="service-pending-table-wrap">
+            <table className="service-pending-table">
               <thead>
-                <tr className="bg-gray-100 text-left text-sm text-gray-600">
-                  <th className="p-3">Shop</th>
-                  <th className="p-3">Amount</th>
-                  <th className="p-3 text-center">Action</th>
+                <tr>
+                  <th>Shop</th>
+                  <th>Amount</th>
+                  <th>Action</th>
                 </tr>
               </thead>
 
               <tbody>
                 {pending.map((p) => (
-                  <tr key={p.id} className="border-b hover:bg-gray-50 transition">
-                    <td className="p-3 font-medium text-gray-800" data-label="Shop">{p.shop}</td>
-                    <td className="p-3 text-gray-700 font-semibold" data-label="Amount">₹{p.amount}</td>
-                    <td className="p-3" data-label="Action">
-                      <div className="flex justify-center gap-2">
+                  <tr key={p.id}>
+                    <td data-label="Shop">{p.shop}</td>
+                    <td data-label="Amount">₹{p.amount}</td>
+                    <td className="service-pending-action-cell" data-label="Action">
+                      <div className="service-pending-actions">
                         <button
-                          className="btn btn-success btn-sm px-3"
+                          type="button"
+                          className="service-pending-action service-pending-action--approve"
                           title="Approve"
                           aria-label="Approve"
                           onClick={() => onWalletAction(p, "approve")}
@@ -176,7 +185,8 @@ useEffect(() => {
                         </button>
 
                         <button
-                          className="btn btn-danger btn-sm px-3"
+                          type="button"
+                          className="service-pending-action service-pending-action--reject"
                           title="Reject"
                           aria-label="Reject"
                           onClick={() => onWalletAction(p, "rejected")}
@@ -197,32 +207,16 @@ useEffect(() => {
       {/* Services Table */}
       <div className="card">
   <div className="table-scroll">
-<div className="search-bar">
-  <input
-    type="text"
-    placeholder="Search services..."
+<div className="admin-search-area">
+  <AdminSearch
     value={searchInput}
-    onChange={(e) => setSearchInput(e.target.value)}
+    appliedValue={search}
+    onChange={setSearchInput}
+    onSearch={handleSearch}
+    placeholder="Search services by name or phone"
+    label="Search services"
+    loading={loading}
   />
-
-  <button className="btn btn-primary"
-    onClick={() => {
-      setPage(1);
-      setSearch(searchInput);
-    }}
-  >
-    Search
-  </button>
-
-  <button className="btn btn-secondary"
-    onClick={() => {
-      setSearchInput("");
-      setSearch("");
-      setPage(1);
-    }}
-  >
-    Clear
-  </button>
 </div>
     <table className="data-table">
 

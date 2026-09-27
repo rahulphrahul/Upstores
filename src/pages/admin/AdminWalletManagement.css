@@ -46,11 +46,6 @@
   margin-bottom: 24px;
 }
 
-.admin-wallet-management__filters--withdrawals {
-  grid-template-columns: minmax(240px, 1.5fr) auto auto;
-  width: min(100%, 760px);
-}
-
 .admin-wallet-management__field {
   width: 100%;
   min-width: 0;
@@ -143,32 +138,6 @@
   white-space: nowrap;
 }
 
-.admin-wallet-management__status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 92px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.admin-wallet-management__status--success {
-  background: #dcfce7;
-  color: #15803d;
-}
-
-.admin-wallet-management__status--danger {
-  background: #fee2e2;
-  color: #b91c1c;
-}
-
-.admin-wallet-management__status--warning {
-  background: #fef3c7;
-  color: #b45309;
-}
-
 .admin-wallet-management__empty-cell {
   text-align: center;
   color: #64748b;
@@ -232,9 +201,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .admin-wallet-management__filters--withdrawals {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 768px) {
@@ -247,8 +213,7 @@
   }
 
   .admin-wallet-management__toolbar,
-  .admin-wallet-management__filters,
-  .admin-wallet-management__filters--withdrawals {
+  .admin-wallet-management__filters {
     grid-template-columns: 1fr;
   }
 

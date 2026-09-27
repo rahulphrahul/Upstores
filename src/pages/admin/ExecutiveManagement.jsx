@@ -1,23 +1,14 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useLayoutEffect,
-} from "react";
-
-import * as am5 from "@amcharts/amcharts5";
-import * as am5xy from "@amcharts/amcharts5/xy";
-import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import React, { useEffect, useState } from "react";
 
 import {
   getExecutives,
   toggleExecutiveStatus,
   deleteExecutive,
-  getExecutivePerformance,
   createExecutive,
 } from "../../service/apiService";
 import { Modal, Button } from "react-bootstrap";
 import ExecutiveManagementSkeleton from "./skeletons/ExecutiveManagementSkeleton";
+import AdminSearch from "./AdminSearch";
 import "./ExecutiveManagement.css";
 import { PauseCircle, PlayCircle, Trash } from "phosphor-react";
 
@@ -31,32 +22,19 @@ const normalizeExecutiveRows = (payload) => {
   return [];
 };
 
-const normalizePerformanceRows = (payload) => {
-  if (Array.isArray(payload)) return payload;
-  if (Array.isArray(payload?.data)) return payload.data;
-  if (Array.isArray(payload?.performance)) return payload.performance;
-  return [];
-};
-
-const getPerformanceTotal = (item) => {
-  const rawValue =
-    item?.transactions ?? item?.total ?? item?.amount ?? item?.value ?? 0;
-  const parsedValue = Number(rawValue);
-  return Number.isFinite(parsedValue) ? parsedValue : 0;
-};
-
 function ExecutiveManagement() {
   /* =========================
      STATE
   ========================= */
   const [loading, setLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [executives, setExecutives] = useState([]);
-  const [performanceData, setPerformanceData] = useState([]);
 const [showDeleteModal, setShowDeleteModal] = useState(false);
 const [selectedId, setSelectedId] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const [credentials, setCredentials] = useState(null);
   const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
 const [page, setPage] = useState(1);
 const [totalPages, setTotalPages] = useState(1);
 const limit = 10;
@@ -69,26 +47,17 @@ const limit = 10;
   const [creating, setCreating] = useState(false);
 
   /* =========================
-     CHART
-  ========================= */
-  const chartDiv = useRef(null);
-  const rootRef = useRef(null);
-
-  /* =========================
      LOAD DATA
   ========================= */
 const loadAll = async (currentPage = page, currentSearch = search) => {
   try {
     setLoading(true);
 
-    const [execRes, perfRes] = await Promise.all([
-      getExecutives({
-        page: currentPage,
-        limit: limit,
-        search: currentSearch,
-      }),
-      getExecutivePerformance(),
-    ]);
+    const execRes = await getExecutives({
+      page: currentPage,
+      limit,
+      search: currentSearch,
+    });
 
     setExecutives(normalizeExecutiveRows(execRes));
     setTotalPages(
@@ -99,90 +68,22 @@ const loadAll = async (currentPage = page, currentSearch = search) => {
           1
       ) || 1
     );
-    setPerformanceData(normalizePerformanceRows(perfRes));
-
   } catch (error) {
     console.error(error);
   } finally {
     setLoading(false);
+    setHasLoaded(true);
   }
 };
 
 useEffect(() => {
   loadAll(page, search);
-}, [page]);
+}, [page, search]);
 
-  /* =========================
-     PERFORMANCE CHART
-  ========================= */
-  useLayoutEffect(() => {
-    if (
-      loading ||
-      !Array.isArray(performanceData) ||
-      performanceData.length === 0 ||
-      !chartDiv.current
-    ) {
-      return;
-    }
-
-    if (rootRef.current) {
-      rootRef.current.dispose();
-      rootRef.current = null;
-    }
-
-    const parsed = performanceData
-      .map((p) => ({
-        name: p?.name ?? p?.executive_name ?? p?.label ?? "",
-        transactions: getPerformanceTotal(p),
-      }))
-      .filter((item) => item.name);
-
-    const root = am5.Root.new(chartDiv.current);
-    rootRef.current = root;
-    root.setThemes([am5themes_Animated.new(root)]);
-
-    const chart = root.container.children.push(
-      am5xy.XYChart.new(root, { panX: false, panY: false })
-    );
-
-    const xAxis = chart.xAxes.push(
-      am5xy.CategoryAxis.new(root, {
-        categoryField: "name",
-        renderer: am5xy.AxisRendererX.new(root, {}),
-      })
-    );
-
-    const yAxis = chart.yAxes.push(
-      am5xy.ValueAxis.new(root, {
-        min: 0,
-        extraMax: 0.1,
-        renderer: am5xy.AxisRendererY.new(root, {}),
-      })
-    );
-
-    const series = chart.series.push(
-      am5xy.ColumnSeries.new(root, {
-        xAxis,
-        yAxis,
-        valueYField: "transactions",
-        categoryXField: "name",
-      })
-    );
-
-    series.columns.template.setAll({
-      width: am5.percent(60),
-      fill: am5.color(0x001ae3),
-      strokeOpacity: 0,
-    });
-
-    xAxis.data.setAll(parsed);
-    series.data.setAll(parsed);
-
-    series.appear(1000);
-    chart.appear(1000, 100);
-
-    return () => root.dispose();
-  }, [loading, performanceData]);
+  const applySearch = (term) => {
+    setPage(1);
+    setSearch(term);
+  };
 
   /* =========================
      ADD EXECUTIVE
@@ -225,7 +126,7 @@ const confirmDelete = async () => {
   }
 };
 
-  if (loading) return <ExecutiveManagementSkeleton />;
+  if (loading && !hasLoaded) return <ExecutiveManagementSkeleton />;
 
   /* =========================
      UI
@@ -308,58 +209,20 @@ const confirmDelete = async () => {
         </div>
       )}
 
-      {/* PERFORMANCE */}
-      <div className="card">
-        <h4 className="exec-card-title">Executive Performance</h4>
-        <div ref={chartDiv} className="chart-box" />
-      </div>
-
       {/* TABLE */}
      <div className="card">
 
         {/* SEARCH BAR */}
         <div className="exec-toolbar">
-
-          <input
-            type="text"
-            placeholder="Search by name or phone..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                setPage(1);
-                loadAll(1, search);
-              }
-            }}
-            className="exec-search-input"
+          <AdminSearch
+            value={searchInput}
+            appliedValue={search}
+            onChange={setSearchInput}
+            onSearch={applySearch}
+            placeholder="Search executives by name or phone"
+            label="Search executives"
+            loading={loading}
           />
-
-          <div className="exec-toolbar-actions">
-            <button
-              type="button"
-              className="btn btn-primary exec-search-btn"
-              onClick={() => {
-                setPage(1);
-                loadAll(1, search);
-              }}
-            >
-              Search
-            </button>
-
-            {search && (
-              <button
-                type="button"
-                className="btn btn-outline"
-                onClick={() => {
-                  setSearch("");
-                  setPage(1);
-                  loadAll(1, "");
-                }}
-              >
-                Clear
-              </button>
-            )}
-          </div>
         </div>
 
   <div className="table-wrapper">
@@ -470,7 +333,7 @@ const confirmDelete = async () => {
       </div>
 
       {/* DELETE MODAL */}
-<Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+<Modal className="exec-delete-modal" show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
   <Modal.Header closeButton>
     <Modal.Title>Confirm Delete</Modal.Title>
   </Modal.Header>
@@ -480,10 +343,10 @@ const confirmDelete = async () => {
   </Modal.Body>
 
   <Modal.Footer>
-    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+    <Button variant="secondary" className="exec-modal-cancel" onClick={() => setShowDeleteModal(false)}>
       Cancel
     </Button>
-    <Button variant="danger" onClick={confirmDelete}>
+    <Button variant="danger" className="exec-modal-delete" onClick={confirmDelete}>
       Delete
     </Button>
   </Modal.Footer>

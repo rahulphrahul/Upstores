@@ -695,3 +695,197 @@
     height: 34px;
   }
 }
+
+/* Pending fund requests card, kept consistent with the Shops and Sellers screens. */
+.service-page .service-pending-panel {
+  padding: 24px;
+}
+
+.service-page .service-pending-title {
+  margin: 0 0 18px;
+  color: #263449;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.service-page .service-pending-empty {
+  margin: 0;
+  padding: 8px 0 2px;
+  color: #687386;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.service-page .service-pending-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.service-page .service-pending-table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  color: #354155;
+  font-size: 14px;
+}
+
+.service-page .service-pending-table th,
+.service-page .service-pending-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #edf0f4;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.service-page .service-pending-table th {
+  background: #f7f8fa;
+  color: #596579;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.service-page .service-pending-table th:first-child {
+  border-radius: 9px 0 0 9px;
+}
+
+.service-page .service-pending-table th:last-child {
+  border-radius: 0 9px 9px 0;
+}
+
+.service-page .service-pending-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.service-page .service-pending-action-cell {
+  width: 1%;
+}
+
+.service-page .service-pending-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.service-page .service-pending-action {
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.service-page .service-pending-action--approve {
+  border-color: #d6eadc;
+  background: #edf6f0;
+  color: #286343;
+}
+
+.service-page .service-pending-action--approve:hover {
+  background: #dfefe4;
+}
+
+.service-page .service-pending-action--reject {
+  border-color: #f1d5d2;
+  background: #fff1f0;
+  color: #a33d37;
+}
+
+.service-page .service-pending-action--reject:hover {
+  background: #fde6e4;
+}
+
+@media (max-width: 768px) {
+  .service-page .service-pending-panel {
+    padding: 17px;
+  }
+
+  .service-page .service-pending-title {
+    margin-bottom: 15px;
+  }
+
+  .service-page .service-pending-table-wrap {
+    overflow: visible;
+  }
+
+  .service-page .service-pending-table,
+  .service-page .service-pending-table thead,
+  .service-page .service-pending-table tbody,
+  .service-page .service-pending-table tr,
+  .service-page .service-pending-table td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .service-page .service-pending-table thead {
+    display: none;
+  }
+
+  .service-page .service-pending-table tbody {
+    display: grid;
+    gap: 11px;
+  }
+
+  .service-page .service-pending-table tbody tr {
+    padding: 7px 14px;
+    border: 1px solid #e5e9f0;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(20, 32, 52, 0.035);
+  }
+
+  .service-page .service-pending-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eef1f5;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: right;
+  }
+
+  .service-page .service-pending-table td:last-child {
+    border-bottom: 0;
+  }
+
+  .service-page .service-pending-table td[data-label]::before {
+    content: attr(data-label);
+    flex: 0 0 34%;
+    color: #667286;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
+  }
+
+  .service-page .service-pending-table .service-pending-action-cell {
+    align-items: center;
+  }
+
+  .service-page .service-pending-action-cell::before {
+    flex: 1 1 auto;
+  }
+
+  .service-page .service-pending-actions {
+    flex: 0 0 auto;
+    gap: 7px;
+  }
+
+  .service-page .service-pending-action {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    min-height: 38px;
+    padding: 0;
+    font-size: 0;
+  }
+}

@@ -3,8 +3,6 @@ import {
   resetWallets,
   getResetHistory,
   exportHistory,
-  getCustomerWithdrawals,
-  exportCustomerWithdrawals,
 } from "../../service/apiService";
 import { Form, Button, Table, Pagination } from "react-bootstrap";
 import { toast, ToastContainer } from "react-toastify";
@@ -13,13 +11,10 @@ import "./AdminWalletManagement.css";
 const AdminWalletManagement = () => {
   const [reason, setReason] = useState("");
   const [history, setHistory] = useState([]);
-  const [withdrawals, setWithdrawals] = useState([]);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-  const [searchName, setSearchName] = useState("");
   const [loading, setLoading] = useState(false);
   const [historyPage, setHistoryPage] = useState(1);
-  const [withdrawalPage, setWithdrawalPage] = useState(1);
 
   const recordsPerPage = 5;
 
@@ -35,30 +30,11 @@ const AdminWalletManagement = () => {
     setHistory([]);
   }, [from, to]);
 
-  const loadWithdrawals = useCallback(async () => {
-    const res = await getCustomerWithdrawals(from, to, searchName);
-
-    if (res.status) {
-      setWithdrawals(res.data || []);
-      setWithdrawalPage(1);
-      return;
-    }
-
-    setWithdrawals([]);
-  }, [from, to, searchName]);
-
   const loadInitialData = useCallback(async () => {
-    const [historyRes, withdrawalsRes] = await Promise.all([
-      getResetHistory("", ""),
-      getCustomerWithdrawals("", "", ""),
-    ]);
+    const historyRes = await getResetHistory("", "");
 
     if (historyRes.status) {
       setHistory(historyRes.data || []);
-    }
-
-    if (withdrawalsRes.status) {
-      setWithdrawals(withdrawalsRes.data || []);
     }
   }, []);
 
@@ -93,17 +69,6 @@ const AdminWalletManagement = () => {
     const indexOfLast = page * recordsPerPage;
     const indexOfFirst = indexOfLast - recordsPerPage;
     return data.slice(indexOfFirst, indexOfLast);
-  };
-
-  const getStatusClassName = (status) => {
-    if (status === "active") return "admin-wallet-management__status--success";
-    if (status === "rejected") return "admin-wallet-management__status--danger";
-    return "admin-wallet-management__status--warning";
-  };
-
-  const getStatusLabel = (status) => {
-    if (status === "active") return "Success";
-    return status || "Pending";
   };
 
   const renderPagination = (data, page, setPage) => {
@@ -142,7 +107,6 @@ const AdminWalletManagement = () => {
   };
 
   const paginatedHistory = paginate(history, historyPage);
-  const paginatedWithdrawals = paginate(withdrawals, withdrawalPage);
 
   return (
     <div className="admin-wallet-management">
@@ -282,101 +246,6 @@ const AdminWalletManagement = () => {
         </div>
       </section>
 
-      <section className="admin-wallet-management__panel">
-        <h3 className="admin-wallet-management__section-title">
-          Customer Withdrawals
-        </h3>
-
-        <div className="admin-wallet-management__filters admin-wallet-management__filters--withdrawals">
-          <div className="admin-wallet-management__field">
-            <label
-              className="admin-wallet-management__label sr-only"
-              htmlFor="admin-wallet-search-name"
-            >
-              Search name
-            </label>
-            <Form.Control
-              id="admin-wallet-search-name"
-              className="admin-wallet-management__control"
-              placeholder="Search Name"
-              value={searchName}
-              onChange={(e) => setSearchName(e.target.value)}
-            />
-          </div>
-
-          <div className="admin-wallet-management__button-wrap">
-            <Button
-              className="admin-wallet-management__button"
-              onClick={loadWithdrawals}
-            >
-              Search
-            </Button>
-          </div>
-
-          <div className="admin-wallet-management__button-wrap">
-            <Button
-              className="admin-wallet-management__button"
-              onClick={() => exportCustomerWithdrawals(from, to)}
-            >
-              Export CSV
-            </Button>
-          </div>
-        </div>
-
-        <div className="admin-wallet-management__table-wrap">
-          <Table bordered className="admin-wallet-management__table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedWithdrawals.length > 0 ? (
-                paginatedWithdrawals.map((item) => (
-                  <tr key={item.id}>
-                    <td data-label="ID">{item.id}</td>
-                    <td data-label="Name">{item.name}</td>
-                    <td data-label="Email">{item.email}</td>
-                    <td data-label="Amount">Rs. {item.amount}</td>
-                    <td data-label="Status">
-                      <span
-                        className={`admin-wallet-management__status ${getStatusClassName(
-                          item.status
-                        )}`}
-                      >
-                        {getStatusLabel(item.status)}
-                      </span>
-                    </td>
-                    <td data-label="Date">{item.created_at}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan="6"
-                    className="admin-wallet-management__empty-cell"
-                  >
-                    No withdrawals found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </Table>
-        </div>
-
-        <div className="admin-wallet-management__pagination">
-          {renderPagination(
-            withdrawals,
-            withdrawalPage,
-            setWithdrawalPage
-          )}
-        </div>
-      </section>
     </div>
   );
 };

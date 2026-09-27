@@ -175,6 +175,7 @@ function CompanyBankDetailsManagement() {
                 <div className="admin-pan-card-management__input-wrap">
                   <input
                     type="text"
+                    className="admin-pan-card-management__control"
                     name="account_holder_name"
                     value={form.account_holder_name}
                     onChange={handleChange}
@@ -188,6 +189,7 @@ function CompanyBankDetailsManagement() {
                 <div className="admin-pan-card-management__input-wrap">
                   <input
                     type="text"
+                    className="admin-pan-card-management__control"
                     name="account_number"
                     value={form.account_number}
                     onChange={handleChange}
@@ -201,6 +203,7 @@ function CompanyBankDetailsManagement() {
                 <div className="admin-pan-card-management__input-wrap">
                   <input
                     type="text"
+                    className="admin-pan-card-management__control"
                     name="ifsc"
                     value={form.ifsc}
                     onChange={handleChange}
@@ -215,6 +218,7 @@ function CompanyBankDetailsManagement() {
                 <div className="admin-pan-card-management__input-wrap">
                   <input
                     type="text"
+                    className="admin-pan-card-management__control"
                     name="pan_card_number"
                     value={form.pan_card_number}
                     onChange={handleChange}
@@ -229,6 +233,7 @@ function CompanyBankDetailsManagement() {
                 <div className="admin-pan-card-management__input-wrap">
                   <input
                     type="text"
+                    className="admin-pan-card-management__control"
                     name="gst"
                     value={form.gst}
                     onChange={handleChange}
@@ -243,6 +248,7 @@ function CompanyBankDetailsManagement() {
                 <div className="admin-pan-card-management__input-wrap">
                   <input
                     type="text"
+                    className="admin-pan-card-management__control"
                     name="bank_name"
                     value={form.bank_name}
                     onChange={handleChange}
@@ -256,6 +262,7 @@ function CompanyBankDetailsManagement() {
                 <div className="admin-pan-card-management__input-wrap">
                   <input
                     type="text"
+                    className="admin-pan-card-management__control"
                     name="branch_name"
                     value={form.branch_name}
                     onChange={handleChange}
@@ -269,6 +276,7 @@ function CompanyBankDetailsManagement() {
                 <div className="admin-pan-card-management__input-wrap">
                   <input
                     type="text"
+                    className="admin-pan-card-management__control"
                     name="upi_id"
                     value={form.upi_id}
                     onChange={handleChange}
