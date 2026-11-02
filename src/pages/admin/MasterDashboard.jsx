@@ -707,6 +707,7 @@ console.log("dashbiard data",dashboardData);
         <tr>
           <th>Date</th>
           <th>Account / Shop</th>
+           <th>Shop Name</th>
           <th>Amount</th>
           <th>Status</th>
           <th>Bill / Proof</th>
@@ -732,6 +733,10 @@ console.log("dashbiard data",dashboardData);
 
               <td data-label="Account / Shop">
                 {pendingAccount}
+              </td>
+
+               <td data-label="Shop Name">
+                {p.merchant_name || "-"}
               </td>
 
               <td data-label="Amount">
@@ -823,6 +828,10 @@ console.log("dashbiard data",dashboardData);
                 {getRequestTitle(record)}
               </td>
 
+              <td data-label="Shop Name">
+                {record.merchant_name || "-"}
+              </td>
+
               <td data-label="Amount">
                 {rupeeSymbol}{" "}
                 {formatNumber(record.amount)}
@@ -865,7 +874,7 @@ console.log("dashbiard data",dashboardData);
           filteredFundReports.length === 0 && (
             <tr>
               <td
-                colSpan="7"
+                colSpan="8"
                 className="empty-text"
               >
                 No fund requests found
