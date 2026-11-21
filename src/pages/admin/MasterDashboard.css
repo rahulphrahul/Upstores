@@ -807,9 +807,9 @@
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
       "date status"
-      "account amount"
+      "merchant amount"
+      "usertype usertype"
       "proof proof"
-      "details details"
       "action action";
     gap: 10px 12px;
     padding: 14px;
@@ -849,12 +849,11 @@
   .master-dashboard .fund-report-table td[data-label="Status"] { grid-area: status; justify-self: end; align-self: center; }
   .master-dashboard .fund-report-table td[data-label="Status"]::before { content: none; }
   .master-dashboard .fund-report-table td[data-label="Status"] .report-status { padding: 4px 8px; font-size: 10px; }
-  .master-dashboard .fund-report-table td[data-label="Account / Shop"] { grid-area: account; align-self: center; color: #202c3e; font-size: 14px; font-weight: 700; }
+  .master-dashboard .fund-report-table td[data-label="Merchant Name"] { grid-area: merchant; align-self: center; color: #202c3e; font-size: 14px; font-weight: 700; }
+  .master-dashboard .fund-report-table td[data-label="User Type"] { grid-area: usertype; align-self: center; color: #596579; font-size: 12px; }
   .master-dashboard .fund-report-table td[data-label="Amount"] { grid-area: amount; align-self: center; color: #202c3e; font-size: 15px; font-weight: 750; text-align: right; white-space: nowrap; }
   .master-dashboard .fund-report-table td[data-label="Bill / Proof"] { grid-area: proof; display: grid; grid-template-columns: 82px minmax(0, 1fr); align-items: center; gap: 8px; padding-top: 9px; border-top: 1px solid #eef1f4; }
-  .master-dashboard .fund-report-table td[data-label="Bill / Proof"]::before,
-  .master-dashboard .fund-report-table td[data-label="Details"]::before { margin: 0; }
-  .master-dashboard .fund-report-table td[data-label="Details"] { grid-area: details; display: grid; grid-template-columns: 82px minmax(0, 1fr); align-items: start; gap: 8px; padding-top: 9px; border-top: 1px solid #eef1f4; color: #465367; font-size: 12px; }
+  .master-dashboard .fund-report-table td[data-label="Bill / Proof"]::before { margin: 0; }
   .master-dashboard .fund-report-table td[data-label="Action"] { grid-area: action; display: flex; align-items: center; gap: 7px; padding-top: 10px; border-top: 1px solid #eef1f4; }
   .master-dashboard .fund-report-table td[data-label="Action"]::before { margin: 0 auto 0 0; content: "Actions"; }
   .master-dashboard .fund-report-table td[data-label="Action"] .approve-btn,

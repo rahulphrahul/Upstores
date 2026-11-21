@@ -28,7 +28,6 @@ import {
   getDashboardStats,
   getDailyTransactions,
   getMonthlyTransactions,
-  getWalletRequests,
   getFundRequestReports,
   handleWalletRequest,
 } from "../../service/apiService";
@@ -45,7 +44,6 @@ function MasterDashboard() {
   const [stats, setStats] = useState({});
   const [dailyData, setDailyData] = useState([]);
   const [monthlyData, setMonthlyData] = useState([]);
-  const [pending, setPending] = useState([]);
   const [fundReports, setFundReports] = useState([]);
   const [reportFrom, setReportFrom] = useState("");
   const [reportTo, setReportTo] = useState("");
@@ -61,7 +59,6 @@ function MasterDashboard() {
 
   const dailyRootRef = useRef(null);
   const monthlyRootRef = useRef(null);
-  const shop_type = "all";
   const rupeeSymbol = "\u20B9";
   const dashboardData = stats?.data || {};
 
@@ -108,11 +105,10 @@ function MasterDashboard() {
     try {
       setLoading(true);
 
-      const [statsRes, dailyRes, monthlyRes, pendingRes,fundReportRes] = await Promise.all([
+      const [statsRes, dailyRes, monthlyRes, fundReportRes] = await Promise.all([
         getDashboardStats(),
         getDailyTransactions(),
         getMonthlyTransactions(),
-        getWalletRequests(shop_type),
         getFundRequestReports({
     page: 1,
     limit: 50
@@ -122,7 +118,6 @@ function MasterDashboard() {
       setStats(statsRes || {});
       setDailyData(normalizeList(dailyRes));
       setMonthlyData(normalizeList(monthlyRes));
-      setPending(normalizeList(pendingRes));
       setFundReports(fundReportRes?.data || []);
     } finally {
       setLoading(false);
@@ -347,21 +342,29 @@ const loadFundReports = async () => {
       toast.error("Failed to update wallet request ");
     }
   };
-const getRequestTitle = (record) =>
-  record.account || record.user_type;
-
 const getRequestStatus = (record) =>
   record.status || "Pending";
 
-const getRecordDisplayDate = (record) =>
-  record.created_at;
+const getRecordDisplayDate = (record) => {
+  if (!record.created_at) return "-";
 
-const getRequestDetails = (record) =>
-  record.admin_remark || "-";
+  // API timestamps use `YYYY-MM-DD HH:mm:ss` without a timezone suffix.
+  const parsedDate = new Date(String(record.created_at).replace(" ", "T"));
+  if (Number.isNaN(parsedDate.getTime())) return record.created_at;
+
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  }).format(parsedDate).replace(",", " ·");
+};
 
 const resolveRequestImageUrl = (record) =>
   record.proof
-    ? `${Bill_WALLET_IMG_URL}?file=${encodeURIComponent(record.proof)}`
+    ? `${Bill_WALLET_IMG_URL.replace(/\/$/, "")}/${encodeURIComponent(record.proof)}`
     : null;
   /* =========================
      SKELETON
@@ -601,7 +604,13 @@ console.log("dashbiard data",dashboardData);
           </div>
           <div className="report-chip">
             <span>Open Approvals</span>
-            <strong>{formatNumber(pending.length)}</strong>
+            <strong>
+              {formatNumber(
+                fundReports.filter(
+                  (record) => String(getRequestStatus(record)).toLowerCase() === "pending"
+                ).length
+              )}
+            </strong>
           </div>
         </div>
 
@@ -670,7 +679,7 @@ console.log("dashbiard data",dashboardData);
     </div>
 
     <strong>
-      {pending.length + filteredFundReports.length}
+      {filteredFundReports.length}
     </strong>
   </div>
 
@@ -739,93 +748,16 @@ console.log("dashbiard data",dashboardData);
       <thead>
         <tr>
           <th>Date</th>
-          <th>Account / Shop</th>
+          <th>Merchant Name</th>
+          <th>User Type</th>
           <th>Amount</th>
           <th>Status</th>
           <th>Bill / Proof</th>
-          <th>Details</th>
           <th>Action</th>
         </tr>
       </thead>
 
       <tbody>
-        {/* Pending Requests */}
-        {pending.map((p, index) => {
-          const pendingDate =
-            p.created_at || p.date || "-";
-
-          const pendingAccount =
-            p.shop || p.account || p.user_type || "-";
-
-          return (
-            <tr key={`pending-${p.id || index}`}>
-              <td data-label="Date">
-                {pendingDate}
-              </td>
-
-              <td data-label="Account / Shop">
-                {pendingAccount}
-              </td>
-
-              <td data-label="Amount">
-                {rupeeSymbol} {formatNumber(p.amount)}
-              </td>
-
-              <td data-label="Status">
-                <span className="report-status report-status--pending">
-                  Pending
-                </span>
-              </td>
-
-              <td data-label="Bill / Proof">
-                {p.proof ? (
-                  <button
-                    type="button"
-                    className="bill-viewer-trigger"
-                    onClick={() => openBillImage(`${Bill_WALLET_IMG_URL}/${p.proof}`)}
-                  >
-                    View Bill
-                  </button>
-                ) : (
-                  "-"
-                )}
-              </td>
-
-              <td data-label="Details">
-                {p.admin_remark || "-"}
-              </td>
-
-              <td data-label="Action">
-                <button
-                  className="approve-btn"
-                  onClick={() =>
-                    onWalletAction(
-                      p,
-                      "approve",
-                      p.user_type
-                    )
-                  }
-                >
-                  Approve
-                </button>
-
-                <button
-                  className="reject-btn"
-                  onClick={() =>
-                    onWalletAction(
-                      p,
-                      "rejected",
-                      p.user_type
-                    )
-                  }
-                >
-                  Reject
-                </button>
-              </td>
-            </tr>
-          );
-        })}
-
         {/* Fund Request Reports */}
         {filteredFundReports.map((record, index) => {
           const imageUrl =
@@ -851,8 +783,12 @@ console.log("dashbiard data",dashboardData);
                 {getRecordDisplayDate(record)}
               </td>
 
-              <td data-label="Account / Shop">
-                {getRequestTitle(record)}
+              <td data-label="Merchant Name">
+                {record.merchant_name || "-"}
+              </td>
+
+              <td data-label="User Type">
+                {record.user_type || "-"}
               </td>
 
               <td data-label="Amount">
@@ -880,20 +816,30 @@ console.log("dashbiard data",dashboardData);
                 )}
               </td>
 
-              <td data-label="Details">
-                {getRequestDetails(record)}
-              </td>
-
               <td data-label="Action">
-                -
+                {String(statusLabel).toLowerCase() === "pending" ? (
+                  <>
+                    <button
+                      className="approve-btn"
+                      onClick={() => onWalletAction(record, "approve", record.user_type)}
+                    >
+                      Approve
+                    </button>
+                    <button
+                      className="reject-btn"
+                      onClick={() => onWalletAction(record, "rejected", record.user_type)}
+                    >
+                      Reject
+                    </button>
+                  </>
+                ) : "-"}
               </td>
             </tr>
           );
         })}
 
         {/* Empty */}
-        {pending.length === 0 &&
-          filteredFundReports.length === 0 && (
+        {filteredFundReports.length === 0 && (
             <tr>
               <td
                 colSpan="7"
